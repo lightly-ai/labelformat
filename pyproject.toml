@@ -1,0 +1,72 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "labelformat"
+version = "0.1.0"
+authors = ["Lightly.ai"]
+description = "Computer vision label and prediction conversion"
+readme = "README.md"
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = ">=3.7"
+tqdm = "*"
+pyyaml = "*"
+pillow = "*"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "*"
+black = "*"
+isort = "*"
+flake8 = "*"
+pytest = "*"
+pytest-mock = "*"
+build = "*"
+twine = "*"
+types-Pillow = "*"
+types-PyYAML = "*"
+
+[tool.poetry.scripts]
+labelformat = "labelformat.cli.cli:main"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  ".", "src/"
+]
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+ignore_missing_imports = true
+python_version = 3.7
+warn_unused_configs = true
+strict_equality = true
+# Disallow dynamic typing
+#disallow_any_unimported = true # because mypy fails to follow some imports, e.g. for PIL.Image.Image and matplotlib.Figure
+#disallow_any_expr = true # because intermediate expressions do not need to be typed
+disallow_any_decorated = true
+disallow_any_explicit = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+# Disallow untyped definitions
+#disallow_untyped_calls = true # otherwise all external functions called must be typed e.g. calls to torch functions
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+# None and optional handling
+no_implicit_optional = true
+strict_optional = true
+# Configuring warnings
+warn_unused_ignores = true
+warn_no_return = true
+warn_return_any = true
+warn_redundant_casts = true
+warn_unreachable = true
+
+# Print format
+show_error_codes = true
+show_error_context = true

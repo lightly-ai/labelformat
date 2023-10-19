@@ -1,0 +1,10 @@
+path: .  # dataset root dir
+train: images
+
+# Classes
+nc: 4  # number of classes
+names:
+  0: kite
+  1: person
+  2: elephant
+  3: sports ball
