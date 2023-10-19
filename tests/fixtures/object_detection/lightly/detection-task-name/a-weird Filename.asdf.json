@@ -1,0 +1,85 @@
+{
+  "file_name": "a-weird Filename.asdf.jpg",
+  "predictions": [
+    {
+      "category_id": 16,
+      "bbox": [
+        540,
+        295,
+        23,
+        18
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 0,
+      "bbox": [
+        513,
+        271,
+        21,
+        33
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 0,
+      "bbox": [
+        586,
+        268,
+        18,
+        23
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 0,
+      "bbox": [
+        548,
+        250,
+        5,
+        8
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 13,
+      "bbox": [
+        377,
+        261,
+        34,
+        24
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 13,
+      "bbox": [
+        448,
+        282,
+        40,
+        23
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 1,
+      "bbox": [
+        75,
+        198,
+        6,
+        15
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 0,
+      "bbox": [
+        604,
+        271,
+        9,
+        11
+      ],
+      "score": 0
+    }
+  ]
+}

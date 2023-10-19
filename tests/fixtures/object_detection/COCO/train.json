@@ -1,0 +1,405 @@
+{
+    "info": {
+        "description": "COCO 2017 Dataset",
+        "url": "http://cocodataset.org",
+        "version": "1.0",
+        "year": 2017,
+        "contributor": "COCO Consortium",
+        "date_created": "2017/09/01"
+    },
+    "licenses": [
+        {
+            "url": "http://creativecommons.org/licenses/by/2.0/",
+            "id": 4,
+            "name": "Attribution License"
+        }
+    ],
+    "images": [
+        {
+            "file_name": "a-weird Filename.asdf.jpg",
+            "height": 416,
+            "width": 640,
+            "id": 0,
+            "date_captured": "2013-11-18 02:53:27"
+        },
+        {
+            "file_name": "aNother-weird__ filename.with.many.characters.jpg",
+            "height": 428,
+            "width": 640,
+            "id": 1,
+            "date_captured": "2016-01-23 13:56:27"
+        }
+    ],
+    "annotations": [
+        {
+            "area": 421,
+            "iscrowd": 0,
+            "image_id": 0,
+            "bbox": [
+                540,
+                295,
+                23,
+                18
+            ],
+            "category_id": 16,
+            "id": 1
+        },
+        {
+            "area": 695.1853359360001,
+            "iscrowd": 0,
+            "image_id": 0,
+            "bbox": [
+                513,
+                271,
+                21,
+                33
+            ],
+            "category_id": 0,
+            "id": 2
+        },
+        {
+            "area": 415,
+            "iscrowd": 0,
+            "image_id": 0,
+            "bbox": [
+                586,
+                268,
+                18,
+                23
+            ],
+            "category_id": 0,
+            "id": 3
+        },
+        {
+            "area": 37,
+            "iscrowd": 0,
+            "image_id": 0,
+            "bbox": [
+                548,
+                250,
+                5,
+                8
+            ],
+            "category_id": 0,
+            "id": 4
+        },
+        {
+            "area": 818,
+            "iscrowd": 0,
+            "image_id": 0,
+            "bbox": [
+                377,
+                261,
+                34,
+                24
+            ],
+            "category_id": 13,
+            "id": 5
+        },
+        {
+            "area": 934,
+            "iscrowd": 0,
+            "image_id": 0,
+            "bbox": [
+                448,
+                282,
+                40,
+                23
+            ],
+            "category_id": 13,
+            "id": 6
+        },
+        {
+            "area": 96,
+            "iscrowd": 0,
+            "image_id": 0,
+            "bbox": [
+                75,
+                198,
+                6,
+                15
+            ],
+            "category_id": 1,
+            "id": 7
+        },
+        {
+            "area": 104,
+            "iscrowd": 0,
+            "image_id": 0,
+            "bbox": [
+                604,
+                271,
+                9,
+                11
+            ],
+            "category_id": 0,
+            "id": 8
+        },
+        {
+            "area": 56149,
+            "iscrowd": 0,
+            "image_id": 1,
+            "bbox": [
+                334,
+                32,
+                155,
+                363
+            ],
+            "category_id": 31,
+            "id": 9
+        },
+        {
+            "area": 53019,
+            "iscrowd": 0,
+            "image_id": 1,
+            "bbox": [
+                284,
+                17,
+                146,
+                362
+            ],
+            "category_id": 31,
+            "id": 10
+        },
+        {
+            "area": 28001,
+            "iscrowd": 0,
+            "image_id": 1,
+            "bbox": [
+                266,
+                49,
+                95,
+                294
+            ],
+            "category_id": 31,
+            "id": 11
+        },
+        {
+            "area": 25276,
+            "iscrowd": 0,
+            "image_id": 1,
+            "bbox": [
+                243,
+                53,
+                86,
+                293
+            ],
+            "category_id": 31,
+            "id": 12
+        },
+        {
+            "area": 23739,
+            "iscrowd": 0,
+            "image_id": 1,
+            "bbox": [
+                212,
+                47,
+                83,
+                287
+            ],
+            "category_id": 31,
+            "id": 13
+        },
+        {
+            "area": 207,
+            "iscrowd": 0,
+            "image_id": 1,
+            "bbox": [
+                615,
+                195,
+                12,
+                17
+            ],
+            "category_id": 0,
+            "id": 14
+        },
+        {
+            "area": 210,
+            "iscrowd": 0,
+            "image_id": 1,
+            "bbox": [
+                586,
+                194,
+                12,
+                18
+            ],
+            "category_id": 1,
+            "id": 15
+        },
+        {
+            "area": 27826,
+            "iscrowd": 0,
+            "image_id": 1,
+            "bbox": [
+                268,
+                63,
+                94,
+                295
+            ],
+            "category_id": 31,
+            "id": 16
+        }
+    ],
+    "categories": [
+        {
+            "supercategory": "person",
+            "id": 0,
+            "name": "person"
+        },
+        {
+            "supercategory": "bicycle with space",
+            "id": 1,
+            "name": "bicycle with space"
+        },
+        {
+            "supercategory": "car",
+            "id": 2,
+            "name": "car"
+        },
+        {
+            "supercategory": "motorcycle",
+            "id": 3,
+            "name": "motorcycle"
+        },
+        {
+            "supercategory": "airplane",
+            "id": 4,
+            "name": "airplane"
+        },
+        {
+            "supercategory": "bus",
+            "id": 5,
+            "name": "bus"
+        },
+        {
+            "supercategory": "train",
+            "id": 6,
+            "name": "train"
+        },
+        {
+            "supercategory": "truck",
+            "id": 7,
+            "name": "truck"
+        },
+        {
+            "supercategory": "boat",
+            "id": 8,
+            "name": "boat"
+        },
+        {
+            "supercategory": "traffic light",
+            "id": 9,
+            "name": "traffic light"
+        },
+        {
+            "supercategory": "fire hydrant",
+            "id": 10,
+            "name": "fire hydrant"
+        },
+        {
+            "supercategory": "stop sign",
+            "id": 11,
+            "name": "stop sign"
+        },
+        {
+            "supercategory": "parking meter",
+            "id": 12,
+            "name": "parking meter"
+        },
+        {
+            "supercategory": "bench",
+            "id": 13,
+            "name": "bench"
+        },
+        {
+            "supercategory": "bird",
+            "id": 14,
+            "name": "bird"
+        },
+        {
+            "supercategory": "cat",
+            "id": 15,
+            "name": "cat"
+        },
+        {
+            "supercategory": "dog",
+            "id": 16,
+            "name": "dog"
+        },
+        {
+            "supercategory": "horse",
+            "id": 17,
+            "name": "horse"
+        },
+        {
+            "supercategory": "sheep",
+            "id": 18,
+            "name": "sheep"
+        },
+        {
+            "supercategory": "cow",
+            "id": 19,
+            "name": "cow"
+        },
+        {
+            "supercategory": "elephant",
+            "id": 20,
+            "name": "elephant"
+        },
+        {
+            "supercategory": "bear",
+            "id": 21,
+            "name": "bear"
+        },
+        {
+            "supercategory": "zebra",
+            "id": 22,
+            "name": "zebra"
+        },
+        {
+            "supercategory": "giraffe",
+            "id": 23,
+            "name": "giraffe"
+        },
+        {
+            "supercategory": "backpack",
+            "id": 24,
+            "name": "backpack"
+        },
+        {
+            "supercategory": "umbrella",
+            "id": 25,
+            "name": "umbrella"
+        },
+        {
+            "supercategory": "handbag",
+            "id": 26,
+            "name": "handbag"
+        },
+        {
+            "supercategory": "tie",
+            "id": 27,
+            "name": "tie"
+        },
+        {
+            "supercategory": "suitcase",
+            "id": 28,
+            "name": "suitcase"
+        },
+        {
+            "supercategory": "frisbee",
+            "id": 29,
+            "name": "frisbee"
+        },
+        {
+            "supercategory": "skis",
+            "id": 30,
+            "name": "skis"
+        },
+        {
+            "supercategory": "snowboard",
+            "id": 31,
+            "name": "snowboard"
+        }
+    ]
+}

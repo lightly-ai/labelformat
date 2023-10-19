@@ -1,0 +1,85 @@
+{
+  "file_name": "aNother-weird__ filename.with.many.characters.jpg",
+  "predictions": [
+    {
+      "category_id": 31,
+      "bbox": [
+        334,
+        32,
+        155,
+        363
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 31,
+      "bbox": [
+        284,
+        17,
+        146,
+        362
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 31,
+      "bbox": [
+        266,
+        49,
+        95,
+        294
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 31,
+      "bbox": [
+        243,
+        53,
+        86,
+        293
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 31,
+      "bbox": [
+        212,
+        47,
+        83,
+        287
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 0,
+      "bbox": [
+        615,
+        195,
+        12,
+        17
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 1,
+      "bbox": [
+        586,
+        194,
+        12,
+        18
+      ],
+      "score": 0
+    },
+    {
+      "category_id": 31,
+      "bbox": [
+        268,
+        63,
+        94,
+        295
+      ],
+      "score": 0
+    }
+  ]
+}
