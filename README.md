@@ -1,4 +1,4 @@
-![Labelformat - Label Conversion, Simplified](labelformat_banner.jpg?raw=true "Labelformat")
+![Labelformat - Label Conversion, Simplified](labelformat_banner.png?raw=true "Labelformat")
 
 # Labelformat - Label Conversion, Simplified
 
