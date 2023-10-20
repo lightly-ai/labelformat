@@ -1,4 +1,11 @@
+![Labelformat - Label Conversion, Simplified](labelformat_banner.png?raw=true "Labelformat")
+
 # Labelformat - Label Conversion, Simplified
+
+![GitHub](https://img.shields.io/github/license/lightly-ai/labelformat)
+![Unit Tests](https://github.com/lightly-ai/labelformat/workflows/Run%20Tests/badge.svg)
+[![PyPI](https://img.shields.io/pypi/v/labelformat)](https://pypi.org/project/labelformat/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 An open-source tool to seamlessly convert between popular computer vision label formats.
 
@@ -33,15 +40,40 @@ pip install labelformat
 
 ### CLI
 
-Example command:
+#### Examples
+
+Convert instance segmentation labels from COCO to YOLOv8:
 ```shell
 labelformat convert \
-    --task object-detection \
+    --task instance-segmentation \
     --input-format coco \
     --input-file coco-labels/train.json \
     --output-format yolov8 \
     --output-file yolo-labels/data.yaml \
     --output-split train
+```
+
+Convert object detection labels from KITTI to PascalVOC:
+```shell
+labelformat convert \
+    --task object-detection \
+    --input-format kitti \
+    --input-folder kitti-labels/labels \
+    --category-names cat,dog,fish \
+    --images-rel-path ../images \
+    --output-format pascalvoc \
+    --output-folder pascalvoc-labels
+```
+
+Convert object detection labels from Labelbox to Lightly:
+```shell
+labelformat convert \
+    --task object-detection \
+    --input-format labelbox \
+    --input-file labelbox-labels/export-result.ndjson \
+    --category-names cat,dog,fish \
+    --output-format lightly \
+    --output-folder lightly-labels/annotation-task
 ```
 
 #### Command Arguments
@@ -135,7 +167,7 @@ YOLOv8ObjectDetectionOutput(
 
 If you encounter a bug or have a feature suggestion we will be happy if you file a GitHub issue.
 
-We also welcome contributors, please submit a PR.
+We also welcome contributions, please submit a PR.
 
 ### Development
 

@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 name = "labelformat"
 version = "0.1.0"
 authors = ["Lightly.ai"]
-description = "Computer vision label and prediction conversion"
+description = "A tool for converting computer vision label formats."
 readme = "README.md"
 license = "MIT"
 
