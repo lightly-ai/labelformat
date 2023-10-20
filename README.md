@@ -9,13 +9,14 @@
 
 An open-source tool to seamlessly convert between popular computer vision label formats.
 
-**Why Labelformat**
+#### Why Labelformat
 
 Popular label formats are sparsely documented and store different
 information. Understanding them and dealing with the differences is tedious
 and time-consuming. Labelformat aims to solve this pain.
 
-**Supported Tasks and Formats:**
+#### Supported Tasks and Formats
+
 - object-detection
     - [COCO](https://cocodataset.org/#format-data)
     - [KITTI](https://github.com/bostondiditeam/kitti/blob/master/resources/devkit_object/readme.txt)
@@ -27,6 +28,14 @@ and time-consuming. Labelformat aims to solve this pain.
     - [COCO](https://cocodataset.org/#format-data)
     - [YOLOv8](https://docs.ultralytics.com/datasets/segment/)
 
+#### Features
+
+- Support for common dataset label formats (more coming soon)
+- Support for common tool formats (more coming soon)
+- Minimal dependencies, targets python 3.7 or higher
+- Typing
+- Tested with round trip tests to ensure consistency
+- MIT license
 
 > **Note**
 > Labelformat is a young project, contributions and bug reports are welcome. Please see [Contributing](#contributing) section below.
@@ -303,7 +312,7 @@ we therefore have to provide also input images. We prepare the following folder 
 ```
 yolo-labels/
 ├── data.yaml
-├── images
+├── images/
 |   ├── image1.jpg
 |   └── image2.jpg
 └── labels/
