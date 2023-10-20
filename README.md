@@ -33,7 +33,9 @@ and time-consuming. Labelformat aims to solve this pain.
 - Support for common dataset label formats (more coming soon)
 - Support for common tool formats (more coming soon)
 - Minimal dependencies, targets python 3.7 or higher
-- Typing
+- Memory concious - datasets are processed file-by-file instead of loading everything
+  in memory (when possible)
+- Typed
 - Tested with round trip tests to ensure consistency
 - MIT license
 
@@ -161,13 +163,18 @@ optional arguments:
 ```
 
 ### Code
+
+Please refer to the code for a full list of available classes.
+
 ```python
 from pathlib import Path
 from labelformat.formats import COCOObjectDetectionInput, YOLOv8ObjectDetectionOutput
 
+# Load the input labels
 label_input = COCOObjectDetectionInput(
     input_file=Path("coco-labels/train.json")
 )
+# Convert to output format and save
 YOLOv8ObjectDetectionOutput(
     output_file=Path("yolo-labels/data.yaml"),
     output_split="train",
