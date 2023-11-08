@@ -23,3 +23,14 @@ from labelformat.formats.yolov8 import (
     YOLOv8ObjectDetectionInput,
     YOLOv8ObjectDetectionOutput,
 )
+
+from labelformat.formats.yolov5 import (
+    YOLOv5ObjectDetectionInput,
+    YOLOv5ObjectDetectionOutput,
+)
+
+from labelformat.formats.yolov7 import (
+    YOLOv7ObjectDetectionInput,
+    YOLOv7ObjectDetectionOutput,
+)
+
