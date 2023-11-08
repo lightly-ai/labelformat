@@ -1,6 +1,6 @@
-from .yolov8 import YOLOv8ObjectDetectionInput, YOLOv8ObjectDetectionOutput
-
 from labelformat.cli.registry import Task, cli_register
+
+from .yolov8 import YOLOv8ObjectDetectionInput, YOLOv8ObjectDetectionOutput
 
 """
 YOLOv5 format follows the same specs as YOLOv8.

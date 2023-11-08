@@ -35,4 +35,3 @@ from labelformat.formats.yolov8 import (
     YOLOv8ObjectDetectionInput,
     YOLOv8ObjectDetectionOutput,
 )
-
