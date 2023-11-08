@@ -1,5 +1,5 @@
 import logging
-from argparse import ArgumentParser, Namespace, _ArgumentGroup
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter, _ArgumentGroup
 from pathlib import Path
 from typing import Optional
 
@@ -12,7 +12,28 @@ logger.setLevel(logging.INFO)
 
 
 def main() -> None:
-    parser = ArgumentParser(prog="labelformat", description="Labelformat")
+    parser = ArgumentParser(
+        prog="labelformat",
+        formatter_class=RawTextHelpFormatter,
+        description="""\
+Labelformat is a Python package for converting between different computer vision label formats.
+It provides a CLI interface as well as an easy-to-use Python API.
+The CLI interface is available as the `labelformat` command.
+
+Supported label formats for object detection:
+- YOLOv5, YOLOv6, YOLOv7, YOLOv8
+- COCO
+- VOC
+- Labelbox
+- and many more
+
+Supported label formats for instance segmentation:
+- COCO
+- YOLOv8
+
+Run `labelformat convert --help` for more information about how to convert between label formats.
+""",
+    )
     subparsers = parser.add_subparsers(dest="command")
     convert_parser = subparsers.add_parser(
         name="convert",
