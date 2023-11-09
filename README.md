@@ -22,6 +22,9 @@ and time-consuming. Labelformat aims to solve this pain.
     - [KITTI](https://github.com/bostondiditeam/kitti/blob/master/resources/devkit_object/readme.txt)
     - [Lightly](https://docs.lightly.ai/docs/prediction-format#prediction-format)
     - [PascalVOC](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/index.html#devkit)
+    - [YOLOv5](https://github.com/ultralytics/yolov5)
+    - [YOLOv6](https://github.com/meituan/YOLOv6)
+    - [YOLOv7](https://github.com/WongKinYiu/yolov7)
     - [YOLOv8](https://docs.ultralytics.com/datasets/detect/)
     - [Labelbox](https://docs.labelbox.com/reference/label-export) (input only)
 - instance-segmentation
@@ -110,18 +113,18 @@ $ labelformat convert --task object-detection --help
 usage: labelformat convert [-h] --task
                            {instance-segmentation,object-detection}
                            --input-format
-                           {coco,kitti,labelbox,lightly,pascalvoc,yolov8}
+                           {coco,kitti,labelbox,lightly,pascalvoc,yolov5,yolov6,yolov7,yolov8}
                            --output-format
-                           {coco,kitti,labelbox,lightly,pascalvoc,yolov8}
+                           {coco,kitti,labelbox,lightly,pascalvoc,yolov5,yolov6,yolov7,yolov8}
 
 Convert labels from one format to another.
 
 optional arguments:
   -h, --help
   --task {instance-segmentation,object-detection}
-  --input-format {coco,kitti,labelbox,lightly,pascalvoc,yolov8}
+  --input-format {coco,kitti,labelbox,lightly,pascalvoc,yolov5,yolov6,yolov7,yolov8}
                         Input format
-  --output-format {coco,kitti,labelbox,lightly,pascalvoc,yolov8}
+  --output-format {coco,kitti,labelbox,lightly,pascalvoc,yolov5,yolov6,yolov7,yolov8}
                         Output format
 ```
 
@@ -135,9 +138,9 @@ $ labelformat convert \
 usage: labelformat convert [-h] --task
                            {instance-segmentation,object-detection}
                            --input-format
-                           {coco,kitti,labelbox,lightly,pascalvoc,yolov8}
+                           {coco,kitti,labelbox,lightly,pascalvoc,yolov5,yolov6,yolov7,yolov8}
                            --output-format
-                           {coco,kitti,labelbox,lightly,pascalvoc,yolov8}
+                           {coco,kitti,labelbox,lightly,pascalvoc,yolov5,yolov6,yolov7,yolov8}
                            --input-file INPUT_FILE --output-file OUTPUT_FILE
                            [--output-split OUTPUT_SPLIT]
 
@@ -146,9 +149,9 @@ Convert labels from one format to another.
 optional arguments:
   -h, --help
   --task {instance-segmentation,object-detection}
-  --input-format {coco,kitti,labelbox,lightly,pascalvoc,yolov8}
+  --input-format {coco,kitti,labelbox,lightly,pascalvoc,yolov5,yolov6,yolov7,yolov8}
                         Input format
-  --output-format {coco,kitti,labelbox,lightly,pascalvoc,yolov8}
+  --output-format {coco,kitti,labelbox,lightly,pascalvoc,yolov5,yolov6,yolov7,yolov8}
                         Output format
 
 'coco' input arguments:
