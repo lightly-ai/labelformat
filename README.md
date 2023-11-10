@@ -42,9 +42,16 @@ and time-consuming. Labelformat aims to solve this pain.
 - Tested with round trip tests to ensure consistency
 - MIT license
 
+#### Supported Platforms
+
+This package is compatible with the following platforms:
+
+- Windows
+- macOS
+- Linux
+
 > **Note**
 > Labelformat is a young project, contributions and bug reports are welcome. Please see [Contributing](#contributing) section below.
-
 
 ## Installation
 
