@@ -3,7 +3,7 @@ import logging
 import re
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Optional
 
 from labelformat import utils
 from labelformat.cli.registry import Task, cli_register
@@ -19,6 +19,8 @@ from labelformat.model.object_detection import (
 from labelformat.types import JsonDict, ParseError
 
 logger = logging.getLogger(__name__)
+
+FILENAME_KEYS = ["global_key", "external_id", "id"]  # valid filename keys
 
 
 @cli_register(format="labelbox", task=Task.OBJECT_DETECTION)
@@ -39,15 +41,15 @@ class LabelboxObjectDetectionInput(ObjectDetectionInput):
         )
 
     def __init__(
-        self,
-        input_file: Path,
-        category_names: str,
+        self, input_file: Path, category_names: str, filename_key: str = "global_key"
     ) -> None:
         self._input_file = input_file
         self._categories = [
             Category(id=idx, name=name)
             for idx, name in enumerate(category_names.split(","))
         ]
+        self._validate_filename_key(filename_key)
+        self._filename_key = filename_key
 
     def get_categories(self) -> Iterable[Category]:
         return self._categories
@@ -56,7 +58,7 @@ class LabelboxObjectDetectionInput(ObjectDetectionInput):
         for label in self.get_labels():
             yield label.image
 
-    def get_labels(self, filename_key: str = None) -> Iterable[ImageObjectDetection]:
+    def get_labels(self) -> Iterable[ImageObjectDetection]:
         category_name_to_category = {cat.name: cat for cat in self._categories}
 
         with self._input_file.open() as file:
@@ -69,7 +71,7 @@ class LabelboxObjectDetectionInput(ObjectDetectionInput):
                         category_name_to_category=category_name_to_category,
                         image_id=image_id,
                         data_row=data_row,
-                        filename_key=filename_key,
+                        filename_key=self._filename_key,
                     )
                 except ParseError as ex:
                     raise ParseError(
@@ -78,14 +80,23 @@ class LabelboxObjectDetectionInput(ObjectDetectionInput):
 
                 image_id += 1
 
+    def _validate_filename_key(self, filename_key: str) -> None:
+        """Validates the provided filename key."""
+        if filename_key not in FILENAME_KEYS:
+            raise ParseError(
+                f"Filename key '{filename_key}' is not a valid option, please use one of {FILENAME_KEYS}"
+            )
+
 
 def _parse_data_row(
     category_name_to_category: Dict[str, Category],
     image_id: int,
     data_row: JsonDict,
-    filename_key: str = None,
+    filename_key: Optional[str] = None,
 ) -> ImageObjectDetection:
-    image = _image_from_data_row(image_id=image_id, data_row=data_row, filename_key=filename_key)
+    image = _image_from_data_row(
+        image_id=image_id, data_row=data_row, filename_key=filename_key
+    )
     objects = _objects_from_data_row(
         category_name_to_category=category_name_to_category,
         data_row=data_row,
@@ -93,34 +104,25 @@ def _parse_data_row(
     return ImageObjectDetection(image=image, objects=objects)
 
 
-def has_illegal_char(filename: str) -> bool:
+def _has_illegal_char(filename: str) -> bool:
     """Checks if filename contains illegal characters for filenames"""
     return bool(re.search(r'[\\/*?:"<>|]', filename))
 
 
-def _image_from_data_row(image_id: int, data_row: JsonDict, filename_key: str = None) -> Image:
-    fn_keys = ["global_key", "external_id", "id"]
-    if filename_key is not None:
-        # use filename_key if it is valid
-        assert filename_key in fn_keys, \
-            f"Filename key '{filename_key}' is not a valid option, please use one of {fn_keys}"
-        assert has_illegal_char(data_row["data_row"][filename_key]) == False, \
-            (f"Filename key '{filename_key}' contains illegal characters for filenames, "
-             f"please use another option among {fn_keys}")
-        assert filename_key in data_row["data_row"], \
-            f"Filename key '{filename_key}' does not exist in data_row: {data_row['data_row']}"
-        filename = data_row["data_row"][filename_key]
-    else:
-        # try to use one of fn_keys as filename
-        for key in fn_keys:
-            if key in data_row["data_row"] and not has_illegal_char(data_row["data_row"][key]):
-                filename = data_row["data_row"][key]
-                break
-        else:
-            raise ParseError(
-                f"Could not parse image filename from data row: {data_row['data_row']}. None of 'data_row.id', "
-                f"'data_row.global_key' nor 'data_row.external_id' existed or in the legal format for a filename."
-            )
+def _image_from_data_row(
+    image_id: int, data_row: JsonDict, filename_key: Optional[str] = None
+) -> Image:
+    if filename_key not in data_row["data_row"]:
+        raise ParseError(
+            f"Filename key '{filename_key}' not found in data_row: {data_row['data_row']}"
+        )
+
+    if _has_illegal_char(data_row["data_row"][filename_key]):
+        raise ParseError(
+            f"Filename key '{filename_key}' contains illegal characters, "
+            f"choose a different key among {FILENAME_KEYS}."
+        )
+    filename = data_row["data_row"][filename_key]
 
     width = data_row["media_attributes"]["width"]
     height = data_row["media_attributes"]["height"]
