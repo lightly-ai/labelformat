@@ -1,8 +1,10 @@
 import json
 import logging
+import re
 from argparse import ArgumentParser
+from enum import Enum
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Optional
 
 from labelformat import utils
 from labelformat.cli.registry import Task, cli_register
@@ -18,6 +20,16 @@ from labelformat.model.object_detection import (
 from labelformat.types import JsonDict, ParseError
 
 logger = logging.getLogger(__name__)
+
+
+class FilenameKeyOption(Enum):
+    GLOBAL_KEY = "global_key"
+    EXTERNAL_ID = "external_id"
+    ID = "id"
+
+    def __str__(self) -> str:
+        """Required for a user-friendly string representation for the CLI."""
+        return self.value
 
 
 @cli_register(format="labelbox", task=Task.OBJECT_DETECTION)
@@ -36,17 +48,29 @@ class LabelboxObjectDetectionInput(ObjectDetectionInput):
             required=True,
             help="Comma separated list of category names without spaces, e.g. 'dog,cat'",
         )
+        parser.add_argument(
+            "--filename-key",
+            type=FilenameKeyOption,
+            choices=list(FilenameKeyOption),
+            default=FilenameKeyOption.GLOBAL_KEY,
+            help=(
+                "Which Labelbox json key should be used as exported image filename. "
+                "Default: global_key"
+            ),
+        )
 
     def __init__(
         self,
         input_file: Path,
         category_names: str,
+        filename_key: FilenameKeyOption = FilenameKeyOption.GLOBAL_KEY,
     ) -> None:
         self._input_file = input_file
         self._categories = [
             Category(id=idx, name=name)
             for idx, name in enumerate(category_names.split(","))
         ]
+        self._filename_key = filename_key
 
     def get_categories(self) -> Iterable[Category]:
         return self._categories
@@ -68,6 +92,7 @@ class LabelboxObjectDetectionInput(ObjectDetectionInput):
                         category_name_to_category=category_name_to_category,
                         image_id=image_id,
                         data_row=data_row,
+                        filename_key=self._filename_key,
                     )
                 except ParseError as ex:
                     raise ParseError(
@@ -81,8 +106,11 @@ def _parse_data_row(
     category_name_to_category: Dict[str, Category],
     image_id: int,
     data_row: JsonDict,
+    filename_key: FilenameKeyOption,
 ) -> ImageObjectDetection:
-    image = _image_from_data_row(image_id=image_id, data_row=data_row)
+    image = _image_from_data_row(
+        image_id=image_id, data_row=data_row, filename_key=filename_key
+    )
     objects = _objects_from_data_row(
         category_name_to_category=category_name_to_category,
         data_row=data_row,
@@ -90,15 +118,27 @@ def _parse_data_row(
     return ImageObjectDetection(image=image, objects=objects)
 
 
-def _image_from_data_row(image_id: int, data_row: JsonDict) -> Image:
-    if "global_key" in data_row["data_row"]:
-        filename = data_row["data_row"]["global_key"]
-    elif "external_id" in data_row["data_row"]:
-        filename = data_row["data_row"]["external_id"]
-    else:
+def _has_illegal_char(filename: str) -> bool:
+    """Checks if filename contains illegal characters for filenames"""
+    return bool(re.search(r'[\\/*?:"<>|]', filename))
+
+
+def _image_from_data_row(
+    image_id: int, data_row: JsonDict, filename_key: FilenameKeyOption
+) -> Image:
+    if filename_key.value not in data_row["data_row"]:
         raise ParseError(
-            "Could not parse image filename from data row. At least one of "
-            "'data_row.global_key' or 'data_row.external_id' should be provided."
+            f"Filename key '{filename_key.value}' not found in data_row. Consider "
+            f"choosing a different key from {[e.value for e in FilenameKeyOption]}. "
+            f"Data row: {data_row['data_row']}"
+        )
+
+    filename = data_row["data_row"][filename_key.value]
+    if _has_illegal_char(filename=filename):
+        raise ParseError(
+            f"Filename key '{filename_key.value}' cannot be used because one of the "
+            f"values '{filename}' contains illegal characters. Please choose a "
+            f"different key from {[e.value for e in FilenameKeyOption]}."
         )
 
     width = data_row["media_attributes"]["width"]
