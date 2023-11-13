@@ -2,6 +2,7 @@ import json
 import logging
 import re
 from argparse import ArgumentParser
+from enum import Enum
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional
 
@@ -20,7 +21,15 @@ from labelformat.types import JsonDict, ParseError
 
 logger = logging.getLogger(__name__)
 
-FILENAME_KEYS = ["global_key", "external_id", "id"]  # valid filename keys
+
+class FilenameKeyOption(Enum):
+    GLOBAL_KEY = "global_key"
+    EXTERNAL_ID = "external_id"
+    ID = "id"
+
+    def __str__(self) -> str:
+        """Required for a user-friendly string representation for the CLI."""
+        return self.value
 
 
 @cli_register(format="labelbox", task=Task.OBJECT_DETECTION)
@@ -39,16 +48,28 @@ class LabelboxObjectDetectionInput(ObjectDetectionInput):
             required=True,
             help="Comma separated list of category names without spaces, e.g. 'dog,cat'",
         )
+        parser.add_argument(
+            "--filename-key",
+            type=FilenameKeyOption,
+            choices=list(FilenameKeyOption),
+            default=FilenameKeyOption.GLOBAL_KEY,
+            help=(
+                "Which Labelbox json key should be used as exported image filename. "
+                "Default: global_key"
+            ),
+        )
 
     def __init__(
-        self, input_file: Path, category_names: str, filename_key: str = "global_key"
+        self,
+        input_file: Path,
+        category_names: str,
+        filename_key: FilenameKeyOption = FilenameKeyOption.GLOBAL_KEY,
     ) -> None:
         self._input_file = input_file
         self._categories = [
             Category(id=idx, name=name)
             for idx, name in enumerate(category_names.split(","))
         ]
-        self._validate_filename_key(filename_key)
         self._filename_key = filename_key
 
     def get_categories(self) -> Iterable[Category]:
@@ -80,19 +101,12 @@ class LabelboxObjectDetectionInput(ObjectDetectionInput):
 
                 image_id += 1
 
-    def _validate_filename_key(self, filename_key: str) -> None:
-        """Validates the provided filename key."""
-        if filename_key not in FILENAME_KEYS:
-            raise ParseError(
-                f"Filename key '{filename_key}' is not a valid option, please use one of {FILENAME_KEYS}"
-            )
-
 
 def _parse_data_row(
     category_name_to_category: Dict[str, Category],
     image_id: int,
     data_row: JsonDict,
-    filename_key: Optional[str] = None,
+    filename_key: FilenameKeyOption,
 ) -> ImageObjectDetection:
     image = _image_from_data_row(
         image_id=image_id, data_row=data_row, filename_key=filename_key
@@ -110,19 +124,22 @@ def _has_illegal_char(filename: str) -> bool:
 
 
 def _image_from_data_row(
-    image_id: int, data_row: JsonDict, filename_key: Optional[str] = None
+    image_id: int, data_row: JsonDict, filename_key: FilenameKeyOption
 ) -> Image:
-    if filename_key not in data_row["data_row"]:
+    if filename_key.value not in data_row["data_row"]:
         raise ParseError(
-            f"Filename key '{filename_key}' not found in data_row: {data_row['data_row']}"
+            f"Filename key '{filename_key.value}' not found in data_row. Consider "
+            f"choosing a different key from {[e.value for e in FilenameKeyOption]}. "
+            f"Data row: {data_row['data_row']}"
         )
 
-    if _has_illegal_char(data_row["data_row"][filename_key]):
+    filename = data_row["data_row"][filename_key.value]
+    if _has_illegal_char(filename=filename):
         raise ParseError(
-            f"Filename key '{filename_key}' contains illegal characters, "
-            f"choose a different key among {FILENAME_KEYS}."
+            f"Filename key '{filename_key.value}' cannot be used because one of the "
+            f"values '{filename}' contains illegal characters. Please choose a "
+            f"different key from {[e.value for e in FilenameKeyOption]}."
         )
-    filename = data_row["data_row"][filename_key]
 
     width = data_row["media_attributes"]["width"]
     height = data_row["media_attributes"]["height"]
