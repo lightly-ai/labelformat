@@ -34,14 +34,21 @@ class LightlyObjectDetectionInput(ObjectDetectionInput):
             default="../images",
             help="Relative path to images folder from label folder",
         )
+        parser.add_argument(
+            "--skip-labels-without-image",
+            action="store_true",
+            help="Skip labels without corresponding image",
+        )
 
     def __init__(
         self,
         input_folder: Path,
         images_rel_path: str = "../images",
+        skip_labels_without_image: bool = False,
     ) -> None:
         self._input_folder = input_folder
         self._images_rel_path = images_rel_path
+        self._skip_labels_without_image = skip_labels_without_image
         self._categories = self._get_categories()
 
     def get_categories(self) -> Iterable[Category]:
@@ -63,6 +70,8 @@ class LightlyObjectDetectionInput(ObjectDetectionInput):
                 continue
             data = json.loads(json_path.read_text())
             if data["file_name"] not in filename_to_image:
+                if self._skip_labels_without_image:
+                    continue
                 raise LabelWithoutImageError(
                     f"Label '{json_path.name}' does not have a corresponding image."
                 )

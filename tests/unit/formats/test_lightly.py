@@ -139,6 +139,50 @@ class TestLightlyObjectDetectionInput:
         ):
             list(label_input.get_labels())
 
+    def test_get_labels__skip_label_without_image(
+        self, tmp_path: Path, mocker: MockerFixture
+    ) -> None:
+        # Prepare inputs.
+        annotation = json.dumps(
+            {
+                "file_name": "image.jpg",
+                "predictions": [
+                    {
+                        "category_id": 0,
+                        "bbox": [10.0, 20.0, 20.0, 20.0],
+                    },
+                    {
+                        "category_id": 1,
+                        "bbox": [50.0, 60.0, 20.0, 20.0],
+                    },
+                ],
+            }
+        )
+        label_path = tmp_path / "labels" / "image.json"
+        label_path.parent.mkdir(parents=True, exist_ok=True)
+        label_path.write_text(annotation)
+
+        schema = json.dumps(
+            {
+                "task_type": "object-detection",
+                "categories": [
+                    {"name": "cat", "id": 0},
+                    {"name": "dog", "id": 1},
+                    {"name": "cow", "id": 2},
+                ],
+            }
+        )
+        schema_path = tmp_path / "labels" / "schema.json"
+        schema_path.write_text(schema)
+
+        # Convert.
+        label_input = LightlyObjectDetectionInput(
+            input_folder=tmp_path / "labels",
+            images_rel_path="../images",
+            skip_labels_without_image=True,
+        )
+        assert list(label_input.get_labels()) == []
+
 
 class TestLightlyObjectDetectionOutput:
     def test_save(self, tmp_path: Path) -> None:
