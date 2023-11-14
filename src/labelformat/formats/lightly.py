@@ -6,6 +6,7 @@ from typing import Any, Dict, Iterable, List, Sequence
 
 from labelformat import utils
 from labelformat.cli.registry import Task, cli_register
+from labelformat.errors import LabelWithoutImageError
 from labelformat.model.bounding_box import BoundingBox, BoundingBoxFormat
 from labelformat.model.category import Category
 from labelformat.model.image import Image
@@ -15,7 +16,6 @@ from labelformat.model.object_detection import (
     ObjectDetectionOutput,
     SingleObjectDetection,
 )
-from labelformat.types import JsonDict
 
 
 @cli_register(format="lightly", task=Task.OBJECT_DETECTION)
@@ -62,6 +62,10 @@ class LightlyObjectDetectionInput(ObjectDetectionInput):
             if json_path.name == "schema.json":
                 continue
             data = json.loads(json_path.read_text())
+            if data["file_name"] not in filename_to_image:
+                raise LabelWithoutImageError(
+                    f"Label '{json_path.name}' does not have a corresponding image."
+                )
             image = filename_to_image[data["file_name"]]
             objects = []
             for prediction in data["predictions"]:
