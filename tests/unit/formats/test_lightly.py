@@ -20,40 +20,51 @@ from labelformat.model.object_detection import (
 from ...simple_object_detection_label_input import SimpleObjectDetectionInput
 
 
+def _create_label_file(tmp_path: Path) -> Path:
+    """Create a dummy label file in the given directory."""
+    annotation = json.dumps(
+        {
+            "file_name": "image.jpg",
+            "predictions": [
+                {
+                    "category_id": 1,
+                    "bbox": [10.0, 20.0, 20.0, 20.0],
+                },
+                {
+                    "category_id": 0,
+                    "bbox": [50.0, 60.0, 20.0, 20.0],
+                },
+            ],
+        }
+    )
+    label_path = tmp_path / "labels" / "image.json"
+    label_path.parent.mkdir(parents=True, exist_ok=True)
+    label_path.write_text(annotation)
+    return label_path
+
+
+def _create_schema_file(tmp_path: Path) -> Path:
+    """Create a dummy schema file in the given directory."""
+    schema = json.dumps(
+        {
+            "task_type": "object-detection",
+            "categories": [
+                {"name": "cat", "id": 0},
+                {"name": "dog", "id": 1},
+                {"name": "cow", "id": 2},
+            ],
+        }
+    )
+    schema_path = tmp_path / "labels" / "schema.json"
+    schema_path.write_text(schema)
+    return schema_path
+
+
 class TestLightlyObjectDetectionInput:
     def test_get_labels(self, tmp_path: Path, mocker: MockerFixture) -> None:
         # Prepare inputs.
-        annotation = json.dumps(
-            {
-                "file_name": "image.jpg",
-                "predictions": [
-                    {
-                        "category_id": 1,
-                        "bbox": [10.0, 20.0, 20.0, 20.0],
-                    },
-                    {
-                        "category_id": 0,
-                        "bbox": [50.0, 60.0, 20.0, 20.0],
-                    },
-                ],
-            }
-        )
-        label_path = tmp_path / "labels" / "image.json"
-        label_path.parent.mkdir(parents=True, exist_ok=True)
-        label_path.write_text(annotation)
-
-        schema = json.dumps(
-            {
-                "task_type": "object-detection",
-                "categories": [
-                    {"name": "cat", "id": 0},
-                    {"name": "dog", "id": 1},
-                    {"name": "cow", "id": 2},
-                ],
-            }
-        )
-        schema_path = tmp_path / "labels" / "schema.json"
-        schema_path.write_text(schema)
+        _create_label_file(tmp_path=tmp_path)
+        _create_schema_file(tmp_path=tmp_path)
 
         # Mock the image file.
         (tmp_path / "images").mkdir()
@@ -92,41 +103,10 @@ class TestLightlyObjectDetectionInput:
             )
         ]
 
-    def test_get_labels__raises_label_without_image(
-        self, tmp_path: Path, mocker: MockerFixture
-    ) -> None:
+    def test_get_labels__raises_label_without_image(self, tmp_path: Path) -> None:
         # Prepare inputs.
-        annotation = json.dumps(
-            {
-                "file_name": "image.jpg",
-                "predictions": [
-                    {
-                        "category_id": 0,
-                        "bbox": [10.0, 20.0, 20.0, 20.0],
-                    },
-                    {
-                        "category_id": 1,
-                        "bbox": [50.0, 60.0, 20.0, 20.0],
-                    },
-                ],
-            }
-        )
-        label_path = tmp_path / "labels" / "image.json"
-        label_path.parent.mkdir(parents=True, exist_ok=True)
-        label_path.write_text(annotation)
-
-        schema = json.dumps(
-            {
-                "task_type": "object-detection",
-                "categories": [
-                    {"name": "cat", "id": 0},
-                    {"name": "dog", "id": 1},
-                    {"name": "cow", "id": 2},
-                ],
-            }
-        )
-        schema_path = tmp_path / "labels" / "schema.json"
-        schema_path.write_text(schema)
+        _create_label_file(tmp_path=tmp_path)
+        _create_schema_file(tmp_path=tmp_path)
 
         # Try to convert.
         label_input = LightlyObjectDetectionInput(
@@ -143,37 +123,8 @@ class TestLightlyObjectDetectionInput:
         self, tmp_path: Path, mocker: MockerFixture
     ) -> None:
         # Prepare inputs.
-        annotation = json.dumps(
-            {
-                "file_name": "image.jpg",
-                "predictions": [
-                    {
-                        "category_id": 0,
-                        "bbox": [10.0, 20.0, 20.0, 20.0],
-                    },
-                    {
-                        "category_id": 1,
-                        "bbox": [50.0, 60.0, 20.0, 20.0],
-                    },
-                ],
-            }
-        )
-        label_path = tmp_path / "labels" / "image.json"
-        label_path.parent.mkdir(parents=True, exist_ok=True)
-        label_path.write_text(annotation)
-
-        schema = json.dumps(
-            {
-                "task_type": "object-detection",
-                "categories": [
-                    {"name": "cat", "id": 0},
-                    {"name": "dog", "id": 1},
-                    {"name": "cow", "id": 2},
-                ],
-            }
-        )
-        schema_path = tmp_path / "labels" / "schema.json"
-        schema_path.write_text(schema)
+        _create_label_file(tmp_path=tmp_path)
+        _create_schema_file(tmp_path=tmp_path)
 
         # Convert.
         label_input = LightlyObjectDetectionInput(
