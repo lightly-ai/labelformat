@@ -6,6 +6,7 @@ from typing import Any, Dict, Iterable, List, Sequence
 
 from labelformat import utils
 from labelformat.cli.registry import Task, cli_register
+from labelformat.errors import LabelWithoutImageError
 from labelformat.model.bounding_box import BoundingBox, BoundingBoxFormat
 from labelformat.model.category import Category
 from labelformat.model.image import Image
@@ -15,7 +16,6 @@ from labelformat.model.object_detection import (
     ObjectDetectionOutput,
     SingleObjectDetection,
 )
-from labelformat.types import JsonDict
 
 
 @cli_register(format="lightly", task=Task.OBJECT_DETECTION)
@@ -34,14 +34,21 @@ class LightlyObjectDetectionInput(ObjectDetectionInput):
             default="../images",
             help="Relative path to images folder from label folder",
         )
+        parser.add_argument(
+            "--skip-labels-without-image",
+            action="store_true",
+            help="Skip labels without corresponding image",
+        )
 
     def __init__(
         self,
         input_folder: Path,
         images_rel_path: str = "../images",
+        skip_labels_without_image: bool = False,
     ) -> None:
         self._input_folder = input_folder
         self._images_rel_path = images_rel_path
+        self._skip_labels_without_image = skip_labels_without_image
         self._categories = self._get_categories()
 
     def get_categories(self) -> Iterable[Category]:
@@ -62,6 +69,12 @@ class LightlyObjectDetectionInput(ObjectDetectionInput):
             if json_path.name == "schema.json":
                 continue
             data = json.loads(json_path.read_text())
+            if data["file_name"] not in filename_to_image:
+                if self._skip_labels_without_image:
+                    continue
+                raise LabelWithoutImageError(
+                    f"Label '{json_path.name}' does not have a corresponding image."
+                )
             image = filename_to_image[data["file_name"]]
             objects = []
             for prediction in data["predictions"]:
