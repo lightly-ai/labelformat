@@ -20,11 +20,11 @@ from labelformat.model.object_detection import (
 from ...simple_object_detection_label_input import SimpleObjectDetectionInput
 
 
-def _create_label_file(tmp_path: Path) -> Path:
+def _create_label_file(tmp_path: Path, filename: str) -> Path:
     """Create a dummy label file in the given directory."""
     annotation = json.dumps(
         {
-            "file_name": "image.jpg",
+            "file_name": filename,
             "predictions": [
                 {
                     "category_id": 1,
@@ -37,7 +37,7 @@ def _create_label_file(tmp_path: Path) -> Path:
             ],
         }
     )
-    label_path = tmp_path / "labels" / "image.json"
+    label_path = (tmp_path / "labels" / filename).with_suffix(".json")
     label_path.parent.mkdir(parents=True, exist_ok=True)
     label_path.write_text(annotation)
     return label_path
@@ -63,12 +63,15 @@ def _create_schema_file(tmp_path: Path) -> Path:
 class TestLightlyObjectDetectionInput:
     def test_get_labels(self, tmp_path: Path, mocker: MockerFixture) -> None:
         # Prepare inputs.
-        _create_label_file(tmp_path=tmp_path)
+        _create_label_file(tmp_path=tmp_path, filename="image.jpg")
+        _create_label_file(tmp_path=tmp_path, filename="subdir/image.jpg")
         _create_schema_file(tmp_path=tmp_path)
 
         # Mock the image file.
         (tmp_path / "images").mkdir()
         (tmp_path / "images/image.jpg").touch()
+        (tmp_path / "images/subdir").mkdir(parents=True)
+        (tmp_path / "images/subdir/image.jpg").touch()
         mocker.patch("PIL.Image.open", autospec=True).return_value.size = (100, 200)
 
         # Convert.
@@ -100,12 +103,35 @@ class TestLightlyObjectDetectionInput:
                         ),
                     ),
                 ],
-            )
+            ),
+            ImageObjectDetection(
+                image=Image(id=1, filename="subdir/image.jpg", width=100, height=200),
+                objects=[
+                    SingleObjectDetection(
+                        category=Category(id=1, name="dog"),
+                        box=BoundingBox(
+                            xmin=10.0,
+                            ymin=20.0,
+                            xmax=30.0,
+                            ymax=40.0,
+                        ),
+                    ),
+                    SingleObjectDetection(
+                        category=Category(id=0, name="cat"),
+                        box=BoundingBox(
+                            xmin=50.0,
+                            ymin=60.0,
+                            xmax=70.0,
+                            ymax=80.0,
+                        ),
+                    ),
+                ],
+            ),
         ]
 
     def test_get_labels__raises_label_without_image(self, tmp_path: Path) -> None:
         # Prepare inputs.
-        _create_label_file(tmp_path=tmp_path)
+        _create_label_file(tmp_path=tmp_path, filename="image.jpg")
         _create_schema_file(tmp_path=tmp_path)
 
         # Try to convert.
@@ -123,7 +149,7 @@ class TestLightlyObjectDetectionInput:
         self, tmp_path: Path, mocker: MockerFixture
     ) -> None:
         # Prepare inputs.
-        _create_label_file(tmp_path=tmp_path)
+        _create_label_file(tmp_path=tmp_path, filename="image.jpg")
         _create_schema_file(tmp_path=tmp_path)
 
         # Convert.
