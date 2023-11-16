@@ -65,7 +65,7 @@ class LightlyObjectDetectionInput(ObjectDetectionInput):
         }
         filename_to_image = {image.filename: image for image in self.get_images()}
 
-        for json_path in self._input_folder.glob("*.json"):
+        for json_path in self._input_folder.rglob("*.json"):
             if json_path.name == "schema.json":
                 continue
             data = json.loads(json_path.read_text())
