@@ -160,5 +160,6 @@ class LightlyObjectDetectionOutput(ObjectDetectionOutput):
             label_file = (self._output_folder / f"{label.image.filename}").with_suffix(
                 ".json"
             )
+            label_file.parent.mkdir(parents=True, exist_ok=True)
             with label_file.open("w") as file:
                 json.dump(data, file, indent=2)

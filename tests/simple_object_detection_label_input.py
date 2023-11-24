@@ -12,6 +12,9 @@ from labelformat.model.object_detection import (
 
 
 class SimpleObjectDetectionInput(ObjectDetectionInput):
+    def __init__(self, filename: str = "image.jpg"):
+        self.filename = filename
+
     def get_categories(self) -> Iterable[Category]:
         return [
             Category(id=0, name="cat"),
@@ -21,13 +24,13 @@ class SimpleObjectDetectionInput(ObjectDetectionInput):
 
     def get_images(self) -> Iterable[Image]:
         return [
-            Image(id=0, filename="image.jpg", width=100, height=200),
+            Image(id=0, filename=self.filename, width=100, height=200),
         ]
 
     def get_labels(self) -> Iterable[ImageObjectDetection]:
         return [
             ImageObjectDetection(
-                image=Image(id=0, filename="image.jpg", width=100, height=200),
+                image=Image(id=0, filename=self.filename, width=100, height=200),
                 objects=[
                     SingleObjectDetection(
                         category=Category(id=1, name="dog"),
