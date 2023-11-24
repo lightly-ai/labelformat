@@ -162,24 +162,29 @@ class TestLightlyObjectDetectionInput:
 
 
 class TestLightlyObjectDetectionOutput:
-    def test_save(self, tmp_path: Path) -> None:
+    @pytest.mark.parametrize("filename", ["image.jpg", "subdir1/subdir2/image.jpg"])
+    def test_save(self, filename: str, tmp_path: Path) -> None:
         output_folder = tmp_path / "labels"
         LightlyObjectDetectionOutput(output_folder=output_folder).save(
-            label_input=SimpleObjectDetectionInput()
+            label_input=SimpleObjectDetectionInput(filename=filename)
         )
         assert output_folder.exists()
         assert output_folder.is_dir()
 
-        filepaths = sorted(list(output_folder.glob("**/*")))
-        assert filepaths == [
-            tmp_path / "labels" / "image.json",
-            tmp_path / "labels" / "schema.json",
-        ]
+        expected_label_filepath = (output_folder / filename).with_suffix(".json")
+        filepaths = set(list(output_folder.glob("**/*.json")))
+        assert len(filepaths) == 2
+        assert filepaths == set(
+            [
+                expected_label_filepath,
+                output_folder / "schema.json",
+            ]
+        )
 
-        contents = (tmp_path / "labels" / "image.json").read_text()
+        contents = expected_label_filepath.read_text()
         expected = json.dumps(
             {
-                "file_name": "image.jpg",
+                "file_name": filename,
                 "predictions": [
                     {
                         "category_id": 1,
