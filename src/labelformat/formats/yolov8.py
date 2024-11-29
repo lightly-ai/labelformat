@@ -81,7 +81,25 @@ class _YOLOv8BaseInput:
 
 @cli_register(format="yolov8", task=Task.OBJECT_DETECTION)
 class YOLOv8ObjectDetectionInput(_YOLOv8BaseInput, ObjectDetectionInput):
+    """YOLOv8 format object detection dataset reader.
+
+    Reads object detection annotations from a YOLOv8 dataset structure:
+    - data.yaml: Contains dataset configuration and category mapping
+    - images/: Contains input images
+    - labels/: Contains annotation .txt files with normalized coordinates
+    """
+
     def get_labels(self) -> Iterable[ImageObjectDetection]:
+        """Read object detection annotations from YOLOv8 format.
+
+        Each .txt annotation file contains one object per line in format:
+        <category_id> <center_x> <center_y> <width> <height>
+        where coordinates are normalized to [0,1] range.
+
+        Returns:
+            Iterator of ImageObjectDetection containing the image metadata
+            and its object annotations with absolute pixel coordinates.
+        """
         category_id_to_category = {
             category.id: category for category in self.get_categories()
         }
@@ -90,26 +108,48 @@ class YOLOv8ObjectDetectionInput(_YOLOv8BaseInput, ObjectDetectionInput):
             label_path = (labels_dir / image.filename).with_suffix(".txt")
             if not label_path.exists():
                 logger.warning(
-                    f"Label file '{label_path}' for image '{image.filename}' does not exist."
+                    f"Label file '{label_path}' for image '{image.filename}' does not exist. Skipping this image."
                 )
-            with label_path.open() as file:
-                label_data = [line.split() for line in file.readlines()]
+                continue  # Skip processing this image
+
+            try:
+                with label_path.open() as file:
+                    label_data = [line.strip().split() for line in file if line.strip()]
+            except Exception as e:
+                logger.error(
+                    f"Error reading label file '{label_path}' for image '{image.filename}': {e}"
+                )
+                continue  # Skip processing this image due to read error
 
             objects = []
-            for category_id, rcx, rcy, rw, rh in label_data:
-                cx = float(rcx) * image.width
-                cy = float(rcy) * image.height
-                w = float(rw) * image.width
-                h = float(rh) * image.height
-                objects.append(
-                    SingleObjectDetection(
-                        category=category_id_to_category[int(category_id)],
-                        box=BoundingBox.from_format(
-                            bbox=[cx, cy, w, h],
-                            format=BoundingBoxFormat.CXCYWH,
-                        ),
+            for entry in label_data:
+                if len(entry) < 5:
+                    logger.warning(
+                        f"Invalid label format in file '{label_path}' for image '{image.filename}'. Skipping this annotation."
                     )
-                )
+                    continue  # Skip invalid annotations
+
+                try:
+                    category_id, rcx, rcy, rw, rh = entry
+                    cx = float(rcx) * image.width
+                    cy = float(rcy) * image.height
+                    w = float(rw) * image.width
+                    h = float(rh) * image.height
+                    objects.append(
+                        SingleObjectDetection(
+                            category=category_id_to_category[int(category_id)],
+                            box=BoundingBox.from_format(
+                                bbox=[cx, cy, w, h],
+                                format=BoundingBoxFormat.CXCYWH,
+                            ),
+                        )
+                    )
+                except (ValueError, KeyError) as e:
+                    logger.error(
+                        f"Error processing annotation in file '{label_path}' for image '{image.filename}': {e}"
+                    )
+                    continue  # Skip invalid annotations
+
             yield ImageObjectDetection(
                 image=image,
                 objects=objects,
