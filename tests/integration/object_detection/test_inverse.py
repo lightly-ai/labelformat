@@ -95,4 +95,8 @@ def test_lightly_inverse(tmp_path: Path, mocker: MockerFixture) -> None:
 def _mock_input_images(mocker: MockerFixture, folder: Path) -> None:
     folder.mkdir()
     (folder / "image.jpg").touch()
-    mocker.patch("PIL.Image.open", autospec=True).return_value.size = (100, 200)
+    mock_img = mocker.MagicMock()
+    mock_img.size = (100, 200)
+    mock_context_manager = mocker.MagicMock()
+    mock_context_manager.__enter__.return_value = mock_img
+    mocker.patch("PIL.Image.open", return_value=mock_context_manager)
