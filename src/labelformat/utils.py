@@ -36,7 +36,8 @@ def get_images_from_folder(folder: Path) -> Iterable[Image]:
             logger.debug(f"Skipping non-image file '{image_path}'")
             continue
         image_filename = str(image_path.relative_to(folder))
-        image_width, image_height = PIL.Image.open(image_path).size
+        with PIL.Image.open(image_path) as img:
+            image_width, image_height = img.size
         yield Image(
             id=image_id,
             filename=image_filename,
