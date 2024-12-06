@@ -115,15 +115,20 @@ class YOLOv8ObjectDetectionInput(_YOLOv8BaseInput, ObjectDetectionInput):
             try:
                 with label_path.open() as file:
                     label_data = [line.strip().split() for line in file if line.strip()]
-            except Exception as e:
+            except (FileNotFoundError, PermissionError, IsADirectoryError) as e:
                 logger.error(
-                    f"Error reading label file '{label_path}' for image '{image.filename}': {e}"
+                    f"Failed to access label file '{label_path}' for image '{image.filename}': {e}"
+                )
+                continue  # Skip processing this image due to access error
+            except (OSError, UnicodeDecodeError) as e:
+                logger.error(
+                    f"Error reading contents of label file '{label_path}' for image '{image.filename}': {e}"
                 )
                 continue  # Skip processing this image due to read error
 
             objects = []
             for entry in label_data:
-                if len(entry) < 5:
+                if len(entry) != 5:
                     logger.warning(
                         f"Invalid label format in file '{label_path}' for image '{image.filename}'. Skipping this annotation."
                     )
