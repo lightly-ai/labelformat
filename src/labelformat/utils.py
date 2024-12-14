@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Tuple
 
 import PIL.Image
 
@@ -27,7 +27,7 @@ class ImageDimensionError(Exception):
     pass
 
 
-def get_jpeg_dimensions(file_path: Path) -> tuple[int, int]:
+def get_jpeg_dimensions(file_path: Path) -> Tuple[int, int]:
     """Try to efficiently get JPEG dimensions from file headers without decoding the image.
 
     This method reads only the JPEG file headers looking for the Start Of Frame (SOFn)
@@ -72,7 +72,7 @@ def get_jpeg_dimensions(file_path: Path) -> tuple[int, int]:
         raise ImageDimensionError(f"Failed to read JPEG dimensions: {str(e)}")
 
 
-def get_png_dimensions(file_path: Path) -> tuple[int, int]:
+def get_png_dimensions(file_path: Path) -> Tuple[int, int]:
     """Try to efficiently get PNG dimensions from file headers without decoding the image.
 
     This method reads only the PNG IHDR (Image Header) chunk which is always the first
@@ -111,7 +111,7 @@ def get_png_dimensions(file_path: Path) -> tuple[int, int]:
         raise ImageDimensionError(f"Failed to read PNG dimensions: {str(e)}")
 
 
-def get_image_dimensions(image_path: Path) -> tuple[int, int]:
+def get_image_dimensions(image_path: Path) -> Tuple[int, int]:
     """Get image dimensions using the most efficient method available.
 
     Args:
