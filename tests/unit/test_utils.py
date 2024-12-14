@@ -1,11 +1,12 @@
-import pytest
 from pathlib import Path
 
+import pytest
+
 from labelformat.utils import (
+    ImageDimensionError,
+    get_image_dimensions,
     get_jpeg_dimensions,
     get_png_dimensions,
-    get_image_dimensions,
-    ImageDimensionError,
 )
 
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
