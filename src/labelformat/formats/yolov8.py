@@ -110,21 +110,21 @@ class YOLOv8ObjectDetectionInput(_YOLOv8BaseInput, ObjectDetectionInput):
                 logger.warning(
                     f"Label file '{label_path}' for image '{image.filename}' does not exist. Skipping this image."
                 )
-                continue  # Skip processing this image
+                continue
 
             try:
                 with label_path.open() as file:
                     label_data = [line.strip().split() for line in file if line.strip()]
-            except (FileNotFoundError, PermissionError, IsADirectoryError) as e:
+            except OSError as e:
                 logger.error(
                     f"Failed to access label file '{label_path}' for image '{image.filename}': {e}"
                 )
-                continue  # Skip processing this image due to access error
-            except (OSError, UnicodeDecodeError) as e:
+                continue
+            except ValueError as e:
                 logger.error(
                     f"Error reading contents of label file '{label_path}' for image '{image.filename}': {e}"
                 )
-                continue  # Skip processing this image due to read error
+                continue
 
             objects = []
             for entry in label_data:
@@ -132,7 +132,7 @@ class YOLOv8ObjectDetectionInput(_YOLOv8BaseInput, ObjectDetectionInput):
                     logger.warning(
                         f"Invalid label format in file '{label_path}' for image '{image.filename}'. Skipping this annotation."
                     )
-                    continue  # Skip invalid annotations
+                    continue
 
                 try:
                     category_id, rcx, rcy, rw, rh = entry
@@ -153,7 +153,7 @@ class YOLOv8ObjectDetectionInput(_YOLOv8BaseInput, ObjectDetectionInput):
                     logger.error(
                         f"Error processing annotation in file '{label_path}' for image '{image.filename}': {e}"
                     )
-                    continue  # Skip invalid annotations
+                    continue
 
             yield ImageObjectDetection(
                 image=image,
