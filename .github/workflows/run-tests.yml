@@ -11,29 +11,29 @@ on:
 jobs:
   test:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         python: ["3.7", "3.10"]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
 
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        version: 1.4.2
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.4.2
 
-    - name: Install the package and dependencies
-      run: |
-        poetry install
+      - name: Install the package and dependencies
+        run: |
+          poetry install
 
-    - name: Run tests
-      run: |
-        poetry run make all-checks
+      - name: Run tests
+        run: |
+          poetry run make all-checks
