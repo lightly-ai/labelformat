@@ -95,7 +95,9 @@ class _YOLOv8BaseInput:
         yield from utils.get_images_from_folder(folder=self._images_dir())
 
     def _root_dir(self) -> Path:
-        return self._config_file.parent / str(self._config_data["path"])
+        if "path" in self._config_data:
+            return self._config_file.parent / str(self._config_data["path"])
+        return self._config_file.parent
 
     def _images_dir(self) -> Path:
         root_dir = self._root_dir()
