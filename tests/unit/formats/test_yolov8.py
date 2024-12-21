@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from pathlib import Path
+from typing import Dict, List, Union
 
 import pytest
 import yaml
@@ -8,7 +11,7 @@ from labelformat.model.category import Category
 
 
 @pytest.fixture
-def expected_categories():
+def expected_categories() -> List[Category]:
     return [
         Category(id=0, name="person"),
         Category(id=1, name="dog"),
@@ -16,7 +19,9 @@ def expected_categories():
     ]
 
 
-def test_get_categories_dict_format(tmp_path: Path, expected_categories) -> None:
+def test_get_categories_dict_format(
+    tmp_path: Path, expected_categories: List[Category]
+) -> None:
     config = {
         "path": ".",
         "train": "images",
@@ -31,8 +36,14 @@ def test_get_categories_dict_format(tmp_path: Path, expected_categories) -> None
     assert categories == expected_categories
 
 
-def test_get_categories_list_format(tmp_path: Path, expected_categories) -> None:
-    config = {"path": ".", "train": "images", "names": ["person", "dog", "cat"]}
+def test_get_categories_list_format(
+    tmp_path: Path, expected_categories: List[Category]
+) -> None:
+    config = {
+        "path": ".",
+        "train": "images",
+        "names": ["person", "dog", "cat"],
+    }
     config_file = tmp_path / "config.yaml"
     with config_file.open("w") as f:
         yaml.safe_dump(config, f)
@@ -42,8 +53,10 @@ def test_get_categories_list_format(tmp_path: Path, expected_categories) -> None
     assert categories == expected_categories
 
 
-def test_get_categories_yaml_block_format(tmp_path: Path, expected_categories) -> None:
-    config = """
+def test_get_categories_yaml_block_format(
+    tmp_path: Path, expected_categories: List[Category]
+) -> None:
+    config: str = """
     path: .
     train: images
     names:
