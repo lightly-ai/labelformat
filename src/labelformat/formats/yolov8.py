@@ -104,11 +104,21 @@ class _YOLOv8BaseInput:
         return root_dir / str(self._config_data[self._split])
 
     def _labels_dir(self) -> Path:
+        """Get labels directory from YOLOv8 config file.
+
+        The labels directory is derived from the images directory by replacing
+        the first occurrence of 'images' with 'labels'.
+        """
         root_dir = self._root_dir()
         images_dir = self._images_dir()
         images_dir_name = str(images_dir.relative_to(root_dir))
-        if images_dir_name.startswith("images"):
-            labels_dir_name = "labels" + images_dir_name[len("images") :]
+        images_subdir_index = images_dir_name.find("images")
+        if images_subdir_index != -1:
+            labels_dir_name = (
+                images_dir_name[:images_subdir_index]
+                + "labels"
+                + images_dir_name[images_subdir_index + len("images") :]
+            )
         else:
             raise RuntimeError(
                 f"Could not find 'images' subdirectory in '{images_dir}'"
