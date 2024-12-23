@@ -50,51 +50,20 @@ class _YOLOv8BaseInput:
             )
 
     def get_categories(self) -> Iterable[Category]:
-        """Get categories from YOLOv8 config file.
-
-        Supports two formats for the 'names' field:
-        - dictionary mapping id to name
-          Example:
-          names:
-            0: person
-            1: dog
-            2: cat
-        - list of names where index is the id
-          Example:
-          names:
-            - person
-            - dog
-            - cat
-          or
-          names: [person, dog, cat]
-        Returns:
-            Iterator of Category objects.
-        """
+        """Get categories from YOLOv8 config file. Assumes contiguous 0-indexed labels."""
         names = self._config_data["names"]
-        if isinstance(names, dict):
-            # Original YOLOv8 format: dictionary mapping id to name
-            for category_id, category_name in names.items():
-                yield Category(
-                    id=int(category_id),
-                    name=category_name,
-                )
-        elif isinstance(names, list):
-            # Alternative YOLO format: list of names where index is the id
-            for category_id, category_name in enumerate(names):
-                yield Category(
-                    id=category_id,
-                    name=category_name,
-                )
-        else:
-            raise ValueError(
-                f"Invalid 'names' format in config file '{self._config_file}'. "
-                "Expected dictionary or list, got {type(names)}"
-            )
+        for category_id in range(len(names)):
+            yield Category(id=category_id, name=names[category_id])
 
     def get_images(self) -> Iterable[Image]:
         yield from utils.get_images_from_folder(folder=self._images_dir())
 
     def _root_dir(self) -> Path:
+        """Return the root directory of the dataset.
+
+        If the config file contains a "path" field, it is used as the root directory (ultralytics format).
+        Otherwise, the root directory is the parent of the config file (roboflow format).
+        """
         if "path" in self._config_data:
             return self._config_file.parent / str(self._config_data["path"])
         return self._config_file.parent
