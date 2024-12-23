@@ -50,32 +50,44 @@ class _YOLOv8BaseInput:
             )
 
     def get_categories(self) -> Iterable[Category]:
-        for category_id, category_name in self._config_data["names"].items():
-            yield Category(
-                id=int(category_id),
-                name=category_name,
-            )
+        """Get categories from YOLOv8 config file. Assumes contiguous 0-indexed labels."""
+        names = self._config_data["names"]
+        for category_id in range(len(names)):
+            yield Category(id=category_id, name=names[category_id])
 
     def get_images(self) -> Iterable[Image]:
         yield from utils.get_images_from_folder(folder=self._images_dir())
 
     def _root_dir(self) -> Path:
-        return self._config_file.parent / str(self._config_data["path"])
+        """Return the root directory of the dataset.
+
+        If the config file contains a "path" field, it is used as the root directory (ultralytics format).
+        Otherwise, the root directory is the parent of the config file (roboflow format).
+        """
+        if "path" in self._config_data:
+            return self._config_file.parent / str(self._config_data["path"])
+        return self._config_file.parent
 
     def _images_dir(self) -> Path:
         root_dir = self._root_dir()
         return root_dir / str(self._config_data[self._split])
 
     def _labels_dir(self) -> Path:
+        """Get labels directory from YOLOv8 config file.
+
+        The labels directory is derived from the images directory by replacing
+        the first occurrence of 'images' with 'labels'.
+        """
         root_dir = self._root_dir()
         images_dir = self._images_dir()
         images_dir_name = str(images_dir.relative_to(root_dir))
-        if images_dir_name.startswith("images"):
-            labels_dir_name = "labels" + images_dir_name[len("images") :]
-        else:
+
+        if "images" not in images_dir_name:
             raise RuntimeError(
                 f"Could not find 'images' subdirectory in '{images_dir}'"
             )
+
+        labels_dir_name = images_dir_name.replace("images", "labels", 1)
         return root_dir / labels_dir_name
 
 
