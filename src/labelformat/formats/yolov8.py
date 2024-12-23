@@ -81,17 +81,13 @@ class _YOLOv8BaseInput:
         root_dir = self._root_dir()
         images_dir = self._images_dir()
         images_dir_name = str(images_dir.relative_to(root_dir))
-        images_subdir_index = images_dir_name.find("images")
-        if images_subdir_index != -1:
-            labels_dir_name = (
-                images_dir_name[:images_subdir_index]
-                + "labels"
-                + images_dir_name[images_subdir_index + len("images") :]
-            )
-        else:
+
+        if "images" not in images_dir_name:
             raise RuntimeError(
                 f"Could not find 'images' subdirectory in '{images_dir}'"
             )
+
+        labels_dir_name = images_dir_name.replace("images", "labels", 1)
         return root_dir / labels_dir_name
 
 
