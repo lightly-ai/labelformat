@@ -35,3 +35,15 @@ from labelformat.formats.yolov8 import (
     YOLOv8ObjectDetectionInput,
     YOLOv8ObjectDetectionOutput,
 )
+from labelformat.formats.yolov9 import (
+    YOLOv9ObjectDetectionInput,
+    YOLOv9ObjectDetectionOutput,
+)
+from labelformat.formats.yolov10 import (
+    YOLOv10ObjectDetectionInput,
+    YOLOv10ObjectDetectionOutput,
+)
+from labelformat.formats.yolov11 import (
+    YOLOv11ObjectDetectionInput,
+    YOLOv11ObjectDetectionOutput,
+)
