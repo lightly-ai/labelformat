@@ -1,10 +1,11 @@
-![Labelformat - Label Conversion, Simplified](labelformat_banner.png?raw=true "Labelformat")
+![Labelformat - Label Conversion, Simplified](docs/assets/labelformat_banner.png?raw=true "Labelformat")
 
 # Labelformat - Label Conversion, Simplified
 
 ![GitHub](https://img.shields.io/github/license/lightly-ai/labelformat)
 ![Unit Tests](https://github.com/lightly-ai/labelformat/workflows/Run%20Tests/badge.svg)
 [![PyPI](https://img.shields.io/pypi/v/labelformat)](https://pypi.org/project/labelformat/)
+[![Documentation](https://img.shields.io/badge/docs-labelformat.com-blue)](https://labelformat.com)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 An open-source tool to seamlessly convert between popular computer vision label formats.
