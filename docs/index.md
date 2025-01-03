@@ -8,7 +8,7 @@ Welcome to **Labelformat**—an open-source tool designed to effortlessly conver
 
 ## Why Choose Labelformat?
 
-- **Comprehensive Format Support:** Convert seamlessly between formats like COCO, YOLOv5-8, PascalVOC, KITTI, and more.
+- **Comprehensive Format Support:** Convert seamlessly between formats like COCO, YOLOv5-11, PascalVOC, KITTI, and more.
 - **Ease of Use:** Intuitive CLI and Python API for flexible integration into your workflows.
 - **Efficiency:** Memory-conscious processing ensures optimal performance, even with large datasets.
 - **Reliability:** Thoroughly tested with round-trip tests to maintain label consistency.
