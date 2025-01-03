@@ -19,18 +19,21 @@ and time-consuming. Labelformat aims to solve this pain.
 #### Supported Tasks and Formats
 
 - object-detection
-    - [COCO](https://cocodataset.org/#format-data)
-    - [KITTI](https://github.com/bostondiditeam/kitti/blob/master/resources/devkit_object/readme.txt)
-    - [Lightly](https://docs.lightly.ai/docs/prediction-format#prediction-format)
-    - [PascalVOC](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/index.html#devkit)
-    - [YOLOv5](https://github.com/ultralytics/yolov5)
-    - [YOLOv6](https://github.com/meituan/YOLOv6)
-    - [YOLOv7](https://github.com/WongKinYiu/yolov7)
-    - [YOLOv8](https://docs.ultralytics.com/datasets/detect/)
-    - [Labelbox](https://docs.labelbox.com/reference/label-export) (input only)
+    - [COCO](https://labelformat.com/formats/object-detection/coco/)
+    - [KITTI](https://labelformat.com/formats/object-detection/kitti/)
+    - [Labelbox](https://labelformat.com/formats/object-detection/labelbox/) (input only)
+    - [Lightly](https://labelformat.com/formats/object-detection/lightly/)
+    - [PascalVOC](https://labelformat.com/formats/object-detection/pascalvoc/)
+    - [YOLOv5](https://labelformat.com/formats/object-detection/yolov5/)
+    - [YOLOv6](https://labelformat.com/formats/object-detection/yolov6/)
+    - [YOLOv7](https://labelformat.com/formats/object-detection/yolov7/)
+    - [YOLOv8](https://labelformat.com/formats/object-detection/yolov8/)
+    - [YOLOv9](https://labelformat.com/formats/object-detection/yolov9/)
+    - [YOLOv10](https://labelformat.com/formats/object-detection/yolov10/)
+    - [YOLOv11](https://labelformat.com/formats/object-detection/yolov11/)
 - instance-segmentation
-    - [COCO](https://cocodataset.org/#format-data)
-    - [YOLOv8](https://docs.ultralytics.com/datasets/segment/)
+    - COCO
+    - YOLOv8
 
 #### Features
 
