@@ -9,6 +9,7 @@ theme:
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.indexes
+    - content.tabs.link
   palette:
     scheme: slate
     primary: grey
@@ -51,9 +52,26 @@ plugins:
   - git-revision-date-localized:
       type: date
 
+extra:
+  analytics:
+    provider: google
+    property: G-K4PH64C9BM
+  consent:
+    title: Cookie consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
+
+extra_javascript:
+  - assets/js/analytics.js
+
 markdown_extensions:
   - admonition
   - codehilite
   - toc:
       permalink: true
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true

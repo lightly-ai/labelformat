@@ -4,7 +4,7 @@ This tutorial walks you through converting object detection labels from the COCO
 
 ## Prerequisites
 
-- **Labelformat Installed:** Follow the [Installation Guide](installation.md).
+- **Labelformat Installed:** Follow the [Installation Guide](../installation.md).
 - **COCO Dataset:** Ensure you have a COCO-formatted dataset ready for conversion.
 
 ## Step 1: Prepare Your Dataset
@@ -145,8 +145,4 @@ You've successfully converted COCO labels to YOLOv8 format using both the CLI an
 
 ## Next Steps
 
-- Explore [Converting YOLOv8 to COCO](converting_yolov8_to_coco.md).
-- Learn how to [Handle Labelbox Exports](handling_labelbox_exports.md).
-- Dive deeper with [Advanced Usage](usage.md).
-
-For any questions or issues, feel free to reach out via our [GitHub Issues](https://github.com/lightly-ai/labelformat/issues).
+- Explore other supported 2d object detection formats in the [Supported Object Detection Formats](../formats/object-detection/index.md) section.
