@@ -23,9 +23,8 @@ At Lightly, we aim to simplify the complexities of active learning and data mana
 
 Stay updated with the latest developments, tips, and tutorials by following us:
 
-- [GitHub](https://github.com/lightly-ai/labelformat)
-- [Twitter](https://twitter.com/lightly_ai)
-- [LinkedIn](https://www.linkedin.com/company/lightly-ai)
+- [GitHub](https://github.com/lightly-ai)
+- [Twitter](https://x.com/LightlyAI)
 
 ---
 

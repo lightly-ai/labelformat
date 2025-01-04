@@ -4,16 +4,32 @@ Installing **Labelformat** is straightforward. Follow the steps below to set up 
 
 ## Prerequisites
 
-- **Python 3.7 or higher:** Ensure you have Python installed. You can download it from the [official website](https://www.python.org/downloads/).
+- **Python 3.7 or higher:** Ensure you have Python installed on Windows, Linux, or macOS.
 - **pip:** Python's package installer. It typically comes with Python installations.
 
-## Installation via PyPI
+## Installation using package managers
 
-You can install Labelformat directly from PyPI using pip:
+Labelformat is available on PyPI and can be installed using various package managers:
 
-```shell
-pip install labelformat
-```
+=== "pip"
+    ```bash
+    pip install labelformat
+    ```
+
+=== "Poetry"
+    ```bash
+    poetry add labelformat
+    ```
+
+=== "Conda"
+    ```bash
+    conda install -c conda-forge labelformat
+    ```
+
+=== "Rye"
+    ```bash
+    rye add labelformat
+    ```
 
 ## Installation from Source
 

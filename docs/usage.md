@@ -1,22 +1,8 @@
-# usage.md
-
 # Detailed Usage Guide
 
 Labelformat offers both a Command-Line Interface (CLI) and a Python API to cater to different workflows. This guide provides in-depth instructions on how to use both interfaces effectively.
 
-## Table of Contents
-
-- [CLI Usage](#cli-usage)
-  - [Basic Conversion Command](#basic-conversion-command)
-  - [Advanced CLI Options](#advanced-cli-options)
-- [Python API Usage](#python-api-usage)
-  - [Basic Conversion](#basic-conversion)
-  - [Customizing Conversion](#customizing-conversion)
-- [Common Tasks](#common-tasks)
-  - [Handling Category Names](#handling-category-names)
-  - [Managing Image Paths](#managing-image-paths)
-
----
+To get a detailed overview of the supported formats and their specifications, please refer to the [Supported Object Detection Formats](formats/object-detection/index.md) section.
 
 ## CLI Usage
 
@@ -57,7 +43,9 @@ labelformat convert --task object-detection --help
 
 **Specifying Category Names:**
 
-Some formats require explicit category names. Use the `--category-names` argument:
+Some formats require explicit category names. The names must be separated by commas and must be in the same order as the categories in the input file.
+
+Use the `--category-names` argument to specify the category names:
 
 ``` shell
 labelformat convert \
@@ -72,7 +60,7 @@ labelformat convert \
 
 **Handling Missing Images:**
 
-When converting formats that require image files (e.g., YOLO to COCO), ensure your image paths are correctly specified. Use `--images-rel-path` to define the relative path to images:
+When converting formats that require image files (e.g., YOLO to COCO), ensure your image paths are correctly specified. Use `--images-rel-path` to define the relative path from the input folder to the images folder:
 
 ``` shell
 labelformat convert \
@@ -176,4 +164,4 @@ labelformat convert \
 - **Consistent Naming:** Maintain consistent naming conventions for categories and files across different formats.
 - **Leverage Round-Trip Tests:** Use Labelformat's testing capabilities to ensure label consistency when converting back and forth between formats.
 
-For more detailed examples and advanced usage scenarios, explore our [Tutorials](tutorials/converting_coco_to_yolov8.md) section.
+For more detailed examples and advanced usage scenarios, explore our [Tutorials](tutorials/converting-coco-to-yolov8.md) section.

@@ -5,16 +5,19 @@ Labelformat offers a robust set of features tailored to meet the diverse needs o
 ## Key Features
 
 - **Wide Format Support:**
-    - **Object Detection** 
-    - **Instance Segmentation**
+    - **2D Object Detection:** Bounding box annotations for object localization
+    - **Instance Segmentation:** Pixel-level masks for precise object delineation
   
 - **User-Friendly CLI and Python API:**
-    - **CLI:** Simple commands to convert formats with customizable options.
+    - **CLI:** Simple terminal commands to convert formats with customizable options.
     - **Python API:** Integrate label conversion seamlessly into your Python workflows.
 
 - **Performance Optimizations:**
     - **Memory Conscious:** Processes datasets file-by-file to minimize memory usage.
     - **Minimal Dependencies:** Targets Python 3.7 or higher, ensuring broad compatibility.
+
+- **Cross-Platform Support:**
+    - **Windows, Linux, and macOS:** Works seamlessly across all major operating systems.
 
 - **Reliability and Testing:**
     - **Typed Codebase:** Ensures type safety and easier maintenance.
@@ -52,4 +55,4 @@ Labelformat addresses the common challenges faced when dealing with diverse labe
 - **Scalability:** Handles large datasets with minimal memory footprint.
 - **Flexibility:** Supports a growing list of formats and tasks, adapting to evolving project needs.
 
-Explore our [Quick Start Guide](quick_start.md) to begin leveraging Labelformat's powerful features today!
+Explore our [Quick Start Guide](quick-start.md) to begin leveraging Labelformat's powerful features today!
