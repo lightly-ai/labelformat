@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#labelformat-label-conversion-simplified" class="md-skip">
+        <a href="#labelformat-fast-label-conversion-for-computer-vision" class="md-skip">
           Skip to content
         </a>
       
@@ -950,27 +950,60 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-choose-labelformat" class="md-nav__link">
+  <a href="#key-features" class="md-nav__link">
     <span class="md-ellipsis">
-      Why Choose Labelformat?
+      Key Features
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#get-started" class="md-nav__link">
+  <a href="#get-started-quickly" class="md-nav__link">
     <span class="md-ellipsis">
-      Get Started
+      Get Started Quickly
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#join-our-community" class="md-nav__link">
+  <a href="#supported-formats" class="md-nav__link">
     <span class="md-ellipsis">
-      Join Our Community
+      Supported Formats
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Supported Formats">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2d-object-detection-label-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      2D Object Detection Label Formats
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2d-instance-segmentation-label-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      2D Instance Segmentation Label Formats
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explore-more" class="md-nav__link">
+    <span class="md-ellipsis">
+      Explore More
     </span>
   </a>
   
@@ -1004,23 +1037,102 @@
 
 
 <p><img alt="Labelformat Banner" src="assets/labelformat_banner.png" /></p>
-<h1 id="labelformat-label-conversion-simplified">Labelformat - Label Conversion, Simplified<a class="headerlink" href="#labelformat-label-conversion-simplified" title="Permanent link">&para;</a></h1>
-<p>Welcome to <strong>Labelformat</strong>—an open-source tool designed to effortlessly convert between various popular computer vision label formats. Whether you're adapting labels from downloaded datasets or modifying outputs from labeling tools to suit your model's requirements, Labelformat streamlines the process, saving you time and reducing complexity.</p>
-<h2 id="why-choose-labelformat">Why Choose Labelformat?<a class="headerlink" href="#why-choose-labelformat" title="Permanent link">&para;</a></h2>
+<h1 id="labelformat-fast-label-conversion-for-computer-vision">Labelformat - Fast Label Conversion for Computer Vision<a class="headerlink" href="#labelformat-fast-label-conversion-for-computer-vision" title="Permanent link">&para;</a></h1>
+<p><strong>Labelformat</strong> is an open-source Python framework for converting between popular computer vision annotation formats like YOLO, COCO, PascalVOC, and KITTI. Save hours on tedious format conversions and ensure consistency in your workflows.</p>
+<h2 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Comprehensive Format Support:</strong> Convert seamlessly between formats like COCO, YOLOv5-11, PascalVOC, KITTI, and more.</li>
-<li><strong>Ease of Use:</strong> Intuitive CLI and Python API for flexible integration into your workflows.</li>
-<li><strong>Efficiency:</strong> Memory-conscious processing ensures optimal performance, even with large datasets.</li>
-<li><strong>Reliability:</strong> Thoroughly tested with round-trip tests to maintain label consistency.</li>
+<li><strong>Wide Format Support</strong>: COCO, YOLO (v5-v11), PascalVOC, KITTI, Labelbox, and more.</li>
+<li><strong>Cross-Platform</strong>: Compatible with Python 3.7+ on Windows, macOS, and Linux.</li>
+<li><strong>Flexible Usage</strong>: Intuitive CLI and Python API.</li>
+<li><strong>Efficient</strong>: Memory-conscious, optimized for large datasets.</li>
+<li><strong>Offline First</strong>: Operates locally without data uploads.</li>
+<li><strong>Tested for Accuracy</strong>: Round-trip tests for consistent results.</li>
 </ul>
-<h2 id="get-started">Get Started<a class="headerlink" href="#get-started" title="Permanent link">&para;</a></h2>
+<h2 id="get-started-quickly">Get Started Quickly<a class="headerlink" href="#get-started-quickly" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Install via pip</strong>:
+    <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>labelformat
+</code></pre></div></li>
+<li><strong>Convert Labels in One Command</strong>:
+    <div class="highlight"><pre><span></span><code>labelformat<span class="w"> </span>convert<span class="w"> </span>--task<span class="w"> </span>object-detection<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>--input-format<span class="w"> </span>coco<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>--input-file<span class="w"> </span>coco-labels/train.json<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>--output-format<span class="w"> </span>yolov8<span class="w"> </span><span class="se">\</span>
+<span class="w">                    </span>--output-file<span class="w"> </span>yolo-labels/data.yaml
+</code></pre></div></li>
+</ol>
+<h2 id="supported-formats">Supported Formats<a class="headerlink" href="#supported-formats" title="Permanent link">&para;</a></h2>
+<h3 id="2d-object-detection-label-formats"><strong>2D Object Detection Label Formats</strong><a class="headerlink" href="#2d-object-detection-label-formats" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Read ✔️</th>
+<th>Write ✔️</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>COCO</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>KITTI</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>Labelbox</td>
+<td>✔️</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Lightly</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>PascalVOC</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>YOLOv5 - v11</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="2d-instance-segmentation-label-formats"><strong>2D Instance Segmentation Label Formats</strong><a class="headerlink" href="#2d-instance-segmentation-label-formats" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Read ✔️</th>
+<th>Write ✔️</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>COCO</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+<tr>
+<td>YOLOv8</td>
+<td>✔️</td>
+<td>✔️</td>
+</tr>
+</tbody>
+</table>
+<h2 id="explore-more">Explore More<a class="headerlink" href="#explore-more" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="installation/">Installation</a></li>
-<li><a href="quick_start.md">Quick Start Guide</a></li>
-<li><a href="features/">Explore Features</a></li>
+<li><a href="quick-start/">Quick Start Guide</a></li>
+<li><a href="usage/">Detailed Usage Guide</a></li>
+<li><a href="features/">List of all features</a></li>
 </ul>
-<h2 id="join-our-community">Join Our Community<a class="headerlink" href="#join-our-community" title="Permanent link">&para;</a></h2>
-<p>Labelformat is actively maintained by <a href="https://www.lightly.ai">Lightly</a>, a company dedicated to building efficient active learning pipelines. We welcome contributions and feedback—check out our <a href="contributing.md">Contributing Guide</a> to get involved!</p>
 <hr />
 <h2 id="quick-links">📦 Quick Links<a class="headerlink" href="#quick-links" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1028,6 +1140,7 @@
 <li><a href="https://pypi.org/project/labelformat/">PyPI Package</a></li>
 <li><a href="https://labelformat.com">Documentation</a></li>
 </ul>
+<p>Labelformat is maintained by <a href="https://www.lightly.ai">Lightly</a>.</p>
 
 
 
@@ -1048,7 +1161,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">January 3, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">January 4, 2025</span>
   </span>
 
     
@@ -1068,6 +1181,8 @@
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
@@ -1177,7 +1292,7 @@
       </div>
       <script>var consent=__md_get("__consent");if(consent)for(var input of document.forms.consent.elements)input.name&&(input.checked=consent[input.name]||!1);else"file:"!==location.protocol&&setTimeout((function(){document.querySelector("[data-md-component=consent]").hidden=!1}),250);var form=document.forms.consent;for(var action of["submit","reset"])form.addEventListener(action,(function(e){if(e.preventDefault(),"reset"===e.type)for(var n of document.forms.consent.elements)n.name&&(n.checked=!1);__md_set("__consent",Object.fromEntries(Array.from(new FormData(form).keys()).map((function(e){return[e,!0]})))),location.hash="",location.reload()}))</script>
     
-    <script id="__config" type="application/json">{"base": ".", "features": ["navigation.instant", "navigation.expand", "search.highlight", "navigation.top", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes"], "search": "assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": ".", "features": ["navigation.instant", "navigation.expand", "search.highlight", "navigation.top", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.tabs.link"], "search": "assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="assets/javascripts/bundle.88dd0f4e.min.js"></script>
