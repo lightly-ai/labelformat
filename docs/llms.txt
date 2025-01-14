@@ -1,0 +1,27 @@
+# Labelformat
+
+> Labelformat is an open-source Python framework designed to streamline the conversion between various computer vision annotation formats, including COCO, YOLO, PascalVOC, and KITTI. It offers both a command-line interface and a Python API, ensuring flexibility and efficiency in managing large datasets.
+
+Labelformat supports the following features:
+
+- **Wide Format Support**: Handles multiple formats such as COCO, YOLO (v5-v11), PascalVOC, KITTI, Labelbox, and more.
+- **Cross-Platform Compatibility**: Works seamlessly with Python 3.7+ on Windows, macOS, and Linux.
+- **Flexible Usage**: Provides both CLI and Python API for diverse use cases.
+- **Efficiency**: Optimized for memory usage, suitable for large datasets.
+- **Offline Operation**: Functions without the need for internet connectivity.
+- **Accuracy**: Undergoes rigorous round-trip tests to ensure consistent results.
+
+## Documentation
+
+- [Quick Start Guide](https://labelformat.com/quick-start/): Step-by-step instructions to begin using Labelformat. :contentReference[oaicite:1]{index=1}
+- [Installation Instructions](https://labelformat.com/installation/): Detailed guide on setting up Labelformat in your environment. :contentReference[oaicite:2]{index=2}
+- [Supported Formats](https://labelformat.com/): Comprehensive list of annotation formats supported by Labelformat. 
+
+## Examples
+
+- [Converting COCO to YOLOv8](https://labelformat.com/quick-start/): Practical example demonstrating the conversion process using the command-line interface. :contentReference[oaicite:3]{index=3}
+
+## Optional
+
+- [GitHub Repository](https://github.com/lightly-ai/labelformat): Access the source code, report issues, and contribute to the project.
+- [PyPI Package](https://pypi.org/project/labelformat/): Official Python Package Index page for Labelformat, including installation instructions and release history.
