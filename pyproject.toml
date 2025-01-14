@@ -27,6 +27,7 @@ build = "*"
 twine = "*"
 types-Pillow = "*"
 types-PyYAML = "*"
+mkdocs = "*"
 
 [tool.poetry.scripts]
 labelformat = "labelformat.cli.cli:main"

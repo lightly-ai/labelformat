@@ -29,3 +29,9 @@ clean:
 
 build:
 	poetry build
+
+build-docs:
+	mkdocs build
+
+install-dev:
+	poetry install --all-groups
