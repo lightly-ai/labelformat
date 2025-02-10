@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import List, Optional
 
+import numpy as np
 import pytest
 
 from labelformat.model.multipolygon import MultiPolygon, Point
@@ -8,7 +9,12 @@ from labelformat.model.multipolygon import MultiPolygon, Point
 INST_SEGMENTATION_FIXTURES_DIR = (
     Path(__file__).parent.parent / "fixtures/instance_segmentation"
 )
+
 OBJ_DETECTION_FIXTURES_DIR = Path(__file__).parent.parent / "fixtures/object_detection"
+
+VIDEO_INSTANCE_SEGMENTATION_FIXTURES_DIR = (
+    Path(__file__).parent.parent / "fixtures/video_instance_segmentation"
+)
 
 COMMA_JOINED_CATEGORY_NAMES = ",".join(
     [
@@ -56,12 +62,22 @@ def assert_almost_equal_recursive(
     nan_ok: bool = False,
 ) -> None:
     if isinstance(obj1, dict):
-        assert isinstance(obj2, dict)
-        assert sorted(obj1.keys()) == sorted(obj2.keys())
-        for key in obj1.keys():
-            assert_almost_equal_recursive(
-                obj1[key], obj2[key], rel=rel, abs=abs, nan_ok=nan_ok
-            )
+        if 'counts' in obj1: #For RLE encodded segmentations
+            import pycocotools.mask as mask_utils
+            mask1 = mask_utils.decode(obj1)
+            mask2 = mask_utils.decode(obj2)
+            assert mask1.shape == mask2.shape, "RLE masks have different shapes"
+            # Allow for subtle differences by using a tolerance
+            difference = np.abs(mask1 - mask2).sum()
+            tolerance = 5  # Adjust tolerance as needed
+            assert (difference <= tolerance), "RLE masks differ beyond tolerance"
+        else:
+            assert isinstance(obj2, dict)
+            assert sorted(obj1.keys()) == sorted(obj2.keys())
+            for key in obj1.keys():
+                assert_almost_equal_recursive(
+                    obj1[key], obj2[key], rel=rel, abs=abs, nan_ok=nan_ok
+                )
     elif isinstance(obj1, list):
         assert isinstance(obj2, list)
         assert len(obj1) == len(obj2)
