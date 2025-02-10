@@ -10,11 +10,16 @@ from labelformat.model.object_detection import (
     ObjectDetectionInput,
     ObjectDetectionOutput,
 )
+from labelformat.model.video_instance_segmentation import (
+    VideoInstanceSegmentationInput,
+    VideoInstanceSegmentationOutput,
+)
 
 
 class Task(Enum):
     INSTANCE_SEGMENTATION = "instance-segmentation"
     OBJECT_DETECTION = "object-detection"
+    VIDEO_INSTANCE_SEGMENTATION = "video-instance-segmentation"
 
 
 @dataclass
@@ -30,12 +35,16 @@ _REGISTRY = Registry(
 
 def cli_register(format: str, task: Task) -> Callable[[Type], Type]:  # type: ignore[type-arg]
     def decorator(cls: Type) -> Type:  # type: ignore[type-arg]
-        if issubclass(cls, ObjectDetectionInput) or issubclass(
-            cls, InstanceSegmentationInput
+        if (
+            issubclass(cls, ObjectDetectionInput)
+            or issubclass(cls, InstanceSegmentationInput)
+            or issubclass(cls, VideoInstanceSegmentationInput)
         ):
             _REGISTRY.input[task][format] = cls
-        elif issubclass(cls, ObjectDetectionOutput) or issubclass(
-            cls, InstanceSegmentationOutput
+        elif (
+            issubclass(cls, ObjectDetectionOutput)
+            or issubclass(cls, InstanceSegmentationOutput)
+            or issubclass(cls, VideoInstanceSegmentationOutput)
         ):
             _REGISTRY.output[task][format] = cls
         else:
@@ -44,7 +53,9 @@ def cli_register(format: str, task: Task) -> Callable[[Type], Type]:  # type: ig
                 f"'{ObjectDetectionInput}', "
                 f"'{InstanceSegmentationInput}', "
                 f"'{ObjectDetectionOutput}', "
-                f"'{InstanceSegmentationOutput}'"
+                f"'{InstanceSegmentationOutput}', "
+                f"'{VideoInstanceSegmentationInput}', "
+                f"'{VideoInstanceSegmentationOutput}'"
             )
         return cls
 

@@ -47,3 +47,4 @@ from labelformat.formats.yolov11 import (
     YOLOv11ObjectDetectionInput,
     YOLOv11ObjectDetectionOutput,
 )
+from labelformat.formats.youtube_vis import YouTubeVISInput, YouTubeVISOutput

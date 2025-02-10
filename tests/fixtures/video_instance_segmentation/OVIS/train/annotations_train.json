@@ -1,0 +1,773 @@
+{
+    "info": {
+        "description": "OVIS",
+        "url": "http://songbai.site/ovis/",
+        "version": "1.0",
+        "year": 2021,
+        "contributor": "youku",
+        "date_created": "2021-01-01"
+    },
+    "videos": [
+        {
+            "width": 1920,
+            "length": 3,
+            "license": 1,
+            "file_names": [
+                "85aa3b0e/img_0000001.jpg",
+                "85aa3b0e/img_0000002.jpg",
+                "85aa3b0e/img_0000003.jpg"
+            ],
+            "id": 1,
+            "height": 886
+        }
+    ],
+    "annotations": [
+        {
+            "length": 1,
+            "category_id": 19,
+            "video_id": 1,
+            "iscrowd": 0,
+            "id": 1,
+            "height": 886,
+            "width": 1920,
+            "segmentations": [
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "YTW71dk04cN0nVO3nh02mVO1FOZh04mWO0ZO?bh0EPXOW1ig0TOlWOS1mg0VOiWOR1Ph0b1H7I6J4L5K4L4L4L3M2M2O000000001O001O\\KhYOk3Wf0oKXZOi3he0oKfZOk3ef0M4M3M2M4L3N1N2N2N2O1N2N2N2M3N2N2N3M3L3N3M3M2M4M3L3M2M2N3M2N2N1K6O1L4H8BWUOHPk0OknlZ1"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "PcZ72ck05[UO8Ui0J_VOl0Ui0WO_VOV1]i0f0fNoMfXOe2df0jMnXOY2nf0VNeXOk1Yg0[1M4M3N3L3N1N10000O0100O10O100001O1O2N1O2N3M6J7H9G6J3M4M2M3M3M3M3M3L4M3M3M3M2M3N1O2M2M4M1N2O0O2M2L5eNPVOk0Tj0UOnUOg0Uj0WOnUOh0Rj0WOQVOf0oi0YOTVOb0Pj0]OYVO5mi0IUXkZ1"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "PcZ73o05\\i01XVO?`i0ETVOj0ei0i0iNWNVXOm1bg0`NVXOc1bg0iNVXOl1Sg0_NdXOc1Xg0b1L5K3M3M2O1O1O00O2O000O10000O4M4L=B4M4K4M2M3N3L3N3L3M4M2M2N1O1N2O1O1O3M4K4M4L4L4K3L4M00J6N12O8G;E5K5K5J6@kimZ1"
+                }
+            ],
+            "bboxes": [
+                [
+                    267,
+                    73,
+                    66,
+                    172
+                ],
+                [
+                    271,
+                    80,
+                    64,
+                    171
+                ],
+                [
+                    271,
+                    78,
+                    61,
+                    173
+                ]
+            ],
+            "areas": [
+                11352,
+                10944,
+                10553
+            ],
+            "occlusion": [
+                "no_occlusion",
+                "no_occlusion",
+                "no_occlusion"
+            ]
+        },
+        {
+            "length": 1,
+            "category_id": 19,
+            "video_id": 1,
+            "iscrowd": 0,
+            "id": 2,
+            "height": 886,
+            "width": 1920,
+            "segmentations": [
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "jYk8i0hj07I6J7I6K5K5K5K5J6K5K5K5K4L4M3L4L4M3L3J6H9G8H8F9G9G:J5O1O2N1O1O1O0101O1M3ZOUZO]KPf0\\4XZO^Kme0Y2]\\OeMdc0T2d\\OlM[c0m1m\\OSNRc0f1W]OXNib0g1Y]OYNfb0g1[]OXNeb0g1]]OYNbb0g1_]OYN`b0f1c]OXN]b0h1h300O100O101N100O1O1000000L5N1O1N3J5K5O1D=N1O1O3JboRY1"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "jQm88Sk0`0@>B<H8J6J5K6J6J5K6J6H7E<I7N1O1N2O2M2O1O0O10O010O1O010OO1N1N2O1O2M2YOg0L5JPNUZObNfe0Y1nZOYNPe0f1`[OmMbd0Q2g[OkMZd0Q2k[OnMUd0R2m[OkMTd0S2o[OkMRd0S2Q\\OlMoc0S2S\\OlMlc0S2X\\OdMoc0Z2g2N2O1RNnVOW1Ti0iNmVOT1Ui0lNlVOR1Vi0mNkVOQ1Wi0nNjVOQ1Vi0oNjVOP1Xi0oNiVOo0Yi0POhVOn0Zi0QOfVOo0[i0POfVOn0\\i0POfVOn0\\i0QOdVOo0]i0POdVOn0^i0QOcVOn0]i0ROcVOn0^i0QOcVOn0^i0QObVOo0_i0PObVOo0_i0PObVO9G2hi0DbVO01:]i0FXWO9ih0FYWO8ih0FYWO8Tj0N1O2N2NhgmX1"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "[Vl85Zk0<C;D:H9I6K5J6J6K5K4L4M4K4L4]Oc0^Oc0N1000O1O1O1O1O00N2N2N2N2L3L4M3L4L4M3N100O0100@^YOhKjf0S4]YOlKaf0g1P\\OXNmc0f1X\\OZNfc0e1]\\O[Nac0e1a\\OZN]c0g1e\\OYNWc0i1k\\OWNob0m1T]ORNhb0P2Z]OoMeb0Q2^3100I7I71O2N2N2O2Md1\\N1O2N2O1N2N2N2N3M2Nk`UY1"
+                }
+            ],
+            "bboxes": [
+                [
+                    327,
+                    178,
+                    73,
+                    245
+                ],
+                [
+                    329,
+                    182,
+                    77,
+                    248
+                ],
+                [
+                    328,
+                    182,
+                    69,
+                    252
+                ]
+            ],
+            "areas": [
+                17885,
+                19096,
+                17388
+            ],
+            "occlusion": [
+                "no_occlusion",
+                "no_occlusion",
+                "no_occlusion"
+            ]
+        },
+        {
+            "length": 1,
+            "category_id": 19,
+            "video_id": 1,
+            "iscrowd": 0,
+            "id": 3,
+            "height": 886,
+            "width": 1920,
+            "segmentations": [
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "iZR96\\k08K2N2N2N1O2O1N2O0O2O000O2O001O001N10001O001N10001N1O1O2N10001O0010O0100O001O001O1O001O0000001O00000000001O000000000O10000000000N2O1O2N1O2N2N101O0O2O00G\\VOaNbi0`1`VO^N`i0b1bVO]N]i0;`VOe04POZi0;cVOe05nNXi0<dVOe07mNUi0=fVOe0fi0ZO\\VOf0di0YO]VOg0ci0XO_VOg0`i0YOaVOg0_i0WOcVOi0]i0VOdVOj0[i0VOgVOi0Yi0VOhVOj0Xi0UOiVOk0Vi0TOmVOk0Si0SOoVOm0mi001O0000001O00001O00001O0000001O00001O0000001N10001O00001O0000001O0O101O0000001O00001O00001O00000O2O000000001O000000001O000000001O00000O2O00001O001O00001N2N]RVV1"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "]\\X9:Zk03N2N2N101N1O101O0O101O1O001N2O0000001N10001O1O1O1O1O1O00001O000O100O100010O1O0001O001O00001O001O00001O00001O000000001O01O000001O0001O0000000000001O01O0001O001O001O001O001N101O001O001O0O2O001O1O001O001O001O0O101O001O00001O001O00001O00001O0000001O000000001O0000001O0000001N100000001O0000001O0O101O0000001N10001N10000O2O000O2O0OTnVV1"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "Wfi9:Yk05M2N2O0O2O001N101O001N101O0O2O001O0O101O0O4M1O1O1N2O000O10O10000000000000010O00000001O001O00100O0010O01O010O1O010O0010CkUOWOUj0j0lUOTOTj0l0mUOROUj0m0mUOPOTj0P1901O00001O01O01O00001O00001O01O01O000O2O00001O00001O00001O0000001O00001O0000001O0O10001O00001O0000001O0000001O00001O0000001O0000001O00001O000O101O00000O2O0000001O0O1000001O000O101O00000O2OjniU1"
+                }
+            ],
+            "bboxes": [
+                [
+                    335,
+                    463,
+                    172,
+                    74
+                ],
+                [
+                    342,
+                    477,
+                    164,
+                    49
+                ],
+                [
+                    362,
+                    478,
+                    159,
+                    52
+                ]
+            ],
+            "areas": [
+                12728,
+                8036,
+                8268
+            ],
+            "occlusion": [
+                "no_occlusion",
+                "no_occlusion",
+                "no_occlusion"
+            ]
+        },
+        {
+            "length": 1,
+            "category_id": 19,
+            "video_id": 1,
+            "iscrowd": 0,
+            "id": 4,
+            "height": 886,
+            "width": 1920,
+            "segmentations": [
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "e`e95^k08I3N2N2N2N2N1O101O001N10001O001O1N2O1O001O1O1O1O001O1O1O1O001O1O1N2O0O2O0O1O2N101O00001O001N10001O001O00001O001O0010O0001O001O0010O01O00001O013L8H5K1O2N1O2O0O2N1O2N1O2O0O1O1O1O1O00100O1O001O1N101O1N2O000O2O000O101O0O101N100O1O01kNPXOdNog0]1RXObNng0_1RXO`Nmg0a1SXO_Nmg0b1SXO\\Nng0d1SXO[Nmg0e1TXOYNlg0i1TXOTNng0l1SXOPNPh0P2QXOlMRh0U2nWOeMWh0[2b00O2O001O00001O00001O0O101OfMYWOe1gh0ZNZWOf1fh0YN\\WOg1ch0WN_WOi1ah0VN`WOj1`h0UNaWOl1_h0RNbWOn1_h0PNbWOP2_h0mMcWOS2^h0kMcWOV2]h0hMdWOX2nh0O01O00001O00010O000010O0001O00010O000010O01O010O0010O01O01O010O00001O010O000010O0001N101O0O101O0O101N1O2M2O2L3O101O001O010O001O001O000010O01O001O010O00001O010O001O0010O01O001O010O001O0010O01O001O001O001O010O001O001O001O001O001O0010O0001O001O001O001O001O00010O001O001O001O001O00001O001O001O001O001O00001O001O001O1O001O1O001O010000O10000O001O1O100O1O1O001O1O1O1O10O01O1O1O1O1O1O010O1O1O1O1O1O001O100O1O1O1O1O1O100O1O1O1O01O0N2WOi0O101O000000001O000O10001O00000000001O00000000001O00000000001O00001N2N2M4M2MZj[o0"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "`^_9;Yk03N2M3N2N2N1O2O0O101N1O2O0O2N101O1O1O1O1O1O001N2O001O1O001O1O1N2O1N1O2O00001O001O001O00001O2N2N1O1O1O1O1O1O0000000000000000000001O02N2N2N2N2N3M2N2O1N3M2N3M2N3M3M2N3M1O1O1O10O01O001OhNjWOQOUh0o0mWOoNSh0R1mWOmNSh0S1oWOkNQh0U1QXOjNng0W1SXOgNmg0Y1UXOeNkg0\\1VXOaNjg0`1XXO]Nig0c1YXOZNhg0g1YXOVNgg0k1[XORNfg0n1\\XOmMgg0T2l010000O2O000O101O0O101O0O101O000O2O00001O0O10001O00001O0000001O00000010eMYWOe1hh0YNYWOg1hh0WNYWOj1gh0SN\\WOl1eh0RN\\WOn1eh0PN\\WOP2eh0nM]WOR2eh0jM\\WOV2Ri0010O00010O01O01O01O0100O00100O0010O0100O00100O010O01O010O010O0010O010O01O010O00001N10001O00001GaVOYN_i0g1bVOWN`i0h1aVOWN_i0i1bVOVN_i0i1701O001O001O001O001O010O0010O0100O0010O010O010O01O010O0010O01O1O010O1O010O1O00100O001O10O01O10O01O1O010O1O010O1O00100O00100O0010O01O1O001O10O01O1O001O001O10O01O1O001O1O0010O01O1O001O1O10O01O1O1O001O10O01O1O1O001O100O001O1O001O1O1O001O1O000001O0000000000000000000000000000000000000000000000001O00000000000O100000000O100000000O10O1000O10000000O01000000001O0O100000001O000O10001O0O1O100O1O2O0O2NXRgo0"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "\\mU97[k07J4M3N2N2N2O1N2O1O1O1O1O1O1O1O1O100O1O1O1O1O1O1O1O1O001O10O01O001O001N2N101O00001O00001O00001O00001O00001O010O001O10O01O3M6K7H5K2O2M2N2N3N1N1O1O100O1O010O1O10O001RO^WOfNbh0Z1_WOfNah0Y1aWOeN_h0\\1bWObN^h0^1dWO`N]h0_1dWO`N\\h0`1fWO_NZh0a1fWO^NZh0b1gWO]NYh0c1hWO\\NYh0d1gWO[NYh0e1hWOZNWh0g1jWOXNVh0h1kWOWNUh0j1kWOUNTh0l1lWOTNTh0l1mWOSNSh0n1mWOQNRh0P2nWOPNRh0P2oWOoMQh0Q2PXOnMog0T2PXOlMPh0T2QXOkMog0U2RXOjMmg0X2SXOgMmg0Y2TXOfMlg0Z2UXOeMjg0]2g000001N10001N10001N101O00001O00001O00001O00001O001O00001O00hMYWOa1hh0]NYWOd1fh0[N[WOe1eh0[N\\WOd1dh0[N]WOf1bh0YN_WOg1bh0WN`WOh1`h0XN`WOh1`h0WNaWOj1_h0UNbWOj1_h0UNaWOk1`h0SNaWOm1_h0RNcWOm1^h0QNcWOP2]h0mMeWOS2Pi0O00001O01O01O000010O0001O0010O01O00010O0010O010O010O01O01O010O010O01O010I\\VOZNdi0g1\\VOYNdi0f1]VOYNci0g1^VOYNbi0f1_VOYNai0g1`VOXN`i0h18O010O001O001O010O00001O0010O01O001O10O01O001O10O01O001O00100O001O00100O001O0010O01O000010O01O001O0010O0001O001O010O001O00010O001O001O010O001O1O001O001O0010O01O001O001O1O001O001O001O0010O0001O001O001O0010O0001O00100O1O10000O10000O100000O010O100O2O1N101N101N101N101N2O0O2O0O1O100O1O10O01O100O0001[Od0N2N3M21O01O10O0100O010O1O010O10O0100O1O2NPajP1"
+                }
+            ],
+            "bboxes": [
+                [
+                    357,
+                    621,
+                    402,
+                    151
+                ],
+                [
+                    350,
+                    612,
+                    396,
+                    132
+                ],
+                [
+                    339,
+                    605,
+                    366,
+                    164
+                ]
+            ],
+            "areas": [
+                60702,
+                52272,
+                60024
+            ],
+            "occlusion": [
+                "no_occlusion",
+                "no_occlusion",
+                "no_occlusion"
+            ]
+        },
+        {
+            "length": 1,
+            "category_id": 19,
+            "video_id": 1,
+            "iscrowd": 0,
+            "id": 5,
+            "height": 886,
+            "width": 1920,
+            "segmentations": [
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "i\\Za0;oj0=L5K4L5L3L5L3L4L4M3L3N2M4L3N3N1N2O2M2O1O0O2O1N101N2O0O2O1O0O101N100O2O0O100O100O1O010O100O010O1O010O1O100O1O010O1O1O100OO1N3M2M3L5M300O10001N100O01O10M2L4L4K6J5L5J6L4M3M3M3N3L=C5K4M3N2N2N1O2N2N2O1O100O1O2MYPio0"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "d`Ya04_k0;E;Ec0^O3M3M3M2N3M2N2N3M2O1N2O1O1N2O1N2O1N100O2O001N100O1O2O0O1O1O1O100O1O1O100O1O1O1O101N2N2N2M2O00N12O1O1O0O2O1O1N2O001N2O10O100000000O1O001N2O1O1C=_Oa0F;F9H8J7H7I8I7J5N3M2N3M4LckVP1"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "U_Sa05\\k0<F9G7I4L4L4M3M2N3M2N2N2N2O0O2N2N2N2N1O2N1O2N2O0O2N101N1O101N1O101N1O101N1O100O1O100O1O100O00100O1O010O1O10000O100O10000O01O01000HcWOXM\\h0h2fWOWMZh0i2hWOUMXh0j2901N1O2O1N2N2M4L3M4K4M3L4M4K4L4L4L5K5K5L3N3M3M3K6JgbXP1"
+                }
+            ],
+            "bboxes": [
+                [
+                    640,
+                    511,
+                    104,
+                    181
+                ],
+                [
+                    639,
+                    511,
+                    89,
+                    180
+                ],
+                [
+                    632,
+                    521,
+                    94,
+                    167
+                ]
+            ],
+            "areas": [
+                18824,
+                16020,
+                15698
+            ],
+            "occlusion": [
+                "no_occlusion",
+                "no_occlusion",
+                "no_occlusion"
+            ]
+        },
+        {
+            "length": 1,
+            "category_id": 19,
+            "video_id": 1,
+            "iscrowd": 0,
+            "id": 6,
+            "height": 886,
+            "width": 1920,
+            "segmentations": [
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "cTfa02dk01O001O1WYOLna05P^OMoa04P^OMPb03o]OMQb04n]OMRb03m]ONRb03m]OMTb03k]ONTb05i]OKXb09c]OH\\b0=_]ODab0`0Z]O@fb0e0U]O[Olb0h0P]OXOPc0l0l\\OTOTc0P1kYOTOo1LWd0S1cYOWOS2GYd0V1]YOXOX2B\\d0S2a[OmM_d0U2_[OkMbd0U2][OkMdd0V2Z[OjMgd0T3ZZOlLie0W3QZOiLVf0V3dYOjLdf0U3UYOlLQg0T3hXOlL^g0c36J7J44J4L4L2N00O1N2N2N2M3N2N2O1O000O1O1O1N2N2O1N3N1N2N3L3N3M3M3M3L4M3MI7H8I6N30cMmWOW1[i0M3N1N3M3L7_OfUOZOcj0<b0I4L4MVooo0"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "haQb02dk00lJ5\\^OLba08\\^OIba0:\\^OFda0<Z^ODea0?Y^OAga0a0W^O_Oja0d0R^O\\Ooa0h0k]OYOVb0l0d]OUO\\b0P1^]OPObb0U1Y]OkNhb0Z1R]OfNob0_1k\\OaNVc0c1e\\O]N\\c0h1]\\OYNec0W2i[OjMZd0g2Q[OYMUe0j2bZOVMee0l2RZOTMUf0n2bYORMkf0j2lXOVM^g0i2XXOXMkg0m2mWOTMUh0U334L7H101O9GN2N2N2N2N3M2O1N3M2N2O1N1O1O1O1N2N1O2N2N2N2N2N3M4L4K4M4K10M4L3M201O1OSNQWOT1Pi0hNWWOT1jh0iN[WOR1ih0jN]WOQ1hh0hN`WOl0TOTOfj0e0<H5K4M2Mkhjo0"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "R_Wb04^k06L3N4L4L4L4M4K4M3M3M5K50lNPVO>dj02nWOQOVe0U1aZOlNae0\\1TZOfNme0c1gYO^N[f0k1ZYOUNhf0S2mXOnMUg0Z2`XOhMag0`2UXO`Mmg0T32003M6J5K4L2N1ON2N2N2N2O1N3M3M2O1N1O1O1O1O1N2O1N3L3N2N3M2O1O2L3N2M4M2M3N3L2OO00YN^VO[1bi0eN`VOY1`i0gNcVOV1]i0kNdVOS1\\i0mNfVOQ1Yi0POjVOk0Xi0UOjVOf0Yi0ZOPWO;Ri0FVWO0jh01YWOJih06ZWODih0<X11O000010O010O010O10001N1O1O1N3M4L`mVo0"
+                }
+            ],
+            "bboxes": [
+                [
+                    654,
+                    287,
+                    82,
+                    218
+                ],
+                [
+                    667,
+                    286,
+                    75,
+                    227
+                ],
+                [
+                    674,
+                    299,
+                    91,
+                    224
+                ]
+            ],
+            "areas": [
+                17876,
+                17025,
+                20384
+            ],
+            "occlusion": [
+                "no_occlusion",
+                "slight_occlusion",
+                "slight_occlusion"
+            ]
+        },
+        {
+            "length": 1,
+            "category_id": 19,
+            "video_id": 1,
+            "iscrowd": 0,
+            "id": 7,
+            "height": 886,
+            "width": 1920,
+            "segmentations": [
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "ebT=1dk03M2O2N2M3N3M2M2O1N101O0O101N10001N10000O10O01O1O1O10O01O1O001000O10000000000000O10000000000000000000000000000000O10000000000000000O2N100O100O1O100O100O1O1O1O100O1O1O100000O1000000O0100000O1000000O1000O10O10O10O01M30O10000O10000O10O10O10000O10000O10000O10000O10000O100000O0100000000O1000000O1000000O1000000O10O100000O1000000O1000000O1000000O10000O1000000O10001O0O1000000O10000IkNmUOU1Rj0mNlUOT1Tj0lNlUOT1Tj0mNkUOS1Tj0nNkUOS1Uj0mNkUOS1Uj0mNkUOS1Uj0mNkUOS1Uj0mNjUOT1Vj060000001N10000000001O000000001O00000O100000O10008H1OO1O1O001N2O1O001O0100O100000000000000O1000000000O100O100O100O100O100O100O100O101N100O2N1O1O1O2N1O1O101N101N2N2O1N2N2G`kSo0"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "klX=3bk05L1O1O1O1O3M3M3M2N1O1O00000000000000001O1O1O1O1O2N1O1O00001O0000O1O1O1N2O1O1O1O100O10O10O1000000O10000O10000O10000O1000O10000O1000O010000O10000O100000000O101O00000O1000O1O1O001O1O100O001O1O1O1O010O1O1O1O001O10O10000O10000O100000O010000O10000O10000O10000O1000000O10000O01000O10000O1000000O1000000O1000O10O1000000O1000000O10O10O1000000O10001O0O10001O0O101O00000O2O0000000O1000O1000O100000000O100000O10O100000000O100000001O0O10000000000O1000O1000O10000O1O100000O0100000000000O010000000O100000000O101O0O10000O10000O10000O2O000O1O1O2N1O1O2N1O1O2N101O00001N2MZkSo0"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "mhY=2bk03N100O2O000O2O000O2O0O2O000O2O1N3N1N2M3N2N100O01000O2O1N10000O10O10O10O1O010000O01000O100O10000O2O0000001O001O00001O001O000O10000000O1N2N20000000000O100000000O1L4L4O1O1O1O1O1O1O1O100O10000O10000O010O10O10O10O10000000O10O1000000000000O10O1000000000O1000000000O01000000O1O1O10000O10000O10000O10000O1000000O10000O10000O101O0O10000O101O000O10001O000O1000000O100000000O1000001O0O1000000O100000000O1000O10O100000O10O100000O1000O1000O100000000O0100000000000000O1000000000000O101O00000000O10O10O10000O100O1O100O10000001O0001N1O1O2N1O1O2N2O0O2N101N100O2O001N6K9FToRo0"
+                }
+            ],
+            "bboxes": [
+                [
+                    486,
+                    24,
+                    283,
+                    77
+                ],
+                [
+                    491,
+                    26,
+                    278,
+                    81
+                ],
+                [
+                    492,
+                    27,
+                    278,
+                    75
+                ]
+            ],
+            "areas": [
+                21791,
+                22518,
+                20850
+            ],
+            "occlusion": [
+                "no_occlusion",
+                "no_occlusion",
+                "no_occlusion"
+            ]
+        },
+        {
+            "length": 1,
+            "category_id": 19,
+            "video_id": 1,
+            "iscrowd": 0,
+            "id": 8,
+            "height": 886,
+            "width": 1920,
+            "segmentations": [
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "\\Z_o03bk04L2N1O1O100O010O100O100O100O010O10O0100O01000O010O10O01O001O001O00001O001O001O001O00001O0O101O001O00001O000O2O001O001O001O1O001O001O001O010O001O1O0010O01O001O010O001O10O01O0010O01O10O01O0010O01O1O010O010O10O0100O010O1O010O10O0100O010O10O010O010O010O010O01O010O01O001OSVOaNdi0_1[VOcNei0\\1YVOfNgi0[1WVOfNji0b1001O1O001O001L4O010O001O10O01O010O1O010O001O1O001O1O1O1O1O100O10000O1O2N1O1O2M2O2N2M4K5L4M3M3M3MSW\\?"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "bg\\o02ak04K4N2O00100O1O100O10O01O100O100O10O10O10000O01000O010O0010O01O10O01O01O00010O00010O000001O00000O2O00001O0O10001O0O2O001O001O001O001O001O1O0010O01O001O001O010O001O001O001O010O0010O01O10O01O010O0010O0100O00100O00100O00100O00100O010O10O0100O010O10O01O010O10O0100O010O010O010O010O010O0100O010O13L2OO0O2M3O0010O01O10O01O1O010O00100O001O1O001O1O1O1O1O010O100O101N1O1O2M2O1N3N2M3N3L4M3Ie[[?"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "]`do04ak02N2O0O2O3L4M1N100O10O0100O010O10O01000O010O10O010O1O010O0001O01O01O0001O0000001O0000001O000O101O00000O2O001O001O001O1O001O001O010O1O001O001O00100O001O001O010O1O001O001O010O0010O01O00100O0010O01O0010O0100O00100O100O00100O10O01O10O0100O00100O010O01O010O00100O0010O01O10O010O10O10O101N4M00O0N3M2O2O010O1O010O0010O01O10O01O001O100O1O1O1O1O10000O10000O1O1O2N1N2O1O1O2N2M4L3N4KVQW?"
+                }
+            ],
+            "bboxes": [
+                [
+                    1164,
+                    84,
+                    187,
+                    119
+                ],
+                [
+                    1161,
+                    85,
+                    191,
+                    122
+                ],
+                [
+                    1170,
+                    85,
+                    187,
+                    122
+                ]
+            ],
+            "areas": [
+                22253,
+                23302,
+                22814
+            ],
+            "occlusion": [
+                "no_occlusion",
+                "no_occlusion",
+                "no_occlusion"
+            ]
+        },
+        {
+            "length": 1,
+            "category_id": 19,
+            "video_id": 1,
+            "iscrowd": 0,
+            "id": 9,
+            "height": 886,
+            "width": 1920,
+            "segmentations": [
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "hcVY11ek02N3M2N2N1O2N1O2N1O1O2N1O2N1O2O01O100O00100O1O100O1O01O0000001O00001O0000001O00001O000O2O00000O2O0000000O1000000O100000000O1000000O1000001O00000000000000000O100bUOPOUj0P1gUOTOYj0U10001O00000000O1O1O001O1O1O100O1O100O1O10O01O100O1001O001O000000O1O100O1O1O1O100O1O1N2O1N2O1N3N1N3N4K6JVbR7"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "XY_Y15]k08K4M4M3M2N1O2N1O1O101N100O2N100O02O3L3N1N010O0100O0010O010O010O1O001O1O000000000000000000000000O10000000000O10000000O010000000000O10O100000O1000000O0100000O10000O2O4L1O0O1000O001O1O001O1O001O1000O0100O01000O001O1O001O1O001O1O001O1O001N2O1O1O3M3L4JPfQ7"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "\\jhX12ck02O001O01O01O0000001O01O0001O00001O0000001O00001O010O1O2O0O1O101N1O101O000O2O000O101O0000001O00001O0000001O1O1O1O001O1O1O1O00000000000000001O0000000000000000001O0000000000000001O0000001O0000000O2O000000000O10000000O1000O1000000000O10O1000000000O1000000O10000O10O1O10O01O10O01O0010O01O010O00010O001N101O1N3M4K5J6JQ_l6"
+                }
+            ],
+            "bboxes": [
+                [
+                    1524,
+                    0,
+                    134,
+                    135
+                ],
+                [
+                    1534,
+                    15,
+                    125,
+                    140
+                ],
+                [
+                    1508,
+                    51,
+                    157,
+                    134
+                ]
+            ],
+            "areas": [
+                18090,
+                17500,
+                21038
+            ],
+            "occlusion": [
+                "no_occlusion",
+                "no_occlusion",
+                "no_occlusion"
+            ]
+        },
+        {
+            "length": 1,
+            "category_id": 19,
+            "video_id": 1,
+            "iscrowd": 0,
+            "id": 10,
+            "height": 886,
+            "width": 1920,
+            "segmentations": [
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "PZPU12dk00O100000001O000mTO3\\j0N_UOb0Vj0^OfUOm0Sj0SOhUOU1Uj08N3M3L2O1O1L4L4L3M4K5J5K6J6J6J5K5L4K4L5K5K5K5K5K5K4J7I7I6J6J6M3N2N2O1UOPJo[OQ6Rd0VJe[Ok5]d0[JZ[Of5hd0c02M2I7cJX[Oc22gLRe0a0l[OX1ge0dNg3O1O2N1O1N2N2M2O2N2N2O001O1N101Ojin<"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "lWWU16Xk0;G7K5YOVO]VOn0ai0ZOTVOm0ii0g0I3N0O1O1L4H8I7J6K4K6K4L4K5L5J5K5J6J6I7J6J6L4M2N2M3N2N2O1N2N1O2O00001O1O1O1O1OUK]ZOY3oe0YLZ[Oj2hd0TMo[O:_O]Ocd08n400000O10O100000001O0010O10000O100O100O1001O001O1O1N3M3K5L\\fb<"
+                },
+                {
+                    "size": [
+                        886,
+                        1920
+                    ],
+                    "counts": "QVWU12`12`h0OhVOi0Wi0YOeVOk0Yi0VOcVOP1[i0PObVOU1[i0mNaVOX1]i0hN_VO^1^i0cN_VOa1`i0<N2N1O1K5L3L5K5K4L4M3L5K4M3L4L4M4K4M3L4L3N2M3N2M3M3N2M3N2M3N2M2O2M2ON1O200TOiYO\\LXf0T3lYO^Lnf0[3[YOeLcf0S3gYOmLWf0h2VZOXMge0Z2jZOeMUe0m1[[OSNcd0[1R\\OdNSc0IgZOm0n2ZO[b0Q1S^OoNna0l0V^OSOka0j0Y^OUOha0f0]^OYOca0d0`^O\\O`a0b0c^O]O^a0`0d^O_O]a0`0e^O_O\\a0`0e^O^O]a0a0m4N2O2N1O1O2N1O1N2N2NdUf<"
+                }
+            ],
+            "bboxes": [
+                [
+                    1368,
+                    519,
+                    72,
+                    233
+                ],
+                [
+                    1376,
+                    504,
+                    78,
+                    230
+                ],
+                [
+                    1376,
+                    480,
+                    74,
+                    243
+                ]
+            ],
+            "areas": [
+                16776,
+                17940,
+                17982
+            ],
+            "occlusion": [
+                "no_occlusion",
+                "no_occlusion",
+                "no_occlusion"
+            ]
+        }
+    ],
+    "categories": [
+        {
+            "supercategory": "object",
+            "id": 1,
+            "name": "Person"
+        },
+        {
+            "supercategory": "object",
+            "id": 2,
+            "name": "Bird"
+        },
+        {
+            "supercategory": "object",
+            "id": 3,
+            "name": "Cat"
+        },
+        {
+            "supercategory": "object",
+            "id": 4,
+            "name": "Dog"
+        },
+        {
+            "supercategory": "object",
+            "id": 5,
+            "name": "Horse"
+        },
+        {
+            "supercategory": "object",
+            "id": 6,
+            "name": "Sheep"
+        },
+        {
+            "supercategory": "object",
+            "id": 7,
+            "name": "Cow"
+        },
+        {
+            "supercategory": "object",
+            "id": 8,
+            "name": "Elephant"
+        },
+        {
+            "supercategory": "object",
+            "id": 9,
+            "name": "Bear"
+        },
+        {
+            "supercategory": "object",
+            "id": 10,
+            "name": "Zebra"
+        },
+        {
+            "supercategory": "object",
+            "id": 11,
+            "name": "Giraffe"
+        },
+        {
+            "supercategory": "object",
+            "id": 12,
+            "name": "Poultry"
+        },
+        {
+            "supercategory": "object",
+            "id": 13,
+            "name": "Giant_panda"
+        },
+        {
+            "supercategory": "object",
+            "id": 14,
+            "name": "Lizard"
+        },
+        {
+            "supercategory": "object",
+            "id": 15,
+            "name": "Parrot"
+        },
+        {
+            "supercategory": "object",
+            "id": 16,
+            "name": "Monkey"
+        },
+        {
+            "supercategory": "object",
+            "id": 17,
+            "name": "Rabbit"
+        },
+        {
+            "supercategory": "object",
+            "id": 18,
+            "name": "Tiger"
+        },
+        {
+            "supercategory": "object",
+            "id": 19,
+            "name": "Fish"
+        },
+        {
+            "supercategory": "object",
+            "id": 20,
+            "name": "Turtle"
+        },
+        {
+            "supercategory": "object",
+            "id": 21,
+            "name": "Bicycle"
+        },
+        {
+            "supercategory": "object",
+            "id": 22,
+            "name": "Motorcycle"
+        },
+        {
+            "supercategory": "object",
+            "id": 23,
+            "name": "Airplane"
+        },
+        {
+            "supercategory": "object",
+            "id": 24,
+            "name": "Boat"
+        },
+        {
+            "supercategory": "object",
+            "id": 25,
+            "name": "Vehical"
+        }
+    ]
+}
