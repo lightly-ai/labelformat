@@ -175,3 +175,49 @@ def test_labels_dir_without_path(tmp_path: Path) -> None:
     input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
     expected = tmp_path / "labels/train"
     assert input_obj._labels_dir() == expected
+
+
+def test_multilevel_relative_paths_with_dot(tmp_path: Path) -> None:
+    dataset_root = tmp_path / "dataset"
+    for split in ["train", "valid", "test"]:
+        (dataset_root / split / "images").mkdir(parents=True)
+        (dataset_root / split / "labels").mkdir(parents=True)
+
+    config = {
+        "train": "./train/images",
+        "valid": "./valid/images",
+        "test": "./test/images",
+        "names": ["person"],
+    }
+    config_file = dataset_root / "data.yaml"
+    with config_file.open("w") as f:
+        yaml.safe_dump(config, f)
+
+    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+
+    assert input_obj._root_dir() == dataset_root
+    assert input_obj._images_dir() == dataset_root / "train" / "images"
+    assert input_obj._labels_dir() == dataset_root / "train" / "labels"
+
+
+def test_multilevel_relative_paths(tmp_path: Path) -> None:
+    dataset_root = tmp_path / "dataset"
+    for split in ["train", "valid", "test"]:
+        (dataset_root / split / "images").mkdir(parents=True)
+        (dataset_root / split / "labels").mkdir(parents=True)
+
+    config = {
+        "train": "../train/images",
+        "valid": "../valid/images",
+        "test": "../test/images",
+        "names": ["person"],
+    }
+    config_file = dataset_root / "data.yaml"
+    with config_file.open("w") as f:
+        yaml.safe_dump(config, f)
+
+    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+
+    assert input_obj._root_dir() == dataset_root
+    assert input_obj._images_dir() == dataset_root / "train" / "images"
+    assert input_obj._labels_dir() == dataset_root / "train" / "labels"
