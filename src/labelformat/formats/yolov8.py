@@ -69,8 +69,13 @@ class _YOLOv8BaseInput:
         return self._config_file.parent
 
     def _images_dir(self) -> Path:
+        """Get images directory from YOLOv8 config file with fallback logic."""
         root_dir = self._root_dir()
-        return root_dir / str(self._config_data[self._split])
+        split_path = str(self._config_data[self._split])
+        # Fix relative paths for Roboflow-style configs.
+        if "path" not in self._config_data and split_path.startswith("../"):
+            split_path = split_path.replace("../", "./", 1)
+        return root_dir / split_path
 
     def _labels_dir(self) -> Path:
         """Get labels directory from YOLOv8 config file.
