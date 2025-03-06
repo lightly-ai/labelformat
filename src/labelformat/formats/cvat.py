@@ -1,8 +1,8 @@
 import logging
 import xml.etree.ElementTree as ET
 from argparse import ArgumentParser
-from collections.abc import Iterable, Sequence
 from pathlib import Path
+from typing import Iterable, List
 
 from labelformat.cli.registry import Task, cli_register
 from labelformat.model.bounding_box import BoundingBox, BoundingBoxFormat
@@ -141,7 +141,7 @@ class CVATObjectDetectionOutput(ObjectDetectionOutput):
         )
 
 
-def _get_categories(xml_root: ET.Element) -> Sequence[Category]:
+def _get_categories(xml_root: ET.Element) -> List[Category]:
     label_paths = ["meta/task/labels", "meta/job/labels", "meta/project/labels"]
     for path in label_paths:
         xml_labels = xml_root.find(path)
@@ -171,8 +171,8 @@ def _parse_image(xml_root: ET.Element) -> Image:
 
 
 def _parse_object(
-    categories: Sequence[Category], xml_root: ET.Element
-) -> Sequence[SingleObjectDetection]:
+    categories: List[Category], xml_root: ET.Element
+) -> List[SingleObjectDetection]:
     objects = []
     xml_boxes = xml_root.findall("box")
     for xml_box in xml_boxes:
@@ -214,7 +214,7 @@ def _xml_text_or_raise(elem: ET.Element) -> str:
 
 
 def _validate_required_attributes(
-    xml_elem: ET.Element, required_attributes: Sequence[str]
+    xml_elem: ET.Element, required_attributes: List[str]
 ) -> None:
     missing_attrs = [attr for attr in required_attributes if xml_elem.get(attr) is None]
     if missing_attrs:
