@@ -105,19 +105,19 @@ class CVATObjectDetectionOutput(ObjectDetectionOutput):
             name = ET.SubElement(label, "name")
             name.text = category.name
 
-        for label in label_input.get_labels():
+        for label_object in label_input.get_labels():
             image_elem = ET.SubElement(
                 root,
                 "image",
                 {
-                    "id": str(label.image.id),
-                    "name": label.image.filename,
-                    "width": str(label.image.width),
-                    "height": str(label.image.height),
+                    "id": str(label_object.image.id),
+                    "name": label_object.image.filename,
+                    "width": str(label_object.image.width),
+                    "height": str(label_object.image.height),
                 },
             )
 
-            for obj in label.objects:
+            for obj in label_object.objects:
                 bbox = obj.box
                 ET.SubElement(
                     image_elem,
@@ -163,10 +163,10 @@ def _parse_image(xml_root: ET.Element) -> Image:
     _validate_required_attributes(xml_root, ["name", "id", "width", "height"])
 
     return Image(
-        id=int(xml_root.get("id")),
-        filename=xml_root.get("name"),
-        width=int(xml_root.get("width")),
-        height=int(xml_root.get("height")),
+        id=int(_xml_attribute_text_or_raise(xml_root, "id")),
+        filename=_xml_attribute_text_or_raise(xml_root, "name"),
+        width=int(_xml_attribute_text_or_raise(xml_root, "width")),
+        height=int(_xml_attribute_text_or_raise(xml_root, "height")),
     )
 
 
@@ -182,7 +182,10 @@ def _parse_object(
         category = next((cat for cat in categories if cat.name == label), None)
         if category is None:
             raise ParseError(f"Unknown category name '{label}'.")
-        bbox = [float(xml_box.get(attr)) for attr in ["xtl", "ytl", "xbr", "ybr"]]
+        bbox = [
+            float(_xml_attribute_text_or_raise(xml_box, attr))
+            for attr in ["xtl", "ytl", "xbr", "ybr"]
+        ]
 
         objects.append(
             SingleObjectDetection(
@@ -211,6 +214,13 @@ def _xml_text_or_raise(elem: ET.Element) -> str:
             f"Missing text content for XML element: {ET.tostring(elem, encoding='unicode')}"
         )
     return text
+
+
+def _xml_attribute_text_or_raise(elem: ET.Element, attribute_name: str) -> str:
+    attribute_text = elem.get(attribute_name)
+    if attribute_text is None:
+        raise ParseError(f"Bad value for attribute: {attribute_name}")
+    return attribute_text
 
 
 def _validate_required_attributes(
