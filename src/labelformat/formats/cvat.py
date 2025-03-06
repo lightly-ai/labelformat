@@ -133,7 +133,12 @@ class CVATObjectDetectionOutput(ObjectDetectionOutput):
 
         tree = ET.ElementTree(root)
         label_path = (self._output_folder / "annotations").with_suffix(".xml")
-        tree.write(label_path, encoding="utf-8", xml_declaration=True, short_empty_elements=False)
+        tree.write(
+            label_path,
+            encoding="utf-8",
+            xml_declaration=True,
+            short_empty_elements=False,
+        )
 
 
 def _get_categories(xml_root: ET.Element) -> Sequence[Category]:
