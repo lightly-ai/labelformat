@@ -111,6 +111,21 @@ class TestCVATObjectDetectionInput:
             label_input = CVATObjectDetectionInput(xml_path)
             list(label_input.get_labels())
 
+def _compare_xml_elements(elem1: ET.Element, elem2: ET.Element) -> bool:
+    """Recursively compare two XML elements for tag, attributes, and text."""
+    if elem1.tag != elem2.tag or elem1.text != elem2.text:
+        return False
+
+    if elem1.attrib != elem2.attrib:
+        return False
+
+    children1 = list(elem1)
+    children2 = list(elem2)
+
+    if len(children1) != len(children2):
+        return False
+
+    return all(_compare_xml_elements(c1, c2) for c1, c2 in zip(children1, children2))
 
 class TestCVATObjectDetectionOutput:
     @pytest.mark.parametrize("annotation_scope", ["task", "project", "job"])
@@ -147,9 +162,14 @@ class TestCVATObjectDetectionOutput:
 
         assert path == tmp_path / "labels" / "annotations.xml"
 
-        contents = path.read_text().replace(" ", "").replace("\n", "")
-        annotation = annotation.replace(" ", "").replace("\n", "")
-        assert contents == annotation
+        annotation = annotation.replace("\n", "")
+        # Compare XML structure.
+        input_tree = ET.parse(xml_path)#ET.ElementTree(ET.fromstring(annotation))
+        output_tree = ET.parse(path)
+
+        assert _compare_xml_elements(
+            input_tree.getroot(), output_tree.getroot()
+        ), "The output XML structure doesn't match the input XML."
 
     def test_output_missing_labels(self, tmp_path: Path) -> None:
         annotation = """<?xml version='1.0' encoding='utf-8'?>
