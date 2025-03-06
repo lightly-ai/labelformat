@@ -42,13 +42,11 @@ class _CVATBaseInput:
         return self._categories
 
 
-
 @cli_register(format="cvat", task=Task.OBJECT_DETECTION)
 class CVATObjectDetectionInput(_CVATBaseInput, ObjectDetectionInput):
     def get_images(self) -> Iterable[Image]:
         for label in self.get_labels():
             yield label.image
-
 
     def get_labels(self) -> Iterable[ImageObjectDetection]:
         xml_images = self._data.findall("image")
