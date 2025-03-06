@@ -111,6 +111,7 @@ class TestCVATObjectDetectionInput:
             label_input = CVATObjectDetectionInput(xml_path)
             list(label_input.get_labels())
 
+
 def _compare_xml_elements(elem1: ET.Element, elem2: ET.Element) -> bool:
     """Recursively compare two XML elements for tag, attributes, and text."""
     if elem1.tag != elem2.tag or elem1.text != elem2.text:
@@ -126,6 +127,7 @@ def _compare_xml_elements(elem1: ET.Element, elem2: ET.Element) -> bool:
         return False
 
     return all(_compare_xml_elements(c1, c2) for c1, c2 in zip(children1, children2))
+
 
 class TestCVATObjectDetectionOutput:
     @pytest.mark.parametrize("annotation_scope", ["task", "project", "job"])
@@ -164,7 +166,7 @@ class TestCVATObjectDetectionOutput:
 
         annotation = annotation.replace("\n", "")
         # Compare XML structure.
-        input_tree = ET.parse(xml_path)#ET.ElementTree(ET.fromstring(annotation))
+        input_tree = ET.parse(xml_path)
         output_tree = ET.parse(path)
 
         assert _compare_xml_elements(
