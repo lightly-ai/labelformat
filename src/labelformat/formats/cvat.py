@@ -1,7 +1,6 @@
 import logging
 import xml.etree.ElementTree as ET
 from argparse import ArgumentParser
-from collections import OrderedDict
 from pathlib import Path
 from typing import Iterable, List
 
@@ -110,14 +109,12 @@ class CVATObjectDetectionOutput(ObjectDetectionOutput):
             image_elem = ET.SubElement(
                 root,
                 "image",
-                OrderedDict(
-                    [
-                        ("id", str(label_object.image.id)),
-                        ("name", label_object.image.filename),
-                        ("width", str(label_object.image.width)),
-                        ("height", str(label_object.image.height)),
-                    ]
-                ),
+                {
+                    "id": str(label_object.image.id),
+                    "name": label_object.image.filename,
+                    "width": str(label_object.image.width),
+                    "height": str(label_object.image.height),
+                },
             )
 
             for obj in label_object.objects:
