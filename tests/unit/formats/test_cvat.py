@@ -106,7 +106,7 @@ class TestCVATObjectDetectionInput:
 
         with pytest.raises(
             ParseError,
-            match="Could not parse XML file : Missing required attributes: height",
+            match="Could not parse XML file: Missing required attributes: height",
         ):
             label_input = CVATObjectDetectionInput(xml_path)
             list(label_input.get_labels())
@@ -193,7 +193,7 @@ class TestCVATObjectDetectionOutput:
 
         with pytest.raises(
             ParseError,
-            match="Could not parse XML file : Unknown category name 'dummy'.",
+            match="Could not parse XML file: Unknown category name 'dummy'.",
         ):
             CVATObjectDetectionOutput(
                 output_folder=output_folder, annotation_scope="task"
