@@ -219,7 +219,7 @@ def _xml_text_or_raise(elem: ET.Element) -> str:
 def _xml_attribute_text_or_raise(elem: ET.Element, attribute_name: str) -> str:
     attribute_text = elem.get(attribute_name)
     if attribute_text is None:
-        raise ParseError(f"Bad value for attribute: {attribute_name}")
+        raise ParseError(f"Could not read attribute: '{attribute_name}'")
     return attribute_text
 
 
