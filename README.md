@@ -39,7 +39,7 @@ and time-consuming. Labelformat aims to solve this pain.
 
 - Support for common dataset label formats (more coming soon)
 - Support for common tool formats (more coming soon)
-- Minimal dependencies, targets python 3.7 or higher
+- Minimal dependencies, targets python 3.8 or higher
 - Memory concious - datasets are processed file-by-file instead of loading everything
   in memory (when possible)
 - Typed
@@ -421,13 +421,13 @@ We also welcome contributions, please submit a PR.
 
 ### Development
 
-The library targets python 3.7 and higher. We use poetry to manage the development environment.
+The library targets python 3.8 and higher. We use poetry to manage the development environment.
 
 Here is an example development workflow:
 
 ```bash
 # Create a virtual environment with development dependencies
-poetry env use python3.7
+poetry env use python3.8
 poetry install
 
 # Make changes
