@@ -11,7 +11,7 @@ readme = "README.md"
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = ">=3.7"
+python = ">=3.8"
 tqdm = "*"
 pyyaml = "*"
 pillow = "*"
@@ -41,7 +41,7 @@ profile = "black"
 
 [tool.mypy]
 ignore_missing_imports = true
-python_version = 3.7
+python_version = 3.8
 warn_unused_configs = true
 strict_equality = true
 # Disallow dynamic typing

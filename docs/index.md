@@ -8,7 +8,7 @@
 
 ## Key Features
 - **Wide Format Support**: COCO, YOLO (v5-v11), PascalVOC, KITTI, Labelbox, and more.
-- **Cross-Platform**: Compatible with Python 3.7+ on Windows, macOS, and Linux.
+- **Cross-Platform**: Compatible with Python 3.8+ on Windows, macOS, and Linux.
 - **Flexible Usage**: Intuitive CLI and Python API.
 - **Efficient**: Memory-conscious, optimized for large datasets.
 - **Offline First**: Operates locally without data uploads.
