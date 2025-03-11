@@ -1,6 +1,7 @@
 import logging
 import xml.etree.ElementTree as ET
 from argparse import ArgumentParser
+from enum import Enum
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional
 
@@ -16,12 +17,12 @@ from labelformat.model.object_detection import (
     ObjectDetectionOutput,
     SingleObjectDetection,
 )
-from labelformat.types import ParseError
+from labelformat.types import ArgumentError, ParseError
 
 logger = logging.getLogger(__name__)
 
 
-# --- Pydantic XML models ---
+# The following Pydantic XML models describe the structure of CVAT XML files.
 class CVATLabel(BaseXmlModel, tag="label"):  # type: ignore
     name: str = element()
 
@@ -80,12 +81,11 @@ class _CVATBaseInput:
         )
 
     def __init__(self, input_file: Path) -> None:
+        xml_text = input_file.read_text()
         try:
-            self._data = CVATAnnotations.from_xml(input_file.read_text())
+            self._data = CVATAnnotations.from_xml(xml_text)
         except Exception as ex:
-            raise ValueError(
-                f"Could not parse XML file {input_file}: {str(ex)}"
-            ) from ex
+            raise ValueError(f"Could not parse XML file {input_file}: {ex}") from ex
 
     def get_categories(self) -> Iterable["Category"]:
         meta = self._data.meta
@@ -142,6 +142,16 @@ class CVATObjectDetectionInput(_CVATBaseInput, ObjectDetectionInput):
             )
 
 
+class AnnotationScope(Enum):
+    TASK = "task"
+    JOB = "job"
+    PROJECT = "project"
+
+    @staticmethod
+    def allowed_values() -> str:
+        return ", ".join(scope.value for scope in AnnotationScope)
+
+
 class _CVATBaseOutput:
     @staticmethod
     def add_cli_arguments(parser: ArgumentParser) -> None:
@@ -153,12 +163,17 @@ class _CVATBaseOutput:
         )
         parser.add_argument(
             "--output-annotation-scope ",
-            choices=["task", "job", "project"],
-            default="task",
-            help="Define the annotation scope to determine the XML structure: 'task', 'job', or 'project'.",
+            choices=[scope.value for scope in AnnotationScope],
+            default=AnnotationScope.TASK.value,
+            help="Define the annotation scope to determine the XML structure. Allowed values: "
+            + AnnotationScope.allowed_values(),
         )
 
-    def __init__(self, output_folder: Path, annotation_scope: str) -> None:
+    def __init__(self, output_folder: Path, annotation_scope: AnnotationScope) -> None:
+        if not isinstance(annotation_scope, AnnotationScope):
+            raise ArgumentError(
+                f"annotation_scope must be one of the allowed values: {AnnotationScope.allowed_values()}"
+            )
         self._output_folder = output_folder
         self._annotation_scope = annotation_scope
 
@@ -190,24 +205,26 @@ class CVATObjectDetectionOutput(_CVATBaseOutput, ObjectDetectionOutput):
                 CVATLabel(name=cat.name) for cat in label_input.get_categories()
             ]
         )
-        if self._annotation_scope == "task":
+        if self._annotation_scope == AnnotationScope.TASK:
             meta = CVATMeta(task=CVATTask(labels=labels))
-        elif self._annotation_scope == "project":
+        elif self._annotation_scope == AnnotationScope.PROJECT:
             meta = CVATMeta(project=CVATProject(labels=labels))
-        elif self._annotation_scope == "job":
+        elif self._annotation_scope == AnnotationScope.JOB:
             meta = CVATMeta(job=CVATJob(labels=labels))
         else:
-            raise ValueError(f"Unknown annotation_scope: {self._annotation_scope}")
+            raise ValueError(
+                f"Unknown annotation_scope: {self._annotation_scope}. Allowed values: {AnnotationScope.allowed_values()}."
+            )
         annotations = CVATAnnotations(meta=meta, images=images)
 
         self._output_folder.mkdir(parents=True, exist_ok=True)
         output_file = self._output_folder / "annotations.xml"
-        # Convert the pydantic model to XML string
+        # Convert the Pydantic model to an XML format (as bytes or string).
         xml_bytes = annotations.to_xml()
-        if isinstance(xml_bytes, bytes):  # Ensure it's bytes before decoding
+        # Ensure the XML output is a string — decode bytes or use as-is if it's already a string.
+        if isinstance(xml_bytes, bytes):
             xml_string = xml_bytes.decode("utf-8")
         else:
-            xml_string = xml_bytes  # In case it's already a string
-        # Save it as a string (ensure you're writing the XML as a string)
+            xml_string = xml_bytes
         with output_file.open("w", encoding="utf-8") as f:
             f.write(xml_string)

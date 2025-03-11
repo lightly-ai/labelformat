@@ -3,7 +3,11 @@ from pathlib import Path
 
 import pytest
 
-from labelformat.formats.cvat import CVATObjectDetectionInput, CVATObjectDetectionOutput
+from labelformat.formats.cvat import (
+    AnnotationScope,
+    CVATObjectDetectionInput,
+    CVATObjectDetectionOutput,
+)
 from labelformat.model.bounding_box import BoundingBox
 from labelformat.model.category import Category
 from labelformat.model.image import Image
@@ -11,7 +15,7 @@ from labelformat.model.object_detection import (
     ImageObjectDetection,
     SingleObjectDetection,
 )
-from labelformat.types import ParseError
+from labelformat.types import ArgumentError, ParseError
 
 
 # Helper for creating temp XML files
@@ -23,18 +27,23 @@ def create_xml_file(tmp_path: Path, content: str) -> Path:
 
 
 class TestCVATObjectDetectionInput:
-    @pytest.mark.parametrize("annotation_scope", ["task", "project", "job"])
-    def test_get_labels(self, tmp_path: Path, annotation_scope: str) -> None:
+    @pytest.mark.parametrize(
+        "annotation_scope",
+        [AnnotationScope.TASK, AnnotationScope.PROJECT, AnnotationScope.JOB],
+    )
+    def test_get_labels(
+        self, tmp_path: Path, annotation_scope: AnnotationScope
+    ) -> None:
         annotation = f"""
           <annotations>
             <version>1.1</version>
             <meta>
-                <{annotation_scope}>
+                <{annotation_scope.value}>
                   <labels>
                     <label><name>label1</name></label>
                     <label><name>label2</name></label>
                   </labels>
-                </{annotation_scope}>
+                </{annotation_scope.value}>
             </meta>
             <image height="8" id="0" name="img0.jpg" width="10">
                 <box label="label1" occluded="0" xtl="4" ytl="0" xbr="4" ybr="2" z_order="1"></box>
@@ -46,14 +55,14 @@ class TestCVATObjectDetectionInput:
         xml_path = create_xml_file(tmp_path, annotation)
         label_input = CVATObjectDetectionInput(xml_path)
 
-        # Validate categories
+        # Validate categories.
         categories = list(label_input.get_categories())
         assert categories == [
             Category(id=1, name="label1"),
             Category(id=2, name="label2"),
         ]
 
-        # Validate labels
+        # Validate labels.
         labels = list(label_input.get_labels())
         assert labels == [
             ImageObjectDetection(
@@ -67,7 +76,7 @@ class TestCVATObjectDetectionInput:
             )
         ]
 
-    def test_invalid_xml(self, tmp_path: Path) -> None:
+    def test___init___invalid_xml(self, tmp_path: Path) -> None:
         invalid_annotation = """
           <annotations>
               <meta>
@@ -89,9 +98,8 @@ class TestCVATObjectDetectionInput:
             match="Input should be a valid number, unable to parse string as a number",
         ):
             label_input = CVATObjectDetectionInput(xml_path)
-            list(label_input.get_labels())
 
-    def test_missing_attributes_for_image(self, tmp_path: Path) -> None:
+    def test___init____missing_attributes_for_image(self, tmp_path: Path) -> None:
         invalid_annotation = """
           <annotations>
               <meta>
@@ -113,9 +121,8 @@ class TestCVATObjectDetectionInput:
             match="validation error for CVATAnnotations\nimages.0.height",
         ):
             label_input = CVATObjectDetectionInput(xml_path)
-            list(label_input.get_labels())
 
-    def test_invalid_label(self, tmp_path: Path) -> None:
+    def test_get_labels_invalid_category_name(self, tmp_path: Path) -> None:
         invalid_annotation = """
           <annotations>
               <meta>
@@ -155,17 +162,22 @@ def _compare_xml_elements(elem1: ET.Element, elem2: ET.Element) -> bool:
 
 
 class TestCVATObjectDetectionOutput:
-    @pytest.mark.parametrize("annotation_scope", ["task", "project", "job"])
-    def test_cyclic_load_save(self, tmp_path: Path, annotation_scope: str) -> None:
+    @pytest.mark.parametrize(
+        "annotation_scope",
+        [AnnotationScope.TASK, AnnotationScope.PROJECT, AnnotationScope.JOB],
+    )
+    def test_save_cyclic_load_and_save(
+        self, tmp_path: Path, annotation_scope: AnnotationScope
+    ) -> None:
         annotation = f"""<?xml version='1.0' encoding='utf-8'?>
           <annotations>
               <meta>
-                <{annotation_scope}>
+                <{annotation_scope.value}>
                   <labels>
                     <label><name>label1</name></label>
                     <label><name>label2</name></label>
                   </labels>
-                </{annotation_scope}>
+                </{annotation_scope.value}>
               </meta>
               <image id="0" name="img0.jpg" width="10" height="8">
                 <box label="label1" xtl="4.0" ytl="0.0" xbr="5.0" ybr="2.0"></box>
@@ -197,3 +209,12 @@ class TestCVATObjectDetectionOutput:
         assert _compare_xml_elements(
             input_tree.getroot(), output_tree.getroot()
         ), "The output XML structure doesn't match the input XML."
+
+    def test__init__invalid_annotation_scope(self, tmp_path: Path) -> None:
+        with pytest.raises(
+            ArgumentError,
+            match="annotation_scope must be one of the allowed values: task, job, project",
+        ):
+            CVATObjectDetectionOutput(
+                output_folder=tmp_path, annotation_scope="invalid"
+            )
