@@ -1,17 +1,13 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Callable, Dict, List, TypeAlias, Union
+from typing import Any, Callable, Dict, List, Union
 
 import pytest
 import yaml
 
 from labelformat.formats.yolov8 import _YOLOv8BaseInput
 from labelformat.model.category import Category
-
-# Type aliases to make the code more readable
-YOLOConfigData: TypeAlias = Union[Dict[str, Any], str]
-ConfigFactory: TypeAlias = Callable[[YOLOConfigData], Path]
 
 
 @pytest.fixture
@@ -24,10 +20,10 @@ def expected_categories() -> List[Category]:
 
 
 @pytest.fixture
-def config_file_factory(tmp_path: Path) -> ConfigFactory:
+def config_file_factory(tmp_path: Path) -> Callable[[Union[Dict[str, Any], str]], Path]:
     """Factory fixture to create config files with different formats."""
 
-    def _create_config(config_data: YOLOConfigData) -> Path:
+    def _create_config(config_data: Union[Dict[str, Any], str]) -> Path:
         config_file = tmp_path / "config.yaml"
 
         if isinstance(config_data, str):
@@ -46,7 +42,7 @@ class TestYOLOv8BaseInput:
     class TestGetCategories:
         def test_extracts_categories_from_dict_format(
             self,
-            config_file_factory: ConfigFactory,
+            config_file_factory: Callable[[Union[Dict[str, Any], str]], Path],
             expected_categories: List[Category],
         ) -> None:
             config = {
@@ -62,7 +58,7 @@ class TestYOLOv8BaseInput:
 
         def test_extracts_categories_from_list_format(
             self,
-            config_file_factory: ConfigFactory,
+            config_file_factory: Callable[[Union[Dict[str, Any], str]], Path],
             expected_categories: List[Category],
         ) -> None:
             config = {
@@ -78,7 +74,7 @@ class TestYOLOv8BaseInput:
 
         def test_extracts_categories_from_yaml_block_format(
             self,
-            config_file_factory: ConfigFactory,
+            config_file_factory: Callable[[Union[Dict[str, Any], str]], Path],
             expected_categories: List[Category],
         ) -> None:
             config = """
@@ -96,7 +92,7 @@ class TestYOLOv8BaseInput:
             assert categories == expected_categories
 
         def test_raises_error_for_invalid_names_format(
-            self, config_file_factory: ConfigFactory
+            self, config_file_factory: Callable[[Union[Dict[str, Any], str]], Path]
         ) -> None:
             config = {
                 "path": ".",
@@ -136,7 +132,7 @@ class TestYOLOv8BaseInput:
 
     class TestLabelsDir:
         def test_resolves_labels_dir_relative_to_path(
-            self, config_file_factory: ConfigFactory
+            self, config_file_factory: Callable[[Union[Dict[str, Any], str]], Path]
         ) -> None:
             config = {
                 "path": "../datasets/coco8",
@@ -150,7 +146,7 @@ class TestYOLOv8BaseInput:
             assert input_obj._labels_dir() == expected
 
         def test_resolves_labels_dir_for_absolute_path(
-            self, config_file_factory: ConfigFactory
+            self, config_file_factory: Callable[[Union[Dict[str, Any], str]], Path]
         ) -> None:
             config = {
                 "path": ".",
@@ -164,7 +160,7 @@ class TestYOLOv8BaseInput:
             assert input_obj._labels_dir() == expected
 
         def test_resolves_labels_dir_with_images_in_path(
-            self, config_file_factory: ConfigFactory
+            self, config_file_factory: Callable[[Union[Dict[str, Any], str]], Path]
         ) -> None:
             config = {
                 "path": "mydataset/images/dataset1",
@@ -178,7 +174,7 @@ class TestYOLOv8BaseInput:
             assert input_obj._labels_dir() == expected
 
         def test_resolves_labels_dir_without_path(
-            self, config_file_factory: ConfigFactory
+            self, config_file_factory: Callable[[Union[Dict[str, Any], str]], Path]
         ) -> None:
             config = {
                 "train": "images/train",
