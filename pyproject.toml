@@ -15,6 +15,7 @@ python = ">=3.8"
 tqdm = "*"
 pyyaml = "*"
 pillow = "*"
+pydantic-xml = "*"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "*"
