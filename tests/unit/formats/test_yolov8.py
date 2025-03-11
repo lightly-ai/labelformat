@@ -19,237 +19,241 @@ def expected_categories() -> List[Category]:
     ]
 
 
-def test_get_categories_dict_format(
-    tmp_path: Path, expected_categories: List[Category]
-) -> None:
-    config = {
-        "path": ".",
-        "train": "images",
-        "names": {0: "person", 1: "dog", 2: "cat"},
-    }
-    config_file = tmp_path / "config.yaml"
-    with config_file.open("w") as f:
-        yaml.safe_dump(config, f)
+@pytest.fixture
+def config_file_factory(tmp_path: Path):
+    """Factory fixture to create config files with different formats."""
 
-    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
-    categories = list(input_obj.get_categories())
-    assert categories == expected_categories
+    def _create_config(config_data: Union[Dict, str]) -> Path:
+        config_file = tmp_path / "config.yaml"
 
+        if isinstance(config_data, str):
+            with config_file.open("w") as f:
+                f.write(config_data)
+        else:
+            with config_file.open("w") as f:
+                yaml.safe_dump(config_data, f)
 
-def test_get_categories_list_format(
-    tmp_path: Path, expected_categories: List[Category]
-) -> None:
-    config = {
-        "path": ".",
-        "train": "images",
-        "names": ["person", "dog", "cat"],
-    }
-    config_file = tmp_path / "config.yaml"
-    with config_file.open("w") as f:
-        yaml.safe_dump(config, f)
+        return config_file
 
-    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
-    categories = list(input_obj.get_categories())
-    assert categories == expected_categories
+    return _create_config
 
 
-def test_get_categories_yaml_block_format(
-    tmp_path: Path, expected_categories: List[Category]
-) -> None:
-    config: str = """
-    path: .
-    train: images
-    names:
-      - person
-      - dog
-      - cat
-    """
-    config_file = tmp_path / "config.yaml"
-    with config_file.open("w") as f:
-        f.write(config)
+class TestYOLOv8BaseInput:
+    class TestGetCategories:
+        def test_extracts_categories_from_dict_format(
+            self, config_file_factory, expected_categories: List[Category]
+        ) -> None:
+            config = {
+                "path": ".",
+                "train": "images",
+                "names": {0: "person", 1: "dog", 2: "cat"},
+            }
+            config_file = config_file_factory(config)
 
-    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
-    categories = list(input_obj.get_categories())
-    assert categories == expected_categories
+            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+            categories = list(input_obj.get_categories())
+            assert categories == expected_categories
 
+        def test_extracts_categories_from_list_format(
+            self, config_file_factory, expected_categories: List[Category]
+        ) -> None:
+            config = {
+                "path": ".",
+                "train": "images",
+                "names": ["person", "dog", "cat"],
+            }
+            config_file = config_file_factory(config)
 
-def test_root_dir_with_explicit_path(tmp_path: Path) -> None:
-    dataset_dir = tmp_path / "dataset"
-    dataset_dir.mkdir()
+            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+            categories = list(input_obj.get_categories())
+            assert categories == expected_categories
 
-    config = {"path": ".", "train": "images", "names": ["person"]}
-    config_file = dataset_dir / "config.yaml"
-    with config_file.open("w") as f:
-        yaml.safe_dump(config, f)
+        def test_extracts_categories_from_yaml_block_format(
+            self, config_file_factory, expected_categories: List[Category]
+        ) -> None:
+            config = """
+            path: .
+            train: images
+            names:
+              - person
+              - dog
+              - cat
+            """
+            config_file = config_file_factory(config)
 
-    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
-    assert input_obj._root_dir() == dataset_dir
+            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+            categories = list(input_obj.get_categories())
+            assert categories == expected_categories
 
+        def test_raises_error_for_invalid_names_format(
+            self, config_file_factory
+        ) -> None:
+            config = {
+                "path": ".",
+                "train": "images",
+                "names": 123,  # Invalid format
+            }
+            config_file = config_file_factory(config)
 
-def test_root_dir_without_path(tmp_path: Path) -> None:
-    dataset_dir = tmp_path / "dataset"
-    dataset_dir.mkdir()
+            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+            with pytest.raises(TypeError):  # Will fail when trying to use len() on int
+                list(input_obj.get_categories())
 
-    config = {"train": "images", "names": ["person"]}
-    config_file = dataset_dir / "config.yaml"
-    with config_file.open("w") as f:
-        yaml.safe_dump(config, f)
+    class TestRootDir:
+        def test_resolves_root_dir_with_explicit_path(self, tmp_path: Path) -> None:
+            dataset_dir = tmp_path / "dataset"
+            dataset_dir.mkdir()
 
-    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
-    assert input_obj._root_dir() == dataset_dir
+            config = {"path": ".", "train": "images", "names": ["person"]}
+            config_file = dataset_dir / "config.yaml"
+            with config_file.open("w") as f:
+                yaml.safe_dump(config, f)
 
+            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+            assert input_obj._root_dir() == dataset_dir
 
-def test_invalid_names_format(tmp_path: Path) -> None:
-    config = {
-        "path": ".",
-        "train": "images",
-        "names": 123,  # Invalid format
-    }
-    config_file = tmp_path / "config.yaml"
-    with config_file.open("w") as f:
-        yaml.safe_dump(config, f)
+        def test_resolves_root_dir_without_path(self, tmp_path: Path) -> None:
+            dataset_dir = tmp_path / "dataset"
+            dataset_dir.mkdir()
 
-    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
-    with pytest.raises(TypeError):  # Will fail when trying to use len() on int
-        list(input_obj.get_categories())
+            config = {"train": "images", "names": ["person"]}
+            config_file = dataset_dir / "config.yaml"
+            with config_file.open("w") as f:
+                yaml.safe_dump(config, f)
 
+            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+            assert input_obj._root_dir() == dataset_dir
 
-def test_labels_dir_relative_to_path(tmp_path: Path) -> None:
-    """Test labels directory resolution for paths relative to dataset root."""
-    config = {
-        "path": "../datasets/coco8",
-        "train": "images/train",
-        "names": ["person"],
-    }
-    config_file = tmp_path / "config.yaml"
-    with config_file.open("w") as f:
-        yaml.safe_dump(config, f)
+    class TestLabelsDir:
+        def test_resolves_labels_dir_relative_to_path(
+            self, config_file_factory
+        ) -> None:
+            config = {
+                "path": "../datasets/coco8",
+                "train": "images/train",
+                "names": ["person"],
+            }
+            config_file = config_file_factory(config)
 
-    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
-    expected = tmp_path / "../datasets/coco8/labels/train"
-    assert input_obj._labels_dir() == expected
+            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+            expected = config_file.parent / "../datasets/coco8/labels/train"
+            assert input_obj._labels_dir() == expected
 
+        def test_resolves_labels_dir_for_absolute_path(
+            self, config_file_factory
+        ) -> None:
+            config = {
+                "path": ".",
+                "train": "../train/images",
+                "names": ["head", "helmet", "person"],
+            }
+            config_file = config_file_factory(config)
 
-def test_labels_dir_absolute_path(tmp_path: Path) -> None:
-    """Test labels directory resolution for absolute paths."""
-    config = {
-        "path": ".",
-        "train": "../train/images",
-        "names": ["head", "helmet", "person"],
-    }
-    config_file = tmp_path / "config.yaml"
-    with config_file.open("w") as f:
-        yaml.safe_dump(config, f)
+            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+            expected = config_file.parent / "../train/labels"
+            assert input_obj._labels_dir() == expected
 
-    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
-    expected = tmp_path / "../train/labels"
-    assert input_obj._labels_dir() == expected
+        def test_resolves_labels_dir_with_images_in_path(
+            self, config_file_factory
+        ) -> None:
+            config = {
+                "path": "mydataset/images/dataset1",
+                "train": "images/train",
+                "names": ["person"],
+            }
+            config_file = config_file_factory(config)
 
+            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+            expected = config_file.parent / "mydataset/images/dataset1/labels/train"
+            assert input_obj._labels_dir() == expected
 
-def test_labels_dir_with_images_in_path(tmp_path: Path) -> None:
-    """Test labels directory resolution when 'images' appears in the root path."""
-    config = {
-        "path": "mydataset/images/dataset1",
-        "train": "images/train",
-        "names": ["person"],
-    }
-    config_file = tmp_path / "config.yaml"
-    with config_file.open("w") as f:
-        yaml.safe_dump(config, f)
+        def test_resolves_labels_dir_without_path(self, config_file_factory) -> None:
+            config = {
+                "train": "images/train",
+                "names": ["person"],
+            }
+            config_file = config_file_factory(config)
 
-    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
-    expected = tmp_path / "mydataset/images/dataset1/labels/train"
-    assert input_obj._labels_dir() == expected
+            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+            expected = config_file.parent / "labels/train"
+            assert input_obj._labels_dir() == expected
 
+    class TestMultilevelPaths:
+        def test_handles_relative_paths_with_dot_notation(self, tmp_path: Path) -> None:
+            dataset_root = tmp_path / "dataset"
+            for split in ["train", "valid", "test"]:
+                (dataset_root / split / "images").mkdir(parents=True)
+                (dataset_root / split / "labels").mkdir(parents=True)
 
-def test_labels_dir_without_path(tmp_path: Path) -> None:
-    """Test labels directory resolution when 'path' is not specified in config."""
-    config = {
-        "train": "images/train",
-        "names": ["person"],
-    }
-    config_file = tmp_path / "config.yaml"
-    with config_file.open("w") as f:
-        yaml.safe_dump(config, f)
+            config = {
+                "train": "./train/images",
+                "valid": "./valid/images",
+                "test": "./test/images",
+                "names": ["person"],
+            }
+            config_file = dataset_root / "data.yaml"
+            with config_file.open("w") as f:
+                yaml.safe_dump(config, f)
 
-    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
-    expected = tmp_path / "labels/train"
-    assert input_obj._labels_dir() == expected
+            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
 
+            assert input_obj._root_dir() == dataset_root
+            assert input_obj._images_dir() == dataset_root / "train" / "images"
+            assert input_obj._labels_dir() == dataset_root / "train" / "labels"
 
-def test_multilevel_relative_paths_with_dot(tmp_path: Path) -> None:
-    dataset_root = tmp_path / "dataset"
-    for split in ["train", "valid", "test"]:
-        (dataset_root / split / "images").mkdir(parents=True)
-        (dataset_root / split / "labels").mkdir(parents=True)
+        def test_handles_relative_paths(self, tmp_path: Path) -> None:
+            dataset_root = tmp_path / "dataset"
+            for split in ["train", "valid", "test"]:
+                (dataset_root / split / "images").mkdir(parents=True)
+                (dataset_root / split / "labels").mkdir(parents=True)
 
-    config = {
-        "train": "./train/images",
-        "valid": "./valid/images",
-        "test": "./test/images",
-        "names": ["person"],
-    }
-    config_file = dataset_root / "data.yaml"
-    with config_file.open("w") as f:
-        yaml.safe_dump(config, f)
+            config = {
+                "train": "../train/images",
+                "valid": "../valid/images",
+                "test": "../test/images",
+                "names": ["person"],
+            }
+            config_file = dataset_root / "data.yaml"
+            with config_file.open("w") as f:
+                yaml.safe_dump(config, f)
 
-    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
 
-    assert input_obj._root_dir() == dataset_root
-    assert input_obj._images_dir() == dataset_root / "train" / "images"
-    assert input_obj._labels_dir() == dataset_root / "train" / "labels"
+            assert input_obj._root_dir() == dataset_root
+            assert input_obj._images_dir() == dataset_root / "train" / "images"
+            assert input_obj._labels_dir() == dataset_root / "train" / "labels"
 
+        def test_preserves_parent_dir_references_when_directory_exists(
+            self, tmp_path: Path
+        ) -> None:
+            parent_dir = tmp_path / "parent"
+            parent_dir.mkdir()
 
-def test_multilevel_relative_paths(tmp_path: Path) -> None:
-    dataset_root = tmp_path / "dataset"
-    for split in ["train", "valid", "test"]:
-        (dataset_root / split / "images").mkdir(parents=True)
-        (dataset_root / split / "labels").mkdir(parents=True)
+            dataset_dir = parent_dir / "dataset"
+            dataset_dir.mkdir()
 
-    config = {
-        "train": "../train/images",
-        "valid": "../valid/images",
-        "test": "../test/images",
-        "names": ["person"],
-    }
-    config_file = dataset_root / "data.yaml"
-    with config_file.open("w") as f:
-        yaml.safe_dump(config, f)
+            target_images_dir = parent_dir / "images"
+            target_images_dir.mkdir()
 
-    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+            target_labels_dir = parent_dir / "labels"
+            target_labels_dir.mkdir()
 
-    assert input_obj._root_dir() == dataset_root
-    assert input_obj._images_dir() == dataset_root / "train" / "images"
-    assert input_obj._labels_dir() == dataset_root / "train" / "labels"
+            config = {
+                "path": ".",
+                "train": "../images",  # This is intentionally using ../ to go up to parent/images
+                "names": ["person"],
+            }
+            config_file = dataset_dir / "config.yaml"
+            with config_file.open("w") as f:
+                yaml.safe_dump(config, f)
 
+            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
 
-def test_intentional_parent_dir_reference(tmp_path: Path) -> None:
-    """Test that paths with ../ are preserved when the directory exists."""
-    parent_dir = tmp_path / "parent"
-    parent_dir.mkdir()
-
-    dataset_dir = parent_dir / "dataset"
-    dataset_dir.mkdir()
-
-    target_images_dir = parent_dir / "images"
-    target_images_dir.mkdir()
-
-    target_labels_dir = parent_dir / "labels"
-    target_labels_dir.mkdir()
-
-    config = {
-        "path": ".",
-        "train": "../images",  # This is intentionally using ../ to go up to parent/images
-        "names": ["person"],
-    }
-    config_file = dataset_dir / "config.yaml"
-    with config_file.open("w") as f:
-        yaml.safe_dump(config, f)
-
-    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
-
-    expected_images_dir = (dataset_dir / "../images").resolve()
-    assert input_obj._images_dir().resolve() == expected_images_dir
-
-    expected_labels_dir = (dataset_dir / "../labels").resolve()
-    assert input_obj._labels_dir().resolve() == expected_labels_dir
+            assert input_obj._root_dir() == dataset_dir
+            # Use .resolve() to normalize the path for comparison
+            assert (
+                input_obj._images_dir().resolve() == (parent_dir / "images").resolve()
+            )
+            assert (
+                input_obj._labels_dir().resolve() == (parent_dir / "labels").resolve()
+            )
