@@ -221,3 +221,35 @@ def test_multilevel_relative_paths(tmp_path: Path) -> None:
     assert input_obj._root_dir() == dataset_root
     assert input_obj._images_dir() == dataset_root / "train" / "images"
     assert input_obj._labels_dir() == dataset_root / "train" / "labels"
+
+
+def test_intentional_parent_dir_reference(tmp_path: Path) -> None:
+    """Test that paths with ../ are preserved when the directory exists."""
+    parent_dir = tmp_path / "parent"
+    parent_dir.mkdir()
+
+    dataset_dir = parent_dir / "dataset"
+    dataset_dir.mkdir()
+
+    target_images_dir = parent_dir / "images"
+    target_images_dir.mkdir()
+
+    target_labels_dir = parent_dir / "labels"
+    target_labels_dir.mkdir()
+
+    config = {
+        "path": ".",
+        "train": "../images",  # This is intentionally using ../ to go up to parent/images
+        "names": ["person"],
+    }
+    config_file = dataset_dir / "config.yaml"
+    with config_file.open("w") as f:
+        yaml.safe_dump(config, f)
+
+    input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+
+    expected_images_dir = (dataset_dir / "../images").resolve()
+    assert input_obj._images_dir().resolve() == expected_images_dir
+
+    expected_labels_dir = (dataset_dir / "../labels").resolve()
+    assert input_obj._labels_dir().resolve() == expected_labels_dir
