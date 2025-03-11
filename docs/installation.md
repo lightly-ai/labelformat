@@ -4,7 +4,7 @@ Installing **Labelformat** is straightforward. Follow the steps below to set up 
 
 ## Prerequisites
 
-- **Python 3.7 or higher:** Ensure you have Python installed on Windows, Linux, or macOS.
+- **Python 3.8 or higher:** Ensure you have Python installed on Windows, Linux, or macOS.
 - **pip:** Python's package installer. It typically comes with Python installations.
 
 ## Installation using package managers
