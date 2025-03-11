@@ -1,13 +1,22 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Union
+from typing import Callable, Dict, List, TypedDict, Union
 
 import pytest
 import yaml
 
 from labelformat.formats.yolov8 import _YOLOv8BaseInput
 from labelformat.model.category import Category
+
+
+class YOLOv8Config(TypedDict, total=False):
+    path: str
+    train: str
+    valid: str
+    test: str
+    nc: int
+    names: Union[Dict[int, str], List[str]]
 
 
 @pytest.fixture
@@ -20,10 +29,10 @@ def expected_categories() -> List[Category]:
 
 
 @pytest.fixture
-def config_file_factory(tmp_path: Path) -> Callable[[Union[Dict[str, Any], str]], Path]:
+def config_file_factory(tmp_path: Path) -> Callable[[Union[YOLOv8Config, str]], Path]:
     """Factory fixture to create config files with different formats."""
 
-    def _create_config(config_data: Union[Dict[str, Any], str]) -> Path:
+    def _create_config(config_data: Union[YOLOv8Config, str]) -> Path:
         config_file = tmp_path / "config.yaml"
 
         if isinstance(config_data, str):
@@ -42,10 +51,10 @@ class TestYOLOv8BaseInput:
     class TestGetCategories:
         def test_extracts_categories_from_dict_format(
             self,
-            config_file_factory: Callable[[Union[Dict[str, Any], str]], Path],
+            config_file_factory: Callable[[Union[YOLOv8Config, str]], Path],
             expected_categories: List[Category],
         ) -> None:
-            config = {
+            config: YOLOv8Config = {
                 "path": ".",
                 "train": "images",
                 "names": {0: "person", 1: "dog", 2: "cat"},
@@ -58,10 +67,10 @@ class TestYOLOv8BaseInput:
 
         def test_extracts_categories_from_list_format(
             self,
-            config_file_factory: Callable[[Union[Dict[str, Any], str]], Path],
+            config_file_factory: Callable[[Union[YOLOv8Config, str]], Path],
             expected_categories: List[Category],
         ) -> None:
-            config = {
+            config: YOLOv8Config = {
                 "path": ".",
                 "train": "images",
                 "names": ["person", "dog", "cat"],
@@ -74,7 +83,7 @@ class TestYOLOv8BaseInput:
 
         def test_extracts_categories_from_yaml_block_format(
             self,
-            config_file_factory: Callable[[Union[Dict[str, Any], str]], Path],
+            config_file_factory: Callable[[Union[YOLOv8Config, str]], Path],
             expected_categories: List[Category],
         ) -> None:
             config = """
@@ -92,14 +101,14 @@ class TestYOLOv8BaseInput:
             assert categories == expected_categories
 
         def test_raises_error_for_invalid_names_format(
-            self, config_file_factory: Callable[[Union[Dict[str, Any], str]], Path]
+            self, config_file_factory: Callable[[Union[YOLOv8Config, str]], Path]
         ) -> None:
             config = {
                 "path": ".",
                 "train": "images",
-                "names": 123,  # Invalid format
+                "names": 123,  # Invalid format will make mypy raise an error
             }
-            config_file = config_file_factory(config)
+            config_file = config_file_factory(config)  # type: ignore[arg-type]
 
             input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
             with pytest.raises(TypeError):  # Will fail when trying to use len() on int
@@ -132,9 +141,9 @@ class TestYOLOv8BaseInput:
 
     class TestLabelsDir:
         def test_resolves_labels_dir_relative_to_path(
-            self, config_file_factory: Callable[[Union[Dict[str, Any], str]], Path]
+            self, config_file_factory: Callable[[Union[YOLOv8Config, str]], Path]
         ) -> None:
-            config = {
+            config: YOLOv8Config = {
                 "path": "../datasets/coco8",
                 "train": "images/train",
                 "names": ["person"],
@@ -146,9 +155,9 @@ class TestYOLOv8BaseInput:
             assert input_obj._labels_dir() == expected
 
         def test_resolves_labels_dir_for_absolute_path(
-            self, config_file_factory: Callable[[Union[Dict[str, Any], str]], Path]
+            self, config_file_factory: Callable[[Union[YOLOv8Config, str]], Path]
         ) -> None:
-            config = {
+            config: YOLOv8Config = {
                 "path": ".",
                 "train": "../train/images",
                 "names": ["head", "helmet", "person"],
@@ -160,9 +169,9 @@ class TestYOLOv8BaseInput:
             assert input_obj._labels_dir() == expected
 
         def test_resolves_labels_dir_with_images_in_path(
-            self, config_file_factory: Callable[[Union[Dict[str, Any], str]], Path]
+            self, config_file_factory: Callable[[Union[YOLOv8Config, str]], Path]
         ) -> None:
-            config = {
+            config: YOLOv8Config = {
                 "path": "mydataset/images/dataset1",
                 "train": "images/train",
                 "names": ["person"],
@@ -174,9 +183,9 @@ class TestYOLOv8BaseInput:
             assert input_obj._labels_dir() == expected
 
         def test_resolves_labels_dir_without_path(
-            self, config_file_factory: Callable[[Union[Dict[str, Any], str]], Path]
+            self, config_file_factory: Callable[[Union[YOLOv8Config, str]], Path]
         ) -> None:
-            config = {
+            config: YOLOv8Config = {
                 "train": "images/train",
                 "names": ["person"],
             }
@@ -193,7 +202,7 @@ class TestYOLOv8BaseInput:
                 (dataset_root / split / "images").mkdir(parents=True)
                 (dataset_root / split / "labels").mkdir(parents=True)
 
-            config = {
+            config: YOLOv8Config = {
                 "train": "./train/images",
                 "valid": "./valid/images",
                 "test": "./test/images",
@@ -215,7 +224,7 @@ class TestYOLOv8BaseInput:
                 (dataset_root / split / "images").mkdir(parents=True)
                 (dataset_root / split / "labels").mkdir(parents=True)
 
-            config = {
+            config: YOLOv8Config = {
                 "train": "../train/images",
                 "valid": "../valid/images",
                 "test": "../test/images",
@@ -246,7 +255,7 @@ class TestYOLOv8BaseInput:
             target_labels_dir = parent_dir / "labels"
             target_labels_dir.mkdir()
 
-            config = {
+            config: YOLOv8Config = {
                 "path": ".",
                 "train": "../images",  # This is intentionally using ../ to go up to parent/images
                 "names": ["person"],
