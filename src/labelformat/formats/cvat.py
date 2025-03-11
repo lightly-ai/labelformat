@@ -20,9 +20,8 @@ from labelformat.types import ParseError
 
 logger = logging.getLogger(__name__)
 
+
 # --- Pydantic XML models ---
-
-
 class CVATLabel(BaseXmlModel, tag="label"):  # type: ignore
     name: str = element()
 
@@ -186,9 +185,10 @@ class CVATObjectDetectionOutput(_CVATBaseOutput, ObjectDetectionOutput):
             )
             for label in label_input.get_labels()
         ]
-        actual_labels = list(label_input.get_categories())
         labels = CVATLabels(
-            label_list=[CVATLabel(name=cat.name) for cat in actual_labels]
+            label_list=[
+                CVATLabel(name=cat.name) for cat in label_input.get_categories()
+            ]
         )
         if self._annotation_scope == "task":
             meta = CVATMeta(task=CVATTask(labels=labels))
