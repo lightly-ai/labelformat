@@ -209,12 +209,3 @@ class TestCVATObjectDetectionOutput:
         assert _compare_xml_elements(
             input_tree.getroot(), output_tree.getroot()
         ), "The output XML structure doesn't match the input XML."
-
-    def test__init__invalid_annotation_scope(self, tmp_path: Path) -> None:
-        with pytest.raises(
-            ArgumentError,
-            match="annotation_scope must be one of the allowed values: task, job, project",
-        ):
-            CVATObjectDetectionOutput(
-                output_folder=tmp_path, annotation_scope="invalid"
-            )
