@@ -62,12 +62,12 @@ class CVATImage(BaseXmlModel, tag="image"):  # type: ignore
     name: str = attr()  # Filename
     width: int = attr()
     height: int = attr()
-    boxes: List[CVATBox] = element(tag="box", default=[])  # type: ignore
+    boxes: List[CVATBox] = element(tag="box", default=[])
 
 
 class CVATAnnotations(BaseXmlModel, tag="annotations", search_mode="unordered"):  # type: ignore
     meta: CVATMeta = element()
-    images: List[CVATImage] = element(tag="image", default=[])  # type: ignore
+    images: List[CVATImage] = element(tag="image", default=[])
 
 
 class _CVATBaseInput:
