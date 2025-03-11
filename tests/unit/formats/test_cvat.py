@@ -28,17 +28,18 @@ class TestCVATObjectDetectionInput:
         annotation = f"""
           <annotations>
             <version>1.1</version>
-              <meta>
+            <meta>
                 <{annotation_scope}>
                   <labels>
                     <label><name>label1</name></label>
                     <label><name>label2</name></label>
                   </labels>
                 </{annotation_scope}>
-              </meta>
-              <image height="8" id="0" name="img0.jpg" width="10">
+            </meta>
+            <image height="8" id="0" name="img0.jpg" width="10">
                 <box label="label1" occluded="0" xtl="4" ytl="0" xbr="4" ybr="2" z_order="1"></box>
-              </image>
+            </image>
+            <version>1.1</version>
           </annotations>
         """
 
@@ -46,10 +47,10 @@ class TestCVATObjectDetectionInput:
         label_input = CVATObjectDetectionInput(xml_path)
 
         # Validate categories
-        categories = label_input.get_categories()
+        categories = list(label_input.get_categories())
         assert categories == [
-            Category(id=0, name="label1"),
-            Category(id=1, name="label2"),
+            Category(id=1, name="label1"),
+            Category(id=2, name="label2"),
         ]
 
         # Validate labels
@@ -59,7 +60,7 @@ class TestCVATObjectDetectionInput:
                 image=Image(id=0, filename="img0.jpg", width=10, height=8),
                 objects=[
                     SingleObjectDetection(
-                        category=Category(id=0, name="label1"),
+                        category=Category(id=1, name="label1"),
                         box=BoundingBox(xmin=4.0, ymin=0.0, xmax=4.0, ymax=2.0),
                     )
                 ],
@@ -83,7 +84,10 @@ class TestCVATObjectDetectionInput:
         """
         xml_path = create_xml_file(tmp_path, invalid_annotation)
 
-        with pytest.raises(ValueError, match="could not convert string to float"):
+        with pytest.raises(
+            ValueError,
+            match="Input should be a valid number, unable to parse string as a number",
+        ):
             label_input = CVATObjectDetectionInput(xml_path)
             list(label_input.get_labels())
 
@@ -105,9 +109,30 @@ class TestCVATObjectDetectionInput:
         xml_path = create_xml_file(tmp_path, invalid_annotation)
 
         with pytest.raises(
-            ParseError,
-            match="Could not parse XML file : Missing required attributes: height",
+            ValueError,
+            match="validation error for CVATAnnotations\nimages.0.height",
         ):
+            label_input = CVATObjectDetectionInput(xml_path)
+            list(label_input.get_labels())
+
+    def test_invalid_label(self, tmp_path: Path) -> None:
+        invalid_annotation = """
+          <annotations>
+              <meta>
+                <task>
+                  <labels>
+                    <label><name>label1</name></label>
+                  </labels>
+                </task>
+              </meta>
+              <image id="0" name="img0.jpg" width="10" height="8">
+                <box label="label2" xtl="1.0" ytl="0.0" xbr="5.0" ybr="2.0"></box>
+              </image>
+          </annotations>
+        """
+        xml_path = create_xml_file(tmp_path, invalid_annotation)
+
+        with pytest.raises(ParseError, match="Unknown category name 'label2'"):
             label_input = CVATObjectDetectionInput(xml_path)
             list(label_input.get_labels())
 
@@ -172,29 +197,3 @@ class TestCVATObjectDetectionOutput:
         assert _compare_xml_elements(
             input_tree.getroot(), output_tree.getroot()
         ), "The output XML structure doesn't match the input XML."
-
-    def test_output_missing_labels(self, tmp_path: Path) -> None:
-        annotation = """<?xml version='1.0' encoding='utf-8'?>
-          <annotations>
-              <meta>
-                <task>
-                  <labels></labels>
-                </task>
-              </meta>
-              <image id="0" name="img0.jpg" width="10" height="8">
-                <box label="dummy" xtl="4.0" ytl="0.0" xbr="5.0" ybr="2.0"></box>
-              </image>
-          </annotations>
-        """
-
-        xml_path = create_xml_file(tmp_path, annotation)
-        label_input = CVATObjectDetectionInput(xml_path)
-        output_folder = tmp_path / "labels"
-
-        with pytest.raises(
-            ParseError,
-            match="Could not parse XML file : Unknown category name 'dummy'.",
-        ):
-            CVATObjectDetectionOutput(
-                output_folder=output_folder, annotation_scope="task"
-            ).save(label_input=label_input)
