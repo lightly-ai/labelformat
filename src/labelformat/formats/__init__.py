@@ -4,6 +4,7 @@ from labelformat.formats.coco import (
     COCOObjectDetectionInput,
     COCOObjectDetectionOutput,
 )
+from labelformat.formats.cvat import CVATObjectDetectionInput, CVATObjectDetectionOutput
 from labelformat.formats.kitti import (
     KittiObjectDetectionInput,
     KittiObjectDetectionOutput,
@@ -53,6 +54,8 @@ __all__ = [
     "COCOInstanceSegmentationOutput",
     "COCOObjectDetectionInput",
     "COCOObjectDetectionOutput",
+    "CVATObjectDetectionInput",
+    "CVATObjectDetectionOutput",
     "KittiObjectDetectionInput",
     "KittiObjectDetectionOutput",
     "LabelboxObjectDetectionInput",

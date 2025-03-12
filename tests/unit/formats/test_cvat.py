@@ -15,7 +15,7 @@ from labelformat.model.object_detection import (
     ImageObjectDetection,
     SingleObjectDetection,
 )
-from labelformat.types import ArgumentError, ParseError
+from labelformat.types import ParseError
 
 
 # Helper for creating temp XML files
@@ -190,7 +190,7 @@ class TestCVATObjectDetectionOutput:
         output_folder = tmp_path / "labels"
 
         CVATObjectDetectionOutput(
-            output_folder=output_folder, annotation_scope=annotation_scope
+            output_folder=output_folder, output_annotation_scope=annotation_scope.value
         ).save(label_input=label_input)
 
         assert output_folder.exists()

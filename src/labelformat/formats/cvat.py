@@ -1,9 +1,8 @@
 import logging
-import xml.etree.ElementTree as ET
 from argparse import ArgumentParser
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Literal, Optional
 
 from pydantic_xml import BaseXmlModel, attr, element
 
@@ -17,39 +16,39 @@ from labelformat.model.object_detection import (
     ObjectDetectionOutput,
     SingleObjectDetection,
 )
-from labelformat.types import ArgumentError, ParseError
+from labelformat.types import ParseError
 
 logger = logging.getLogger(__name__)
 
 
 # The following Pydantic XML models describe the structure of CVAT XML files.
-class CVATLabel(BaseXmlModel, tag="label"):  # type: ignore
+class CVATLabel(BaseXmlModel, tag="label", search_mode="unordered"):  # type: ignore
     name: str = element()
 
 
-class CVATLabels(BaseXmlModel, tag="labels"):  # type: ignore
+class CVATLabels(BaseXmlModel, tag="labels", search_mode="unordered"):  # type: ignore
     label_list: List[CVATLabel] = element(tag="label")
 
 
-class CVATTask(BaseXmlModel, tag="task"):  # type: ignore
+class CVATTask(BaseXmlModel, tag="task", search_mode="unordered"):  # type: ignore
     labels: Optional[CVATLabels] = element(tag="labels")
 
 
-class CVATJob(BaseXmlModel, tag="job"):  # type: ignore
+class CVATJob(BaseXmlModel, tag="job", search_mode="unordered"):  # type: ignore
     labels: Optional[CVATLabels] = element(tag="labels")
 
 
-class CVATProject(BaseXmlModel, tag="project"):  # type: ignore
+class CVATProject(BaseXmlModel, tag="project", search_mode="unordered"):  # type: ignore
     labels: Optional[CVATLabels] = element(tag="labels")
 
 
-class CVATMeta(BaseXmlModel, tag="meta"):  # type: ignore
+class CVATMeta(BaseXmlModel, tag="meta", search_mode="unordered"):  # type: ignore
     task: Optional[CVATTask] = element(default=None)
     job: Optional[CVATJob] = element(default=None)
     project: Optional[CVATProject] = element(default=None)
 
 
-class CVATBox(BaseXmlModel, tag="box"):  # type: ignore
+class CVATBox(BaseXmlModel, tag="box", search_mode="unordered"):  # type: ignore
     label: str = attr()
     xtl: float = attr()
     ytl: float = attr()
@@ -57,7 +56,7 @@ class CVATBox(BaseXmlModel, tag="box"):  # type: ignore
     ybr: float = attr()
 
 
-class CVATImage(BaseXmlModel, tag="image"):  # type: ignore
+class CVATImage(BaseXmlModel, tag="image", search_mode="unordered"):  # type: ignore
     id: int = attr()
     name: str = attr()  # Filename
     width: int = attr()
@@ -162,20 +161,25 @@ class _CVATBaseOutput:
             help="Output folder to store generated CVAT XML annotations file",
         )
         parser.add_argument(
-            "--output-annotation-scope ",
+            "--output-annotation-scope",
             choices=[scope.value for scope in AnnotationScope],
-            default=AnnotationScope.TASK.value,
+            default="task",
             help="Define the annotation scope to determine the XML structure. Allowed values: "
             + AnnotationScope.allowed_values(),
         )
 
-    def __init__(self, output_folder: Path, annotation_scope: AnnotationScope) -> None:
-        if not isinstance(annotation_scope, AnnotationScope):
-            raise ArgumentError(
+    def __init__(
+        self,
+        output_folder: Path,
+        output_annotation_scope: Literal["task", "job", "project"],
+    ) -> None:
+        try:
+            self._annotation_scope = AnnotationScope(output_annotation_scope)
+        except ValueError:
+            raise ValueError(
                 f"annotation_scope must be one of the allowed values: {AnnotationScope.allowed_values()}"
             )
         self._output_folder = output_folder
-        self._annotation_scope = annotation_scope
 
 
 @cli_register(format="cvat", task=Task.OBJECT_DETECTION)
