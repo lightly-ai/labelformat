@@ -162,8 +162,8 @@ class _CVATBaseOutput:
         )
         parser.add_argument(
             "--output-annotation-scope",
+            required=True,
             choices=[scope.value for scope in AnnotationScope],
-            default="task",
             help="Define the annotation scope to determine the XML structure. Allowed values: "
             + AnnotationScope.allowed_values(),
         )
