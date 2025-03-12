@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from typing import Optional
 
 import pytest
 
@@ -20,7 +21,7 @@ from labelformat.types import ParseError
 
 # Helper for creating temp XML files
 def create_xml_file(tmp_path: Path, content: str) -> Path:
-    xml_path = tmp_path / "labels" / "annotations.xml"
+    xml_path = tmp_path / "labels" / "annotations_in.xml"
     xml_path.parent.mkdir(parents=True, exist_ok=True)
     xml_path.write_text(content.strip())
     return xml_path
@@ -146,7 +147,11 @@ class TestCVATObjectDetectionInput:
 
 def _compare_xml_elements(elem1: ET.Element, elem2: ET.Element) -> bool:
     """Recursively compare two XML elements for tag, attributes, and text."""
-    if elem1.tag != elem2.tag or elem1.text != elem2.text:
+
+    def normalize(text: Optional[str]) -> str:
+        return (text or "").strip().replace("\n", "").replace(" ", "")
+
+    if elem1.tag != elem2.tag or normalize(elem1.text) != normalize(elem2.text):
         return False
 
     if elem1.attrib != elem2.attrib:
@@ -169,8 +174,7 @@ class TestCVATObjectDetectionOutput:
     def test_save_cyclic_load_and_save(
         self, tmp_path: Path, annotation_scope: AnnotationScope
     ) -> None:
-        annotation = f"""<?xml version='1.0' encoding='utf-8'?>
-          <annotations>
+        annotation = f"""<annotations>
               <meta>
                 <{annotation_scope.value}>
                   <labels>
@@ -185,8 +189,8 @@ class TestCVATObjectDetectionOutput:
           </annotations>
         """
 
-        xml_path = create_xml_file(tmp_path, annotation)
-        label_input = CVATObjectDetectionInput(xml_path)
+        input_xml_path = create_xml_file(tmp_path, annotation)
+        label_input = CVATObjectDetectionInput(input_xml_path)
         output_folder = tmp_path / "labels"
 
         CVATObjectDetectionOutput(
@@ -196,15 +200,12 @@ class TestCVATObjectDetectionOutput:
         assert output_folder.exists()
         assert output_folder.is_dir()
         filepaths = list(output_folder.glob("**/*.xml"))
-        assert len(filepaths) == 1
-        path = filepaths[0]
+        assert len(filepaths) == 2
 
-        assert path == tmp_path / "labels" / "annotations.xml"
-
-        annotation = annotation.replace("\n", "")
+        output_xml_path = tmp_path / "labels" / "annotations.xml"
         # Compare XML structure.
-        input_tree = ET.parse(xml_path)
-        output_tree = ET.parse(path)
+        input_tree = ET.parse(input_xml_path)
+        output_tree = ET.parse(output_xml_path)
 
         assert _compare_xml_elements(
             input_tree.getroot(), output_tree.getroot()
