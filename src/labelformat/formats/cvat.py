@@ -162,8 +162,8 @@ class _CVATBaseOutput:
         )
         parser.add_argument(
             "--output-annotation-scope",
-            required=True,
             choices=[scope.value for scope in AnnotationScope],
+            default="task",
             help="Define the annotation scope to determine the XML structure. Allowed values: "
             + AnnotationScope.allowed_values(),
         )
@@ -171,7 +171,7 @@ class _CVATBaseOutput:
     def __init__(
         self,
         output_folder: Path,
-        output_annotation_scope: Literal["task", "job", "project"],
+        output_annotation_scope: Literal["task", "job", "project"] = "task",
     ) -> None:
         try:
             self._annotation_scope = AnnotationScope(output_annotation_scope)
