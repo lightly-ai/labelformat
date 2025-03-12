@@ -47,8 +47,8 @@ def config_file_factory(tmp_path: Path) -> Callable[[Union[YOLOv8Config, str]], 
     return _create_config
 
 
-class TestYOLOv8BaseInput:
-    class TestGetCategories:
+class Test_YOLOv8BaseInput:
+    class Test_GetCategories:
         def test_extracts_categories_from_dict_format(
             self,
             config_file_factory: Callable[[Union[YOLOv8Config, str]], Path],
@@ -114,7 +114,7 @@ class TestYOLOv8BaseInput:
             with pytest.raises(TypeError):  # Will fail when trying to use len() on int
                 list(input_obj.get_categories())
 
-    class TestRootDir:
+    class Test_RootDir:
         def test_resolves_root_dir_with_explicit_path(self, tmp_path: Path) -> None:
             dataset_dir = tmp_path / "dataset"
             dataset_dir.mkdir()
@@ -139,7 +139,7 @@ class TestYOLOv8BaseInput:
             input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
             assert input_obj._root_dir() == dataset_dir
 
-    class TestLabelsDir:
+    class Test_LabelsDir:
         def test_resolves_labels_dir_relative_to_path(
             self, config_file_factory: Callable[[Union[YOLOv8Config, str]], Path]
         ) -> None:
@@ -195,7 +195,7 @@ class TestYOLOv8BaseInput:
             expected = config_file.parent / "labels/train"
             assert input_obj._labels_dir() == expected
 
-    class TestMultilevelPaths:
+    class Test_MultilevelPaths:
         def test_handles_relative_paths_with_dot_notation(self, tmp_path: Path) -> None:
             dataset_root = tmp_path / "dataset"
             for split in ["train", "valid", "test"]:
