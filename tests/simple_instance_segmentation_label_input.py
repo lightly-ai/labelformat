@@ -1,6 +1,8 @@
 from argparse import ArgumentParser
 from typing import Iterable
 
+from labelformat.model.binary_mask_rle import BinaryMaskSegmentation
+from labelformat.model.bounding_box import BoundingBox
 from labelformat.model.category import Category
 from labelformat.model.image import Image
 from labelformat.model.instance_segmentation import (
@@ -11,7 +13,7 @@ from labelformat.model.instance_segmentation import (
 from labelformat.model.multipolygon import MultiPolygon
 
 
-class SimpleInstanceSegmentationInput(InstanceSegmentationInput):
+class _BaseSimpleInstanceSegmentationInput(InstanceSegmentationInput):
     def get_categories(self) -> Iterable[Category]:
         return [
             Category(id=0, name="cat"),
@@ -24,6 +26,13 @@ class SimpleInstanceSegmentationInput(InstanceSegmentationInput):
             Image(id=0, filename="image.jpg", width=100, height=200),
         ]
 
+    @staticmethod
+    def add_cli_arguments(parser: ArgumentParser) -> None:
+        # Default implementation (no arguments)
+        pass
+
+
+class SimpleInstanceSegmentationInput(_BaseSimpleInstanceSegmentationInput):
     def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
         return [
             ImageInstanceSegmentation(
@@ -63,6 +72,42 @@ class SimpleInstanceSegmentationInput(InstanceSegmentationInput):
             )
         ]
 
-    @staticmethod
-    def add_cli_arguments(parser: ArgumentParser) -> None:
-        raise NotImplementedError()
+
+class SimpleInstanceSegmentationInputWithBinaryMask(
+    _BaseSimpleInstanceSegmentationInput
+):
+    def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
+        return [
+            ImageInstanceSegmentation(
+                image=Image(id=0, filename="image.jpg", width=100, height=200),
+                objects=[
+                    SingleInstanceSegmentation(
+                        category=Category(id=1, name="dog"),
+                        segmentation=MultiPolygon(
+                            polygons=[
+                                [
+                                    (10.0, 10.0),
+                                    (10.0, 20.0),
+                                    (20.0, 20.0),
+                                    (20.0, 10.0),
+                                ],
+                            ],
+                        ),
+                    ),
+                    SingleInstanceSegmentation(
+                        category=Category(id=0, name="cat"),
+                        segmentation=BinaryMaskSegmentation(
+                            _rle_row_wise=[1, 2, 3],
+                            width=3,
+                            height=2,
+                            bounding_box=BoundingBox(
+                                0.0,
+                                0.0,
+                                3.0,
+                                2.0,
+                            ),
+                        ),
+                    ),
+                ],
+            )
+        ]
