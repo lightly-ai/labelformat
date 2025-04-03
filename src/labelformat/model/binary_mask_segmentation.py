@@ -57,7 +57,14 @@ class RLEDecoderEncoder:
     This class provides methods to encode a binary mask into RLE format and
     decode an RLE list back into a binary mask.
 
-    The encoding and decoding can be done in both row-major and column-major order.
+    The encoding and decoding can be done both row-wise and column-wise.
+
+    Example:
+        Consider a binary mask of shape 2x4:
+            [[0, 1, 1, 0],
+             [1, 1, 1, 1]]
+        Row-wise RLE: [1, 2, 1, 4]
+        Column-wise RLE: [1, 5, 1, 1]
     """
 
     @staticmethod

@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from dataclasses import dataclass
 from typing import Iterable
 
-from labelformat.model.binary_mask_rle import BinaryMaskSegmentation
+from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
 from labelformat.model.category import Category
 from labelformat.model.image import Image
 from labelformat.model.multipolygon import MultiPolygon

@@ -6,7 +6,10 @@ from pathlib import Path
 from typing import Dict, Iterable, List, TypedDict
 
 from labelformat.cli.registry import Task, cli_register
-from labelformat.model.binary_mask_rle import BinaryMaskSegmentation, RLEDecoderEncoder
+from labelformat.model.binary_mask_segmentation import (
+    BinaryMaskSegmentation,
+    RLEDecoderEncoder,
+)
 from labelformat.model.bounding_box import BoundingBox, BoundingBoxFormat
 from labelformat.model.category import Category
 from labelformat.model.image import Image
