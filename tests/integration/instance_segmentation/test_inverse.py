@@ -10,13 +10,17 @@ from labelformat.formats.yolov8 import (
     YOLOv8InstanceSegmentationInput,
     YOLOv8InstanceSegmentationOutput,
 )
+from labelformat.model.multipolygon import MultiPolygon
 
-from ...simple_instance_segmentation_label_input import SimpleInstanceSegmentationInput
+from ...simple_instance_segmentation_label_input import (
+    SimpleInstanceSegmentationInput,
+    SimpleInstanceSegmentationInputWithBinaryMask,
+)
 from .. import integration_utils
 
 
 def test_coco_inverse(tmp_path: Path) -> None:
-    start_label_input = SimpleInstanceSegmentationInput()
+    start_label_input = SimpleInstanceSegmentationInputWithBinaryMask()
     COCOInstanceSegmentationOutput(output_file=tmp_path / "train.json").save(
         label_input=start_label_input
     )
@@ -46,6 +50,8 @@ def test_yolov8_inverse(tmp_path: Path, mocker: MockerFixture) -> None:
         assert len(image_label_0.objects) == len(image_label_1.objects)
         for object_0, object_1 in zip(image_label_0.objects, image_label_1.objects):
             assert object_0.category == object_1.category
+            assert isinstance(object_0.segmentation, MultiPolygon)
+            assert isinstance(object_1.segmentation, MultiPolygon)
             integration_utils.assert_multipolygons_almost_equal(
                 object_0.segmentation, object_1.segmentation
             )

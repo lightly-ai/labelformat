@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 import json
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, TypedDict
 
 from labelformat.cli.registry import Task, cli_register
+from labelformat.model.binary_mask_segmentation import (
+    BinaryMaskSegmentation,
+    RLEDecoderEncoder,
+)
 from labelformat.model.bounding_box import BoundingBox, BoundingBoxFormat
 from labelformat.model.category import Category
 from labelformat.model.image import Image
@@ -52,6 +58,14 @@ class _COCOBaseInput:
                 width=int(image["width"]),
                 height=int(image["height"]),
             )
+
+
+class _COCOInstanceSegmentationRLE(TypedDict):
+    counts: list[int]
+    size: list[int]
+
+
+_COCOInstanceSegmentationMultiPolygon = List[List[float]]
 
 
 @cli_register(format="coco", task=Task.OBJECT_DETECTION)
@@ -103,14 +117,15 @@ class COCOInstanceSegmentationInput(_COCOBaseInput, InstanceSegmentationInput):
             for ann in annotations:
                 if "segmentation" not in ann:
                     raise ParseError(f"Segmentation missing for image id {image_id}")
+                segmentation: MultiPolygon | BinaryMaskSegmentation
                 if ann["iscrowd"] == 1:
-                    raise ParseError(
-                        "Parsing segmentations with iscrowd=1 is not yet supported. "
-                        f"(image id {image_id})"
+                    segmentation = _coco_segmentation_to_binary_mask_rle(
+                        segmentation=ann["segmentation"], bbox=ann["bbox"]
                     )
-                segmentation = _coco_segmentation_to_multipolygon(
-                    coco_segmentation=ann["segmentation"]
-                )
+                else:
+                    segmentation = _coco_segmentation_to_multipolygon(
+                        coco_segmentation=ann["segmentation"]
+                    )
                 objects.append(
                     SingleInstanceSegmentation(
                         category=category_id_to_category[ann["category_id"]],
@@ -173,19 +188,41 @@ class COCOInstanceSegmentationOutput(_COCOBaseOutput, InstanceSegmentationOutput
         data["annotations"] = []
         for label in label_input.get_labels():
             for obj in label.objects:
-                annotation = {
-                    "image_id": label.image.id,
-                    "category_id": obj.category.id,
-                    "bbox": [
+                segmentation: (
+                    _COCOInstanceSegmentationMultiPolygon | _COCOInstanceSegmentationRLE
+                )
+                if isinstance(obj.segmentation, BinaryMaskSegmentation):
+                    segmentation = _binary_mask_rle_to_coco_segmentation(
+                        binary_mask_rle=obj.segmentation
+                    )
+                    bbox = [
+                        float(v)
+                        for v in obj.segmentation.bounding_box.to_format(
+                            BoundingBoxFormat.XYWH
+                        )
+                    ]
+                    iscrowd = 1
+                elif isinstance(obj.segmentation, MultiPolygon):
+                    segmentation = _multipolygon_to_coco_segmentation(
+                        multipolygon=obj.segmentation
+                    )
+                    bbox = [
                         float(v)
                         for v in obj.segmentation.bounding_box().to_format(
                             BoundingBoxFormat.XYWH
                         )
-                    ],
-                    "iscrowd": 0,
-                    "segmentation": _multipolygon_to_coco_segmentation(
-                        multipolygon=obj.segmentation
-                    ),
+                    ]
+                    iscrowd = 0
+                else:
+                    raise ParseError(
+                        f"Unsupported segmentation type: {type(obj.segmentation)}"
+                    )
+                annotation = {
+                    "image_id": label.image.id,
+                    "category_id": obj.category.id,
+                    "bbox": bbox,
+                    "iscrowd": iscrowd,
+                    "segmentation": segmentation,
                 }
                 data["annotations"].append(annotation)
 
@@ -195,7 +232,7 @@ class COCOInstanceSegmentationOutput(_COCOBaseOutput, InstanceSegmentationOutput
 
 
 def _coco_segmentation_to_multipolygon(
-    coco_segmentation: List[List[float]],
+    coco_segmentation: _COCOInstanceSegmentationMultiPolygon,
 ) -> MultiPolygon:
     """Convert COCO segmentation to MultiPolygon."""
     polygons = []
@@ -213,12 +250,34 @@ def _coco_segmentation_to_multipolygon(
     return MultiPolygon(polygons=polygons)
 
 
-def _multipolygon_to_coco_segmentation(multipolygon: MultiPolygon) -> List[List[float]]:
+def _multipolygon_to_coco_segmentation(
+    multipolygon: MultiPolygon,
+) -> _COCOInstanceSegmentationMultiPolygon:
     """Convert MultiPolygon to COCO segmentation."""
     coco_segmentation = []
     for polygon in multipolygon.polygons:
         coco_segmentation.append([x for point in polygon for x in point])
     return coco_segmentation
+
+
+def _coco_segmentation_to_binary_mask_rle(
+    segmentation: _COCOInstanceSegmentationRLE, bbox: list[float]
+) -> BinaryMaskSegmentation:
+    counts = segmentation["counts"]
+    height, width = segmentation["size"]
+    binary_mask = RLEDecoderEncoder.decode_column_wise_rle(counts, height, width)
+    bounding_box = BoundingBox.from_format(bbox=bbox, format=BoundingBoxFormat.XYWH)
+    return BinaryMaskSegmentation.from_binary_mask(
+        binary_mask, bounding_box=bounding_box
+    )
+
+
+def _binary_mask_rle_to_coco_segmentation(
+    binary_mask_rle: BinaryMaskSegmentation,
+) -> _COCOInstanceSegmentationRLE:
+    binary_mask = binary_mask_rle.get_binary_mask()
+    counts = RLEDecoderEncoder.encode_column_wise_rle(binary_mask)
+    return {"counts": counts, "size": [binary_mask_rle.height, binary_mask_rle.width]}
 
 
 def _get_output_images_dict(

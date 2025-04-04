@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from argparse import ArgumentParser
 from dataclasses import dataclass
-from typing import Iterable, List
+from typing import Iterable
 
+from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
 from labelformat.model.category import Category
 from labelformat.model.image import Image
 from labelformat.model.multipolygon import MultiPolygon
@@ -11,13 +14,13 @@ from labelformat.model.multipolygon import MultiPolygon
 @dataclass(frozen=True)
 class SingleInstanceSegmentation:
     category: Category
-    segmentation: MultiPolygon
+    segmentation: MultiPolygon | BinaryMaskSegmentation
 
 
 @dataclass(frozen=True)
 class ImageInstanceSegmentation:
     image: Image
-    objects: List[SingleInstanceSegmentation]
+    objects: list[SingleInstanceSegmentation]
 
 
 class InstanceSegmentationInput(ABC):

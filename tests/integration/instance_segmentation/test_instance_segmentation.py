@@ -13,16 +13,18 @@ from ..integration_utils import (
 
 
 def test_coco_to_coco(tmp_path: Path) -> None:
-    coco_file = INST_SEGMENTATION_FIXTURES_DIR / "COCO/instances.json"
+    coco_file = INST_SEGMENTATION_FIXTURES_DIR / "COCO/instances_with_binary_mask.json"
     label_input = COCOInstanceSegmentationInput(input_file=coco_file)
-    COCOInstanceSegmentationOutput(output_file=tmp_path / "instances.json").save(
-        label_input=label_input
-    )
+    COCOInstanceSegmentationOutput(
+        output_file=tmp_path / "instances_with_binary_mask.json"
+    ).save(label_input=label_input)
 
     # Compare jsons.
-    output_json = json.loads((tmp_path / "instances.json").read_text())
+    output_json = json.loads((tmp_path / "instances_with_binary_mask.json").read_text())
     expected_json = json.loads(
-        (INST_SEGMENTATION_FIXTURES_DIR / "COCO/instances.json").read_text()
+        (
+            INST_SEGMENTATION_FIXTURES_DIR / "COCO/instances_with_binary_mask.json"
+        ).read_text()
     )
     # Some fields are not converted:
     # - info

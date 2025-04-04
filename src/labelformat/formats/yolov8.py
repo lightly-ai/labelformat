@@ -290,6 +290,10 @@ class YOLOv8InstanceSegmentationOutput(_YOLOv8BaseOutput, InstanceSegmentationOu
             label_path.parent.mkdir(parents=True, exist_ok=True)
             with label_path.open("w") as file:
                 for obj in label.objects:
+                    if not isinstance(obj.segmentation, MultiPolygon):
+                        raise ValueError(
+                            f"YOLOv8 format only supports MultiPolygon segmentation."
+                        )
                     polygon = _multipolygon_to_polygon(multipolygon=obj.segmentation)
                     polygon_str = " ".join(
                         [
