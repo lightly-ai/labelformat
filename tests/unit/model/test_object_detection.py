@@ -33,8 +33,8 @@ class TestSingleObjectDetection:
     @pytest.mark.parametrize(
         "confidence, expected_error",
         [
-            (-0.1, "Confidence must be between 0 and 1"),
-            (1.1, "Confidence must be between 0 and 1"),
+            (-0.1, "Confidence must be between 0 and 1, but got: -0.1"),
+            (1.1, "Confidence must be between 0 and 1, but got: 1.1"),
         ],
     )
     def test_confidence_out_of_bounds(
