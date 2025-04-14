@@ -41,60 +41,6 @@ class CustomObjectDetectionInput(_CustomBaseInput, ObjectDetectionInput):
     
     It can be used standalone or for conversion to other formats.
 
-
-    Creation example:
-    ```python
-    from labelformat.formats.custom import CustomObjectDetectionInput
-    from labelformat.model.bounding_box import BoundingBox
-    from labelformat.model.category import Category
-    from labelformat.model.image import Image
-    from labelformat.model.object_detection import (
-        ImageObjectDetection,
-        SingleObjectDetection,
-    )
-    
-    
-
-    my_dataloader = ...
-    my_model = ...
-    prediction_bbox_format = "xywh" # or "xyxy" or "cxcywh", depending on your model
-    
-    categories = [
-        Category(id=i, name=category)
-        for i, category in enumerate(my_model.get_categories())
-    ]
-
-    images = []
-    labels = []
-    # Iterate over the PILImages and their filenames
-    for i, image, filename in enumerate(my_dataloader):
-
-        # Prediction for each image
-        predictions = my_model.predict(image)
-        
-        # Create a new Image object for each image
-        images.append(
-            Image(id=i, filename=filename, width=image.width, height=image.height)
-        )
-        # Create a new ImageObjectDetection object for each image
-        objects = []
-        for prediction in predictions:
-            objects.append(
-                SingleObjectDetection(
-                    category=categories[prediction.category],
-                    box=BoundingBox.from_format(
-                        box=prediction.box,
-                        format=prediction_bbox_format,
-                    ),
-                    confidence=prediction.confidence,
-                )
-            )
-        labels.append(
-            ImageObjectDetection(
-                image=images[-1],
-                objects=objects,
-            )
-        )
     """
 
     def get_labels(self) -> Iterable[ImageObjectDetection]:
