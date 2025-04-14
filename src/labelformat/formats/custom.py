@@ -45,23 +45,3 @@ class CustomObjectDetectionInput(_CustomBaseInput, ObjectDetectionInput):
 
     def get_labels(self) -> Iterable[ImageObjectDetection]:
         return self.labels
-
-
-@dataclass
-class CustomInstanceSegmentationInput(_CustomBaseInput, InstanceSegmentationInput):
-
-    labels: list[ImageInstanceSegmentation]
-
-    """Class for custom instance segmentation input format.
-
-    It can be used standalone or for conversion to other formats.
-
-    Creation example: 
-    ```python
-    TODO(Malte, 04/2025): Add example
-    ```
-
-    """
-
-    def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
-        return self.labels

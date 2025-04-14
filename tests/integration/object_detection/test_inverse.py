@@ -103,8 +103,7 @@ def test_lightly_inverse(
     if with_confidence:
         expected_labels = list(start_label_input.get_labels())
     else:
-        # If confidence is not set, it is set to 0.0 in the output.
-        # We need to set it to None in the expected labels.
+        # If confidence is None in the input, it is set to 0.0 in the output.
         expected_labels = []
         for label in start_label_input.get_labels():
             expected_objects = []
