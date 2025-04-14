@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from argparse import ArgumentParser
 from dataclasses import dataclass
@@ -12,6 +14,13 @@ from labelformat.model.image import Image
 class SingleObjectDetection:
     category: Category
     box: BoundingBox
+    confidence: float | None = None
+
+    def __post_init__(self) -> None:
+        if self.confidence is not None and not (0 <= self.confidence <= 1):
+            raise ValueError(
+                f"Confidence must be between 0 and 1, but got: {self.confidence}"
+            )
 
 
 @dataclass(frozen=True)

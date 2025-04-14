@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 from typing import Iterable
 
+import pytest
 from pytest_mock import MockerFixture
 
 from labelformat.formats.kitti import (
@@ -17,7 +18,7 @@ from labelformat.model.object_detection import (
     SingleObjectDetection,
 )
 
-from ...simple_object_detection_label_input import SimpleObjectDetectionInput
+from ... import simple_object_detection_label_input
 
 
 class TestKittiObjectDetectionInput:
@@ -73,10 +74,14 @@ class TestKittiObjectDetectionInput:
 
 
 class TestKittiObjectDetectionOutput:
-    def test_save(self, tmp_path: Path) -> None:
+
+    @pytest.mark.parametrize("with_confidence", [True, False])
+    def test_save(self, tmp_path: Path, with_confidence: bool) -> None:
         output_folder = tmp_path / "labels"
         KittiObjectDetectionOutput(output_folder=output_folder).save(
-            label_input=SimpleObjectDetectionInput()
+            label_input=simple_object_detection_label_input.get_input(
+                with_confidence=with_confidence
+            )
         )
         assert output_folder.exists()
         assert output_folder.is_dir()

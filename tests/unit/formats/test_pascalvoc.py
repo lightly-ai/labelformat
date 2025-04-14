@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from labelformat.formats.pascalvoc import (
     PascalVOCObjectDetectionInput,
     PascalVOCObjectDetectionOutput,
@@ -12,7 +14,7 @@ from labelformat.model.object_detection import (
     SingleObjectDetection,
 )
 
-from ...simple_object_detection_label_input import SimpleObjectDetectionInput
+from ... import simple_object_detection_label_input
 
 
 class TestPascalVOCObjectDetectionInput:
@@ -64,10 +66,13 @@ class TestPascalVOCObjectDetectionInput:
 
 
 class TestPascalVOCObjectDetectionOutput:
-    def test_save(self, tmp_path: Path) -> None:
+    @pytest.mark.parametrize("with_confidence", [True, False])
+    def test_save(self, tmp_path: Path, with_confidence: bool) -> None:
         output_folder = tmp_path / "labels"
         PascalVOCObjectDetectionOutput(output_folder=output_folder).save(
-            label_input=SimpleObjectDetectionInput()
+            label_input=simple_object_detection_label_input.get_input(
+                with_confidence=with_confidence
+            )
         )
         assert output_folder.exists()
         assert output_folder.is_dir()
