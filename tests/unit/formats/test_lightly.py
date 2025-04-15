@@ -17,7 +17,7 @@ from labelformat.model.object_detection import (
     SingleObjectDetection,
 )
 
-from ...simple_object_detection_label_input import SimpleObjectDetectionInput
+from ... import simple_object_detection_label_input
 
 
 def _create_label_file(tmp_path: Path, filename: str) -> Path:
@@ -167,10 +167,13 @@ class TestLightlyObjectDetectionInput:
 
 class TestLightlyObjectDetectionOutput:
     @pytest.mark.parametrize("filename", ["image.jpg", "subdir1/subdir2/image.jpg"])
-    def test_save(self, filename: str, tmp_path: Path) -> None:
+    @pytest.mark.parametrize("with_confidence", [True, False])
+    def test_save(self, filename: str, tmp_path: Path, with_confidence: bool) -> None:
         output_folder = tmp_path / "labels"
         LightlyObjectDetectionOutput(output_folder=output_folder).save(
-            label_input=SimpleObjectDetectionInput(filename=filename)
+            label_input=simple_object_detection_label_input.get_input(
+                filename=filename, with_confidence=with_confidence
+            )
         )
         assert output_folder.exists()
         assert output_folder.is_dir()
@@ -193,12 +196,12 @@ class TestLightlyObjectDetectionOutput:
                     {
                         "category_id": 1,
                         "bbox": [10.0, 20.0, 20.0, 20.0],
-                        "score": 0.0,  # default
+                        "score": 0.4 if with_confidence else 0.0,
                     },
                     {
                         "category_id": 0,
                         "bbox": [50.0, 60.0, 20.0, 20.0],
-                        "score": 0.0,  # default
+                        "score": 0.8 if with_confidence else 0.0,
                     },
                 ],
             },

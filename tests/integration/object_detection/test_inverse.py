@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pytest
 from pytest_mock import MockerFixture
 
 from labelformat.formats.coco import COCOObjectDetectionInput, COCOObjectDetectionOutput
@@ -19,12 +20,16 @@ from labelformat.formats.yolov8 import (
     YOLOv8ObjectDetectionInput,
     YOLOv8ObjectDetectionOutput,
 )
+from labelformat.model.object_detection import (
+    ImageObjectDetection,
+    SingleObjectDetection,
+)
 
-from ...simple_object_detection_label_input import SimpleObjectDetectionInput
+from ... import simple_object_detection_label_input
 
 
 def test_coco_inverse(tmp_path: Path) -> None:
-    start_label_input = SimpleObjectDetectionInput()
+    start_label_input = simple_object_detection_label_input.get_input()
     COCOObjectDetectionOutput(output_file=tmp_path / "train.json").save(
         label_input=start_label_input
     )
@@ -33,7 +38,7 @@ def test_coco_inverse(tmp_path: Path) -> None:
 
 
 def test_yolov8_inverse(tmp_path: Path, mocker: MockerFixture) -> None:
-    start_label_input = SimpleObjectDetectionInput()
+    start_label_input = simple_object_detection_label_input.get_input()
     YOLOv8ObjectDetectionOutput(
         output_file=tmp_path / "data.yaml",
         output_split="train",
@@ -50,7 +55,7 @@ def test_yolov8_inverse(tmp_path: Path, mocker: MockerFixture) -> None:
 
 
 def test_pascalvoc_inverse(tmp_path: Path) -> None:
-    start_label_input = SimpleObjectDetectionInput()
+    start_label_input = simple_object_detection_label_input.get_input()
     PascalVOCObjectDetectionOutput(output_folder=tmp_path).save(
         label_input=start_label_input
     )
@@ -62,7 +67,7 @@ def test_pascalvoc_inverse(tmp_path: Path) -> None:
 
 
 def test_kitti_inverse(tmp_path: Path, mocker: MockerFixture) -> None:
-    start_label_input = SimpleObjectDetectionInput()
+    start_label_input = simple_object_detection_label_input.get_input()
     KittiObjectDetectionOutput(output_folder=tmp_path / "labels").save(
         label_input=start_label_input
     )
@@ -77,8 +82,13 @@ def test_kitti_inverse(tmp_path: Path, mocker: MockerFixture) -> None:
     assert list(start_label_input.get_labels()) == list(end_label_input.get_labels())
 
 
-def test_lightly_inverse(tmp_path: Path, mocker: MockerFixture) -> None:
-    start_label_input = SimpleObjectDetectionInput()
+@pytest.mark.parametrize("with_confidence", [True, False])
+def test_lightly_inverse(
+    tmp_path: Path, mocker: MockerFixture, with_confidence: bool
+) -> None:
+    start_label_input = simple_object_detection_label_input.get_input(
+        with_confidence=with_confidence
+    )
     LightlyObjectDetectionOutput(output_folder=tmp_path / "task").save(
         label_input=start_label_input
     )
@@ -89,7 +99,29 @@ def test_lightly_inverse(tmp_path: Path, mocker: MockerFixture) -> None:
     end_label_input = LightlyObjectDetectionInput(
         input_folder=tmp_path / "task",
     )
-    assert list(start_label_input.get_labels()) == list(end_label_input.get_labels())
+
+    if with_confidence:
+        expected_labels = list(start_label_input.get_labels())
+    else:
+        # If confidence is None in the input, it is set to 0.0 in the output.
+        expected_labels = []
+        for label in start_label_input.get_labels():
+            expected_objects = []
+            for obj in label.objects:
+                if obj.confidence is None:
+                    obj = SingleObjectDetection(
+                        category=obj.category,
+                        box=obj.box,
+                        confidence=0.0,
+                    )
+                expected_objects.append(obj)
+            expected_labels.append(
+                ImageObjectDetection(
+                    image=label.image,
+                    objects=expected_objects,
+                )
+            )
+    assert list(end_label_input.get_labels()) == expected_labels
 
 
 def _mock_input_images(mocker: MockerFixture, folder: Path) -> None:

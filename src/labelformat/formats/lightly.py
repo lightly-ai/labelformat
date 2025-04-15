@@ -85,6 +85,11 @@ class LightlyObjectDetectionInput(ObjectDetectionInput):
                             bbox=[float(x) for x in prediction["bbox"]],
                             format=BoundingBoxFormat.XYWH,
                         ),
+                        confidence=(
+                            float(prediction["score"])
+                            if "score" in prediction
+                            else None
+                        ),
                     )
                 )
             yield ImageObjectDetection(
@@ -152,7 +157,7 @@ class LightlyObjectDetectionOutput(ObjectDetectionOutput):
                     {
                         "category_id": obj.category.id,
                         "bbox": obj.box.to_format(BoundingBoxFormat.XYWH),
-                        "score": 0.0,  # default
+                        "score": 0.0 if obj.confidence is None else obj.confidence,
                     }
                     for obj in label.objects
                 ],
