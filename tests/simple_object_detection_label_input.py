@@ -1,4 +1,4 @@
-from labelformat.formats.custom import CustomObjectDetectionInput
+from labelformat.formats.labelformat import LabelformatObjectDetectionInput
 from labelformat.model.bounding_box import BoundingBox
 from labelformat.model.category import Category
 from labelformat.model.image import Image
@@ -10,7 +10,7 @@ from labelformat.model.object_detection import (
 
 def get_input(
     filename: str = "image.jpg", with_confidence: bool = False
-) -> CustomObjectDetectionInput:
+) -> LabelformatObjectDetectionInput:
 
     categories = [
         Category(id=0, name="cat"),
@@ -48,7 +48,7 @@ def get_input(
         )
     ]
 
-    return CustomObjectDetectionInput(
+    return LabelformatObjectDetectionInput(
         categories=categories,
         images=images,
         labels=labels,

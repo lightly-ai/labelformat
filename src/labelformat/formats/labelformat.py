@@ -23,7 +23,7 @@ class _CustomBaseInput:
 
     @staticmethod
     def add_cli_arguments(parser: ArgumentParser) -> None:
-        raise ValueError("CustomObjectDetectionInput does not support CLI arguments")
+        raise ValueError("LabelformatObjectDetectionInput does not support CLI arguments")
 
     def get_categories(self) -> Iterable[Category]:
         return self.categories
@@ -33,7 +33,7 @@ class _CustomBaseInput:
 
 
 @dataclass
-class CustomObjectDetectionInput(_CustomBaseInput, ObjectDetectionInput):
+class LabelformatObjectDetectionInput(_CustomBaseInput, ObjectDetectionInput):
 
     labels: list[ImageObjectDetection]
 
