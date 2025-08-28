@@ -17,6 +17,7 @@ pyyaml = "*"
 pillow = "*"
 pydantic-xml = "*"
 numpy = "*"
+opencv-python = "*"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "*"
