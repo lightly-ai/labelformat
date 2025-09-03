@@ -5,6 +5,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+from numpy.typing import NDArray
 
 
 def create_cli_test_data(base_path: Path) -> None:
@@ -22,7 +23,7 @@ def create_cli_test_data(base_path: Path) -> None:
         cv2.imwrite(str(image_path), image)
 
         # Create corresponding mask
-        mask = np.zeros((80, 80), dtype=np.uint8)
+        mask: NDArray[np.uint8] = np.zeros((80, 80), dtype=np.uint8)
         # Add some rectangular regions
         mask[20:60, 20:40] = 255
         if i == 1:

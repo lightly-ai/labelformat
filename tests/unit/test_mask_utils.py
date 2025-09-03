@@ -5,6 +5,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
 from labelformat.mask_utils import (
     binarize_mask,
@@ -19,25 +20,25 @@ class TestBinarizeMask:
     def test_binarize_with_threshold(self, tmp_path: Path) -> None:
         """Test binarization with a fixed threshold."""
         # Create a simple grayscale image
-        mask = np.array([[100, 200], [50, 150]], dtype=np.uint8)
+        mask: NDArray[np.uint8] = np.array([[100, 200], [50, 150]], dtype=np.uint8)
         mask_path = tmp_path / "test_mask.png"
         cv2.imwrite(str(mask_path), mask)
 
         # Binarize with threshold 100
         result = binarize_mask(mask_path, threshold=100)
-        expected = np.array([[0, 1], [0, 1]], dtype=np.uint8)
+        expected: NDArray[np.uint8] = np.array([[0, 1], [0, 1]], dtype=np.uint8)
         np.testing.assert_array_equal(result, expected)
 
     def test_binarize_with_otsu(self, tmp_path: Path) -> None:
         """Test binarization with Otsu automatic threshold."""
         # Create a bimodal image suitable for Otsu
-        mask = np.array([[50, 50], [200, 200]], dtype=np.uint8)
+        mask: NDArray[np.uint8] = np.array([[50, 50], [200, 200]], dtype=np.uint8)
         mask_path = tmp_path / "test_mask.png"
         cv2.imwrite(str(mask_path), mask)
 
         # Binarize with Otsu (None threshold)
         result = binarize_mask(mask_path, threshold=None)
-        expected = np.array([[0, 0], [1, 1]], dtype=np.uint8)
+        expected: NDArray[np.uint8] = np.array([[0, 0], [1, 1]], dtype=np.uint8)
         np.testing.assert_array_equal(result, expected)
 
     def test_binarize_file_not_found(self) -> None:
@@ -49,25 +50,35 @@ class TestBinarizeMask:
 class TestExtractInstanceMasks:
     def test_single_instance(self) -> None:
         """Test extraction of a single connected component."""
-        mask = np.array([[0, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0]], dtype=np.uint8)
+        mask: NDArray[np.uint8] = np.array(
+            [[0, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0]], dtype=np.uint8
+        )
 
         instances = extract_instance_masks(mask)
         assert len(instances) == 1
-        expected = np.array([[0, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0]], dtype=np.uint8)
+        expected: NDArray[np.uint8] = np.array(
+            [[0, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0]], dtype=np.uint8
+        )
         np.testing.assert_array_equal(instances[0], expected)
 
     def test_multiple_instances(self) -> None:
         """Test extraction of multiple connected components."""
-        mask = np.array([[1, 1, 0, 1], [1, 1, 0, 1], [0, 0, 0, 0]], dtype=np.uint8)
+        mask: NDArray[np.uint8] = np.array(
+            [[1, 1, 0, 1], [1, 1, 0, 1], [0, 0, 0, 0]], dtype=np.uint8
+        )
 
         instances = extract_instance_masks(mask)
         assert len(instances) == 2
 
         # First instance (left blob)
-        expected1 = np.array([[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 0, 0]], dtype=np.uint8)
+        expected1: NDArray[np.uint8] = np.array(
+            [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 0, 0]], dtype=np.uint8
+        )
 
         # Second instance (right blob)
-        expected2 = np.array([[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0]], dtype=np.uint8)
+        expected2: NDArray[np.uint8] = np.array(
+            [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 0]], dtype=np.uint8
+        )
 
         # Check that we get both instances (order may vary)
         found_instance1 = any(np.array_equal(inst, expected1) for inst in instances)
@@ -76,7 +87,7 @@ class TestExtractInstanceMasks:
 
     def test_empty_mask(self) -> None:
         """Test extraction from empty mask."""
-        mask = np.zeros((3, 3), dtype=np.uint8)
+        mask: NDArray[np.uint8] = np.zeros((3, 3), dtype=np.uint8)
         instances = extract_instance_masks(mask)
         assert len(instances) == 0
 
@@ -84,7 +95,7 @@ class TestExtractInstanceMasks:
 class TestMaskToMultipolygon:
     def test_simple_rectangle(self) -> None:
         """Test conversion of rectangular mask to multipolygon."""
-        mask = np.array(
+        mask: NDArray[np.uint8] = np.array(
             [[0, 0, 0, 0], [0, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0]], dtype=np.uint8
         )
 
@@ -97,7 +108,9 @@ class TestMaskToMultipolygon:
 class TestMaskToBinaryMaskSegmentation:
     def test_simple_mask(self) -> None:
         """Test conversion to BinaryMaskSegmentation."""
-        mask = np.array([[0, 1, 1], [0, 1, 1], [0, 0, 0]], dtype=np.uint8)
+        mask: NDArray[np.uint8] = np.array(
+            [[0, 1, 1], [0, 1, 1], [0, 0, 0]], dtype=np.uint8
+        )
 
         binary_seg = mask_to_binary_mask_segmentation(mask)
         assert binary_seg.width == 3

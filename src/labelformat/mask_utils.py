@@ -1,7 +1,7 @@
 """Mask utilities implemented with Pillow and NumPy, without OpenCV."""
 
 from pathlib import Path
-from typing import List, Tuple
+from typing import Generator, List, Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -20,7 +20,9 @@ def _read_grayscale(mask_path: Path) -> NDArray[np.uint8]:
 
 
 def _otsu_threshold(img: NDArray[np.uint8]) -> int:
-    hist = np.bincount(img.ravel(), minlength=256).astype(np.float64)
+    hist: NDArray[np.float64] = np.bincount(img.ravel(), minlength=256).astype(
+        np.float64
+    )
     total = img.size
     prob = hist / total
     omega = np.cumsum(prob)
@@ -36,7 +38,7 @@ def _otsu_threshold(img: NDArray[np.uint8]) -> int:
 
 
 def _apply_threshold(
-    img: NDArray[np.uint8], threshold: int | None
+    img: NDArray[np.uint8], threshold: Union[int, None]
 ) -> NDArray[np.uint8]:
     t = _otsu_threshold(img) if threshold is None else int(threshold)
     return (img > t).astype(np.uint8)
@@ -73,7 +75,7 @@ def _morph_open_close(
 
 def binarize_mask(
     mask_path: Path,
-    threshold: int | None = None,
+    threshold: Union[int, None] = None,
     morph_open: int = 0,
     morph_close: int = 0,
 ) -> NDArray[np.uint8]:
@@ -107,11 +109,11 @@ def _connected_components(
     binary_mask: NDArray[np.uint8], connectivity: int = 8
 ) -> Tuple[int, NDArray[np.int32]]:
     h, w = binary_mask.shape
-    labels = np.zeros((h, w), dtype=np.int32)
+    labels: NDArray[np.int32] = np.zeros((h, w), dtype=np.int32)
     next_label = 1
     parent: List[int] = [0]
 
-    def neighbors(y: int, x: int):
+    def neighbors(y: int, x: int) -> Generator[Tuple[int, int], None, None]:
         offs = (
             [(-1, 0), (-1, -1), (-1, 1), (0, -1)]
             if connectivity == 8
@@ -175,12 +177,14 @@ def _rdp(points: NDArray[np.float64], epsilon: float) -> NDArray[np.float64]:
     if len(points) <= 3 or epsilon <= 0:
         return points
 
-    def _point_line_dist(p, a, b):
+    def _point_line_dist(
+        p: NDArray[np.float64], a: NDArray[np.float64], b: NDArray[np.float64]
+    ) -> float:
         if np.allclose(a, b):
             return float(np.linalg.norm(p - a))
         return float(abs(np.cross(b - a, a - p)) / np.linalg.norm(b - a))
 
-    def _rec(pts):
+    def _rec(pts: NDArray[np.float64]) -> NDArray[np.float64]:
         a, b = pts[0], pts[-1]
         dmax = 0.0
         idx = 0
@@ -199,7 +203,7 @@ def _rdp(points: NDArray[np.float64], epsilon: float) -> NDArray[np.float64]:
 
 
 def _find_boundary_pixels(binary_mask: NDArray[np.uint8]) -> NDArray[np.uint8]:
-    m = binary_mask.astype(np.uint8)
+    m: NDArray[np.uint8] = binary_mask.astype(np.uint8)
     p = np.pad(m, 1, mode="constant", constant_values=0)
     c = p[1:-1, 1:-1]
     up = p[:-2, 1:-1]
@@ -207,7 +211,8 @@ def _find_boundary_pixels(binary_mask: NDArray[np.uint8]) -> NDArray[np.uint8]:
     left = p[1:-1, :-2]
     right = p[1:-1, 2:]
     boundary = (c == 1) & ((up == 0) | (down == 0) | (left == 0) | (right == 0))
-    return boundary.astype(np.uint8)
+    result: NDArray[np.uint8] = boundary.astype(np.uint8)
+    return result
 
 
 def _trace_outer_contour(binary_mask: NDArray[np.uint8]) -> List[Tuple[float, float]]:
@@ -272,7 +277,7 @@ def mask_to_multipolygon(
     if len(contour) < 3:
         return MultiPolygon(polygons=[])
 
-    pts = np.array(contour, dtype=np.float64)
+    pts: NDArray[np.float64] = np.array(contour, dtype=np.float64)
 
     if approx_epsilon > 0.0 and len(pts) >= 3:
         diffs = np.diff(np.vstack([pts, pts[:1]]), axis=0)

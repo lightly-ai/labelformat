@@ -6,6 +6,7 @@ from typing import Any, Dict
 import cv2
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
 from labelformat.formats.coco import COCOInstanceSegmentationOutput
 from labelformat.formats.maskpair import MaskPairInstanceSegmentationInput
@@ -26,7 +27,7 @@ def create_test_data(base_path: Path) -> None:
         cv2.imwrite(str(image_path), image)
 
         # Create a corresponding binary mask with some shapes
-        mask = np.zeros((100, 100), dtype=np.uint8)
+        mask: NDArray[np.uint8] = np.zeros((100, 100), dtype=np.uint8)
 
         if i == 0:
             # Single rectangle
@@ -37,7 +38,7 @@ def create_test_data(base_path: Path) -> None:
             mask[50:70, 50:70] = 255
         else:
             # Circle-like shape
-            cv2.circle(mask, (50, 50), 20, 255, -1)
+            cv2.circle(mask, (50, 50), 20, (255,), -1)
 
         mask_path = masks_dir / f"test_{i:03d}.png"
         cv2.imwrite(str(mask_path), mask)
@@ -178,7 +179,7 @@ class TestMaskPairIntegration:
         cv2.imwrite(str(images_dir / "test.jpg"), image)
 
         # Create a noisy mask that would benefit from morphological operations
-        mask = np.zeros((100, 100), dtype=np.uint8)
+        mask: NDArray[np.uint8] = np.zeros((100, 100), dtype=np.uint8)
         mask[30:70, 30:70] = 255
         # Add noise
         mask[35, 35] = 0  # Small hole
@@ -214,7 +215,7 @@ class TestMaskPairIntegration:
         cv2.imwrite(str(images_dir / "test.jpg"), image)
 
         # Create mask with one large and one small instance
-        mask = np.zeros((100, 100), dtype=np.uint8)
+        mask: NDArray[np.uint8] = np.zeros((100, 100), dtype=np.uint8)
         mask[20:80, 20:80] = 255  # Large instance (60x60 = 3600 pixels)
         mask[5:10, 5:10] = 255  # Small instance (5x5 = 25 pixels)
         cv2.imwrite(str(masks_dir / "test.png"), mask)
