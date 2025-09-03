@@ -41,7 +41,6 @@ and time-consuming. Labelformat aims to solve this pain.
 - Support for common dataset label formats (more coming soon)
 - Support for common tool formats (more coming soon)
 - Minimal dependencies, targets python 3.8 or higher
-- OpenCV support for image/mask processing
 - Memory concious - datasets are processed file-by-file instead of loading everything
   in memory (when possible)
 - Typed
