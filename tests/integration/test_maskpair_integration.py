@@ -1,4 +1,5 @@
 """Integration tests for maskpair format."""
+
 import json
 from pathlib import Path
 from typing import Any, Dict

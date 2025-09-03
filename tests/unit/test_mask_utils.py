@@ -1,4 +1,5 @@
 """Tests for mask utilities."""
+
 import tempfile
 from pathlib import Path
 

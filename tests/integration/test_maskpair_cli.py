@@ -1,4 +1,5 @@
 """Test CLI integration for maskpair format."""
+
 import json
 import subprocess
 from pathlib import Path

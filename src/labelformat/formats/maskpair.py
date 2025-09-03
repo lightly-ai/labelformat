@@ -1,4 +1,5 @@
 """Support for image/mask pair input format for instance segmentation."""
+
 from __future__ import annotations
 
 from argparse import ArgumentParser
