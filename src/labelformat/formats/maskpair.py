@@ -28,7 +28,7 @@ from labelformat.utils import get_image_dimensions
 @cli_register(format="maskpair", task=Task.INSTANCE_SEGMENTATION)
 class MaskPairInstanceSegmentationInput(InstanceSegmentationInput):
     """Input format for image/mask pairs for instance segmentation.
-    
+
     This format loads images and corresponding binary masks, converts masks to
     instance segmentations by finding connected components, and outputs in the
     standard labelformat representation.
@@ -43,7 +43,7 @@ class MaskPairInstanceSegmentationInput(InstanceSegmentationInput):
             help="Glob pattern for image files (e.g., 'images/**/*.jpg')",
         )
         parser.add_argument(
-            "--mask-glob", 
+            "--mask-glob",
             type=str,
             required=True,
             help="Glob pattern for mask files (e.g., 'masks/**/*.png')",
@@ -136,7 +136,7 @@ class MaskPairInstanceSegmentationInput(InstanceSegmentationInput):
         # Find and validate image/mask pairs
         self._image_mask_pairs = match_image_mask_pairs(
             image_glob=image_glob,
-            mask_glob=mask_glob, 
+            mask_glob=mask_glob,
             base_path=self._base_path,
             pairing_mode=pairing_mode,
         )
@@ -159,7 +159,7 @@ class MaskPairInstanceSegmentationInput(InstanceSegmentationInput):
     def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
         """Get instance segmentation labels by processing mask images."""
         images = {img.id: img for img in self.get_images()}
-        
+
         for image_id, (image_path, mask_path) in enumerate(self._image_mask_pairs):
             # Load and binarize the mask
             binary_mask = binarize_mask(
@@ -168,10 +168,10 @@ class MaskPairInstanceSegmentationInput(InstanceSegmentationInput):
                 morph_open=self._morph_open,
                 morph_close=self._morph_close,
             )
-            
+
             # Extract individual instances via connected components
             instance_masks = extract_instance_masks(binary_mask)
-            
+
             # Convert each instance to segmentation format
             objects: List[SingleInstanceSegmentation] = []
             for instance_mask in instance_masks:
@@ -179,7 +179,7 @@ class MaskPairInstanceSegmentationInput(InstanceSegmentationInput):
                 area = float(instance_mask.sum())
                 if area < self._min_area:
                     continue
-                
+
                 # Convert to appropriate segmentation format
                 segmentation: Union[MultiPolygon, BinaryMaskSegmentation]
                 if self._segmentation_type == "polygon":
@@ -189,15 +189,21 @@ class MaskPairInstanceSegmentationInput(InstanceSegmentationInput):
                     )
                 else:  # rle
                     segmentation = mask_to_binary_mask_segmentation(instance_mask)
-                
+
                 # Use the first category for now (could be extended to support multiple categories)
-                category = self._categories[0] if self._categories else Category(id=0, name="object")
-                
-                objects.append(SingleInstanceSegmentation(
-                    category=category,
-                    segmentation=segmentation,
-                ))
-            
+                category = (
+                    self._categories[0]
+                    if self._categories
+                    else Category(id=0, name="object")
+                )
+
+                objects.append(
+                    SingleInstanceSegmentation(
+                        category=category,
+                        segmentation=segmentation,
+                    )
+                )
+
             yield ImageInstanceSegmentation(
                 image=images[image_id],
                 objects=objects,

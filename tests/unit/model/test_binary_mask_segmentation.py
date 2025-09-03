@@ -8,7 +8,6 @@ from labelformat.model.bounding_box import BoundingBox
 
 
 class TestBinaryMaskSegmentation:
-
     def test_from_binary_mask(self) -> None:
         # Create a binary mask
         binary_mask = np.array([[0, 1], [1, 0]], dtype=np.int_)
@@ -24,7 +23,6 @@ class TestBinaryMaskSegmentation:
 
 
 class TestRLEDecoderEncoder:
-
     def test_encode_row_wise_rle(self) -> None:
         binary_mask = np.array([[0, 1, 1, 0], [1, 1, 1, 1]], dtype=np.int_)
         rle = RLEDecoderEncoder.encode_row_wise_rle(binary_mask)

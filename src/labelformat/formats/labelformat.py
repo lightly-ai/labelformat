@@ -36,7 +36,6 @@ class _CustomBaseInput:
 
 @dataclass
 class LabelformatObjectDetectionInput(_CustomBaseInput, ObjectDetectionInput):
-
     labels: list[ImageObjectDetection]
 
     """Class for custom object detection input format. 

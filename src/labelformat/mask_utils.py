@@ -7,12 +7,12 @@ import numpy as np
 from numpy.typing import NDArray
 from PIL import Image, ImageFilter
 
-from labelformat.model.bounding_box import BoundingBox, BoundingBoxFormat
 from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
+from labelformat.model.bounding_box import BoundingBox, BoundingBoxFormat
 from labelformat.model.multipolygon import MultiPolygon
 
-
 # --- I/O and thresholding ---
+
 
 def _read_grayscale(mask_path: Path) -> NDArray[np.uint8]:
     img = Image.open(mask_path).convert("L")
@@ -35,7 +35,9 @@ def _otsu_threshold(img: NDArray[np.uint8]) -> int:
     return int(np.nanargmax(sigma_b2))
 
 
-def _apply_threshold(img: NDArray[np.uint8], threshold: int | None) -> NDArray[np.uint8]:
+def _apply_threshold(
+    img: NDArray[np.uint8], threshold: int | None
+) -> NDArray[np.uint8]:
     t = _otsu_threshold(img) if threshold is None else int(threshold)
     return (img > t).astype(np.uint8)
 
@@ -46,7 +48,9 @@ def _ensure_odd(n: int) -> int:
     return n if n % 2 == 1 else n + 1
 
 
-def _morph_open_close(binary: NDArray[np.uint8], morph_open: int, morph_close: int) -> NDArray[np.uint8]:
+def _morph_open_close(
+    binary: NDArray[np.uint8], morph_open: int, morph_close: int
+) -> NDArray[np.uint8]:
     if morph_open <= 0 and morph_close <= 0:
         return binary
 
@@ -54,11 +58,15 @@ def _morph_open_close(binary: NDArray[np.uint8], morph_open: int, morph_close: i
 
     if morph_open > 0:
         k = _ensure_odd(morph_open)
-        img = img.filter(ImageFilter.MinFilter(size=k)).filter(ImageFilter.MaxFilter(size=k))
+        img = img.filter(ImageFilter.MinFilter(size=k)).filter(
+            ImageFilter.MaxFilter(size=k)
+        )
 
     if morph_close > 0:
         k = _ensure_odd(morph_close)
-        img = img.filter(ImageFilter.MaxFilter(size=k)).filter(ImageFilter.MinFilter(size=k))
+        img = img.filter(ImageFilter.MaxFilter(size=k)).filter(
+            ImageFilter.MinFilter(size=k)
+        )
 
     return (np.asarray(img) > 0).astype(np.uint8)
 
@@ -81,6 +89,7 @@ def binarize_mask(
 
 # --- Connected components (8-connectivity) ---
 
+
 def _uf_find(par: List[int], x: int) -> int:
     while par[x] != x:
         par[x] = par[par[x]]
@@ -94,14 +103,20 @@ def _uf_union(par: List[int], a: int, b: int) -> None:
         par[rb] = ra
 
 
-def _connected_components(binary_mask: NDArray[np.uint8], connectivity: int = 8) -> Tuple[int, NDArray[np.int32]]:
+def _connected_components(
+    binary_mask: NDArray[np.uint8], connectivity: int = 8
+) -> Tuple[int, NDArray[np.int32]]:
     h, w = binary_mask.shape
     labels = np.zeros((h, w), dtype=np.int32)
     next_label = 1
     parent: List[int] = [0]
 
     def neighbors(y: int, x: int):
-        offs = [(-1, 0), (-1, -1), (-1, 1), (0, -1)] if connectivity == 8 else [(-1, 0), (0, -1)]
+        offs = (
+            [(-1, 0), (-1, -1), (-1, 1), (0, -1)]
+            if connectivity == 8
+            else [(-1, 0), (0, -1)]
+        )
         for dy, dx in offs:
             ny, nx = y + dy, x + dx
             if 0 <= ny < h and 0 <= nx < w:
@@ -111,7 +126,9 @@ def _connected_components(binary_mask: NDArray[np.uint8], connectivity: int = 8)
         for x in range(w):
             if binary_mask[y, x] == 0:
                 continue
-            neigh_labels = [labels[ny, nx] for ny, nx in neighbors(y, x) if labels[ny, nx] != 0]
+            neigh_labels = [
+                labels[ny, nx] for ny, nx in neighbors(y, x) if labels[ny, nx] != 0
+            ]
             if not neigh_labels:
                 labels[y, x] = next_label
                 parent.append(next_label)
@@ -152,6 +169,7 @@ def extract_instance_masks(binary_mask: NDArray[np.uint8]) -> List[NDArray[np.ui
 
 
 # --- Contour tracing for polygons (preserves concavities) ---
+
 
 def _rdp(points: NDArray[np.float64], epsilon: float) -> NDArray[np.float64]:
     if len(points) <= 3 or epsilon <= 0:
@@ -243,7 +261,9 @@ def _trace_outer_contour(binary_mask: NDArray[np.uint8]) -> List[Tuple[float, fl
     return contour
 
 
-def mask_to_multipolygon(binary_mask: NDArray[np.uint8], approx_epsilon: float = 0.0) -> MultiPolygon:
+def mask_to_multipolygon(
+    binary_mask: NDArray[np.uint8], approx_epsilon: float = 0.0
+) -> MultiPolygon:
     """Trace the outer contour of a single instance mask and return a polygon.
 
     If you need holes, use RLE based segmentation instead.
@@ -256,17 +276,21 @@ def mask_to_multipolygon(binary_mask: NDArray[np.uint8], approx_epsilon: float =
 
     if approx_epsilon > 0.0 and len(pts) >= 3:
         diffs = np.diff(np.vstack([pts, pts[:1]]), axis=0)
-        per = float(np.sqrt((diffs ** 2).sum(axis=1)).sum())
+        per = float(np.sqrt((diffs**2).sum(axis=1)).sum())
         pts = _rdp(pts, epsilon=approx_epsilon * max(per, 1.0))
 
     polygon_points = [(float(x), float(y)) for x, y in pts]
     return MultiPolygon(polygons=[polygon_points])
 
 
-def mask_to_binary_mask_segmentation(binary_mask: NDArray[np.uint8]) -> BinaryMaskSegmentation:
+def mask_to_binary_mask_segmentation(
+    binary_mask: NDArray[np.uint8],
+) -> BinaryMaskSegmentation:
     ys, xs = np.nonzero(binary_mask)
     if len(xs) == 0:
-        bbox = BoundingBox.from_format(bbox=[0.0, 0.0, 1.0, 1.0], format=BoundingBoxFormat.XYWH)
+        bbox = BoundingBox.from_format(
+            bbox=[0.0, 0.0, 1.0, 1.0], format=BoundingBoxFormat.XYWH
+        )
     else:
         x0 = float(xs.min())
         y0 = float(ys.min())
@@ -274,7 +298,9 @@ def mask_to_binary_mask_segmentation(binary_mask: NDArray[np.uint8]) -> BinaryMa
         y1 = float(ys.max())
         w = float(x1 - x0 + 1.0)
         h = float(y1 - y0 + 1.0)
-        bbox = BoundingBox.from_format(bbox=[x0, y0, w, h], format=BoundingBoxFormat.XYWH)
+        bbox = BoundingBox.from_format(
+            bbox=[x0, y0, w, h], format=BoundingBoxFormat.XYWH
+        )
 
     return BinaryMaskSegmentation.from_binary_mask(
         binary_mask=binary_mask.astype(np.int_),
@@ -332,6 +358,8 @@ def match_image_mask_pairs(
         raise ValueError(f"Invalid pairing mode: {pairing_mode}")
 
     if not pairs:
-        raise ValueError(f"No matching image/mask pairs found using pairing mode '{pairing_mode}'")
+        raise ValueError(
+            f"No matching image/mask pairs found using pairing mode '{pairing_mode}'"
+        )
 
     return pairs

@@ -11,7 +11,6 @@ from labelformat.model.object_detection import (
 def get_input(
     filename: str = "image.jpg", with_confidence: bool = False
 ) -> LabelformatObjectDetectionInput:
-
     categories = [
         Category(id=0, name="cat"),
         Category(id=1, name="dog"),
