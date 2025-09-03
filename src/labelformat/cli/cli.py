@@ -81,7 +81,7 @@ Run `labelformat convert --help` for more information about how to convert betwe
             choices=sorted(
                 set(
                     name
-                    for tsk, name_to_cls in _REGISTRY.input.items()
+                    for tsk, name_to_cls in _REGISTRY.output.items()
                     for name in name_to_cls
                     if tsk == task
                 )
