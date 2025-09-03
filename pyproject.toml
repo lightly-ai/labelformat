@@ -17,7 +17,6 @@ pyyaml = "*"
 pillow = "*"
 pydantic-xml = "*"
 numpy = "*"
-opencv-python = "*"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "*"
@@ -30,6 +29,7 @@ build = "*"
 twine = "*"
 types-Pillow = "*"
 types-PyYAML = "*"
+opencv-python = "*"
 
 [tool.poetry.scripts]
 labelformat = "labelformat.cli.cli:main"
