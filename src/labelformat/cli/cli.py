@@ -65,27 +65,13 @@ Run `labelformat convert --help` for more information about how to convert betwe
         # Add input/output format arguments.
         convert_parser.add_argument(
             "--input-format",
-            choices=sorted(
-                set(
-                    name
-                    for tsk, name_to_cls in _REGISTRY.input.items()
-                    for name in name_to_cls
-                    if tsk == task
-                )
-            ),
+            choices=sorted(_REGISTRY.input[task].keys()),
             help="Input format",
             required=True,
         )
         convert_parser.add_argument(
             "--output-format",
-            choices=sorted(
-                set(
-                    name
-                    for tsk, name_to_cls in _REGISTRY.output.items()
-                    for name in name_to_cls
-                    if tsk == task
-                )
-            ),
+            choices=sorted(_REGISTRY.output[task].keys()),
             type=str,
             help="Output format",
             required=True,

@@ -26,7 +26,7 @@ class TestBinarizeMask:
         cv2.imwrite(str(mask_path), mask)
 
         # Binarize with threshold 100
-        result = binarize_mask(mask_path, threshold=100)
+        result = binarize_mask(mask_path=mask_path, threshold=100)
         expected: NDArray[np.uint8] = np.array([[0, 1], [0, 1]], dtype=np.uint8)
         np.testing.assert_array_equal(result, expected)
 
@@ -38,14 +38,14 @@ class TestBinarizeMask:
         cv2.imwrite(str(mask_path), mask)
 
         # Binarize with Otsu (None threshold)
-        result = binarize_mask(mask_path, threshold=None)
+        result = binarize_mask(mask_path=mask_path, threshold=None)
         expected: NDArray[np.uint8] = np.array([[0, 0], [1, 1]], dtype=np.uint8)
         np.testing.assert_array_equal(result, expected)
 
     def test_binarize_file_not_found(self) -> None:
         """Test error handling for missing file."""
         with pytest.raises(RuntimeError, match="Failed to read mask image"):
-            binarize_mask(Path("nonexistent.png"))
+            binarize_mask(mask_path=Path("nonexistent.png"))
 
 
 class TestExtractInstanceMasks:
@@ -55,7 +55,7 @@ class TestExtractInstanceMasks:
             [[0, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0]], dtype=np.uint8
         )
 
-        instances = extract_instance_masks(mask)
+        instances = extract_instance_masks(binary_mask=mask)
         assert len(instances) == 1
         expected: NDArray[np.uint8] = np.array(
             [[0, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0]], dtype=np.uint8
@@ -68,7 +68,7 @@ class TestExtractInstanceMasks:
             [[1, 1, 0, 1], [1, 1, 0, 1], [0, 0, 0, 0]], dtype=np.uint8
         )
 
-        instances = extract_instance_masks(mask)
+        instances = extract_instance_masks(binary_mask=mask)
         assert len(instances) == 2
 
         # First instance (left blob)
@@ -89,7 +89,7 @@ class TestExtractInstanceMasks:
     def test_empty_mask(self) -> None:
         """Test extraction from empty mask."""
         mask: NDArray[np.uint8] = np.zeros((3, 3), dtype=np.uint8)
-        instances = extract_instance_masks(mask)
+        instances = extract_instance_masks(binary_mask=mask)
         assert len(instances) == 0
 
 
@@ -100,7 +100,7 @@ class TestMaskToMultipolygon:
             [[0, 0, 0, 0], [0, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0]], dtype=np.uint8
         )
 
-        multipolygon = mask_to_multipolygon(mask)
+        multipolygon = mask_to_multipolygon(binary_mask=mask)
         assert len(multipolygon.polygons) == 1
         # Should have 4 corner points for rectangle
         assert len(multipolygon.polygons[0]) >= 4
@@ -113,7 +113,7 @@ class TestMaskToBinaryMaskSegmentation:
             [[0, 1, 1], [0, 1, 1], [0, 0, 0]], dtype=np.uint8
         )
 
-        binary_seg = mask_to_binary_mask_segmentation(mask)
+        binary_seg = mask_to_binary_mask_segmentation(binary_mask=mask)
         assert binary_seg.width == 3
         assert binary_seg.height == 3
 

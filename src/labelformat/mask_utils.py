@@ -81,7 +81,7 @@ def binarize_mask(
 ) -> NDArray[np.uint8]:
     """Read an image, produce a 0 or 1 mask, and apply optional morphology."""
     try:
-        img = _read_grayscale(mask_path)
+        img = _read_grayscale(mask_path=mask_path)
     except Exception as e:  # pragma: no cover
         raise RuntimeError(f"Failed to read mask image: {mask_path}") from e
 
