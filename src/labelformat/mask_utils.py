@@ -85,8 +85,8 @@ def binarize_mask(
     except Exception as e:  # pragma: no cover
         raise RuntimeError(f"Failed to read mask image: {mask_path}") from e
 
-    binary = _apply_threshold(img, threshold)
-    return _morph_open_close(binary, morph_open, morph_close)
+    binary = _apply_threshold(img=img, threshold=threshold)
+    return _morph_open_close(binary=binary, morph_open=morph_open, morph_close=morph_close)
 
 
 # --- Connected components (8-connectivity) ---
@@ -160,7 +160,7 @@ def _connected_components(
 
 def extract_instance_masks(binary_mask: NDArray[np.uint8]) -> List[NDArray[np.uint8]]:
     """Split a binary mask into 8-connected components."""
-    _, labels = _connected_components(binary_mask, connectivity=8)
+    _, labels = _connected_components(binary_mask=binary_mask, connectivity=8)
     max_label = int(labels.max(initial=0))
     out: List[NDArray[np.uint8]] = []
     for lid in range(1, max_label + 1):
