@@ -86,7 +86,9 @@ def binarize_mask(
         raise RuntimeError(f"Failed to read mask image: {mask_path}") from e
 
     binary = _apply_threshold(img=img, threshold=threshold)
-    return _morph_open_close(binary=binary, morph_open=morph_open, morph_close=morph_close)
+    return _morph_open_close(
+        binary=binary, morph_open=morph_open, morph_close=morph_close
+    )
 
 
 # --- Connected components (8-connectivity) ---
