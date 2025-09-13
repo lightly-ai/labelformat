@@ -70,26 +70,22 @@ class RLEDecoderEncoder:
     @staticmethod
     def encode_row_wise_rle(binary_mask: NDArray[np.int_]) -> list[int]:
         # Encodes a binary mask using row-major order.
-        flat: NDArray[np.int_] = np.concatenate(
-            [[-1], binary_mask.ravel(order="C"), [-1]]
-        )
+        flat = np.concatenate(([-1], binary_mask.ravel(order="C"), [-1]))
         borders = np.nonzero(np.diff(flat))[0]
         rle = np.diff(borders)
         if flat[1]:
-            rle = np.concatenate([[0], rle])
+            rle = np.concatenate(([0], rle))
         rle_list: list[int] = rle.tolist()
         return rle_list
 
     @staticmethod
     def encode_column_wise_rle(binary_mask: NDArray[np.int_]) -> list[int]:
         # Encodes a binary mask using column-major order.
-        flat: NDArray[np.int_] = np.concatenate(
-            [[-1], binary_mask.ravel(order="F"), [-1]]
-        )
+        flat = np.concatenate(([-1], binary_mask.ravel(order="F"), [-1]))
         borders = np.nonzero(np.diff(flat))[0]
         rle = np.diff(borders)
         if flat[1]:
-            rle = np.concatenate([[0], rle])
+            rle = np.concatenate(([0], rle))
         rle_list: list[int] = rle.tolist()
         return rle_list
 

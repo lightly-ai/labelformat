@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Iterable, List, Union
+from typing import Iterable, List, Literal, Union
 
 from labelformat.cli.registry import Task, cli_register
 from labelformat.mask_utils import (
@@ -109,13 +109,13 @@ class MaskPairInstanceSegmentationInput(InstanceSegmentationInput):
         image_glob: str,
         mask_glob: str,
         base_path: Path = Path("."),
-        pairing_mode: str = "stem",
+        pairing_mode: Literal["stem", "regex", "index"] = "stem",
         category_names: str = "object",
         threshold: int = -1,
         min_area: float = 10.0,
         morph_open: int = 0,
         morph_close: int = 0,
-        segmentation_type: str = "polygon",
+        segmentation_type: Literal["polygon", "rle"] = "polygon",
         approx_epsilon: float = 0.0,
     ) -> None:
         self._image_glob = image_glob
@@ -188,8 +188,13 @@ class MaskPairInstanceSegmentationInput(InstanceSegmentationInput):
                         binary_mask=instance_mask,
                         approx_epsilon=self._approx_epsilon,
                     )
-                else:  # rle
+                elif self._segmentation_type == "rle":
                     segmentation = mask_to_binary_mask_segmentation(instance_mask)
+                else:
+                    raise ValueError(
+                        f"Invalid segmentation type: {self._segmentation_type}."
+                        "Valid options are: polygon, rle"
+                    )
 
                 # Use the first category for now (could be extended to support multiple categories)
                 category = (

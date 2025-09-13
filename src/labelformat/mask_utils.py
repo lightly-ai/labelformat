@@ -11,6 +11,7 @@ from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
 from labelformat.model.bounding_box import BoundingBox, BoundingBoxFormat
 from labelformat.model.multipolygon import MultiPolygon
 
+# Copied from OpenCV and then vibe-translated to using only numpy.
 # --- I/O and thresholding ---
 
 
@@ -20,8 +21,8 @@ def _read_grayscale(mask_path: Path) -> NDArray[np.uint8]:
 
 
 def _otsu_threshold(img: NDArray[np.uint8]) -> int:
-    hist: NDArray[np.float64] = np.bincount(img.ravel(), minlength=256).astype(
-        np.float64
+    hist: NDArray[np.float32] = np.bincount(img.ravel(), minlength=256).astype(
+        np.float32
     )
     total = img.size
     prob = hist / total
@@ -175,18 +176,18 @@ def extract_instance_masks(binary_mask: NDArray[np.uint8]) -> List[NDArray[np.ui
 # --- Contour tracing for polygons (preserves concavities) ---
 
 
-def _rdp(points: NDArray[np.float64], epsilon: float) -> NDArray[np.float64]:
+def _rdp(points: NDArray[np.float32], epsilon: float) -> NDArray[np.float32]:
     if len(points) <= 3 or epsilon <= 0:
         return points
 
     def _point_line_dist(
-        p: NDArray[np.float64], a: NDArray[np.float64], b: NDArray[np.float64]
+        p: NDArray[np.float32], a: NDArray[np.float32], b: NDArray[np.float32]
     ) -> float:
         if np.allclose(a, b):
             return float(np.linalg.norm(p - a))
         return float(abs(np.cross(b - a, a - p)) / np.linalg.norm(b - a))
 
-    def _rec(pts: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _rec(pts: NDArray[np.float32]) -> NDArray[np.float32]:
         a, b = pts[0], pts[-1]
         dmax = 0.0
         idx = 0
@@ -279,7 +280,7 @@ def mask_to_multipolygon(
     if len(contour) < 3:
         return MultiPolygon(polygons=[])
 
-    pts: NDArray[np.float64] = np.array(contour, dtype=np.float64)
+    pts: NDArray[np.float32] = np.array(contour, dtype=np.float32)
 
     if approx_epsilon > 0.0 and len(pts) >= 3:
         diffs = np.diff(np.vstack([pts, pts[:1]]), axis=0)
