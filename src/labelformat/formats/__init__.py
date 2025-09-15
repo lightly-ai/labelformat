@@ -14,6 +14,7 @@ from labelformat.formats.lightly import (
     LightlyObjectDetectionInput,
     LightlyObjectDetectionOutput,
 )
+from labelformat.formats.maskpair import MaskPairInstanceSegmentationInput
 from labelformat.formats.pascalvoc import (
     PascalVOCObjectDetectionInput,
     PascalVOCObjectDetectionOutput,
@@ -79,4 +80,5 @@ __all__ = [
     "YOLOv10ObjectDetectionOutput",
     "YOLOv11ObjectDetectionInput",
     "YOLOv11ObjectDetectionOutput",
+    "MaskPairInstanceSegmentationInput",
 ]

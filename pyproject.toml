@@ -29,6 +29,7 @@ build = "*"
 twine = "*"
 types-Pillow = "*"
 types-PyYAML = "*"
+opencv-python = "*"
 
 [tool.poetry.scripts]
 labelformat = "labelformat.cli.cli:main"

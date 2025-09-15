@@ -34,6 +34,7 @@ and time-consuming. Labelformat aims to solve this pain.
 - instance-segmentation
     - COCO
     - YOLOv8
+    - MaskPair (image/mask pairs)
 
 #### Features
 
@@ -68,6 +69,21 @@ pip install labelformat
 ### CLI
 
 #### Examples
+
+Convert image/mask pairs to COCO instance segmentation:
+```shell
+labelformat convert \
+    --task instance-segmentation \
+    --input-format maskpair \
+    --image-glob "images/**/*.jpg" \
+    --mask-glob "masks/**/*.png" \
+    --category-names crack,defect \
+    --pairing-mode stem \
+    --threshold -1 \
+    --min-area 50 \
+    --output-format coco \
+    --output-file coco-labels/annotations.json
+```
 
 Convert instance segmentation labels from COCO to YOLOv8:
 ```shell
@@ -180,6 +196,7 @@ optional arguments:
 
 Please refer to the code for a full list of available classes.
 
+Object detection example:
 ```python
 from pathlib import Path
 from labelformat.formats import COCOObjectDetectionInput, YOLOv8ObjectDetectionOutput
@@ -192,6 +209,28 @@ label_input = COCOObjectDetectionInput(
 YOLOv8ObjectDetectionOutput(
     output_file=Path("yolo-labels/data.yaml"),
     output_split="train",
+).save(label_input=label_input)
+```
+
+Instance segmentation from image/mask pairs example:
+```python
+from pathlib import Path
+from labelformat.formats import MaskPairInstanceSegmentationInput, COCOInstanceSegmentationOutput
+
+# Load image/mask pairs
+label_input = MaskPairInstanceSegmentationInput(
+    image_glob="images/*.jpg",
+    mask_glob="masks/*.png",
+    base_path=Path("dataset"),
+    pairing_mode="stem",
+    category_names="crack,defect",
+    threshold=128,
+    min_area=100.0,
+    segmentation_type="polygon"
+)
+# Convert to COCO format
+COCOInstanceSegmentationOutput(
+    output_file=Path("output/annotations.json")
 ).save(label_input=label_input)
 ```
 
