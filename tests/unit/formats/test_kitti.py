@@ -74,7 +74,6 @@ class TestKittiObjectDetectionInput:
 
 
 class TestKittiObjectDetectionOutput:
-
     @pytest.mark.parametrize("with_confidence", [True, False])
     def test_save(self, tmp_path: Path, with_confidence: bool) -> None:
         output_folder = tmp_path / "labels"

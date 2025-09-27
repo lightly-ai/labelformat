@@ -13,7 +13,6 @@ from labelformat.model.object_detection import SingleObjectDetection
 
 
 class TestSingleObjectDetection:
-
     @pytest.mark.parametrize(
         "confidence",
         [
