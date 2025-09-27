@@ -49,6 +49,10 @@ from labelformat.formats.yolov11 import (
     YOLOv11ObjectDetectionInput,
     YOLOv11ObjectDetectionOutput,
 )
+from labelformat.formats.yolov26 import (
+    YOLOv26ObjectDetectionInput,
+    YOLOv26ObjectDetectionOutput,
+)
 
 __all__ = [
     "COCOInstanceSegmentationInput",
@@ -80,5 +84,7 @@ __all__ = [
     "YOLOv10ObjectDetectionOutput",
     "YOLOv11ObjectDetectionInput",
     "YOLOv11ObjectDetectionOutput",
+    "YOLOv26ObjectDetectionInput",
+    "YOLOv26ObjectDetectionOutput",
     "MaskPairInstanceSegmentationInput",
 ]
