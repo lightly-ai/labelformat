@@ -13,3 +13,4 @@
 - [YOLOv9](./object-detection/yolov9.md)
 - [YOLOv10](./object-detection/yolov10.md)
 - [YOLOv11](./object-detection/yolov11.md)
+- [YOLOv12](./object-detection/yolov12.md)
