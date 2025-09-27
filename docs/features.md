@@ -36,6 +36,8 @@ Labelformat offers a robust set of features tailored to meet the diverse needs o
 - **[Labelbox](formats/object-detection/labelbox.md)** (input only)
 - **[Lightly](formats/object-detection/lightly.md)**
 - **[PascalVOC](formats/object-detection/pascalvoc.md)**
+- **[RT-DETR](formats/object-detection/rtdetr.md)**
+- **[RT-DETRv2](formats/object-detection/rtdetrv2.md)**
 - **[YOLOv5](formats/object-detection/yolov5.md)**
 - **[YOLOv6](formats/object-detection/yolov6.md)**
 - **[YOLOv7](formats/object-detection/yolov7.md)**

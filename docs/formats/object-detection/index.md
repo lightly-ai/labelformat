@@ -15,6 +15,8 @@ Labelformat supports converting between major object detection annotation format
 - [Labelbox](./labelbox.md)
 - [Lightly](./lightly.md)
 - [PascalVOC](./pascalvoc.md)
+- [RT-DETR](./rtdetr.md)
+- [RT-DETRv2](./rtdetrv2.md)
 - [YOLOv5](./yolov5.md)
 - [YOLOv6](./yolov6.md)
 - [YOLOv7](./yolov7.md)

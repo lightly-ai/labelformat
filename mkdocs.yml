@@ -35,6 +35,8 @@ nav:
               - Labelbox Format: formats/object-detection/labelbox.md
               - Lightly Format: formats/object-detection/lightly.md
               - PascalVOC Format: formats/object-detection/pascalvoc.md
+              - RT-DETR Format: formats/object-detection/rtdetr.md
+              - RT-DETRv2 Format: formats/object-detection/rtdetrv2.md
               - YOLOv5 Format: formats/object-detection/yolov5.md
               - YOLOv6 Format: formats/object-detection/yolov6.md
               - YOLOv7 Format: formats/object-detection/yolov7.md
