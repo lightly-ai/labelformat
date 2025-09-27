@@ -19,6 +19,14 @@ from labelformat.formats.pascalvoc import (
     PascalVOCObjectDetectionInput,
     PascalVOCObjectDetectionOutput,
 )
+from labelformat.formats.rtdetr import (
+    RTDETRObjectDetectionInput,
+    RTDETRObjectDetectionOutput,
+)
+from labelformat.formats.rtdetrv2 import (
+    RTDETRv2ObjectDetectionInput,
+    RTDETRv2ObjectDetectionOutput,
+)
 from labelformat.formats.yolov5 import (
     YOLOv5ObjectDetectionInput,
     YOLOv5ObjectDetectionOutput,
@@ -64,6 +72,10 @@ __all__ = [
     "LightlyObjectDetectionOutput",
     "PascalVOCObjectDetectionInput",
     "PascalVOCObjectDetectionOutput",
+    "RTDETRObjectDetectionInput",
+    "RTDETRObjectDetectionOutput",
+    "RTDETRv2ObjectDetectionInput",
+    "RTDETRv2ObjectDetectionOutput",
     "YOLOv5ObjectDetectionInput",
     "YOLOv5ObjectDetectionOutput",
     "YOLOv6ObjectDetectionInput",

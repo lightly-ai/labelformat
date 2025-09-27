@@ -22,7 +22,7 @@ The CLI interface is available as the `labelformat` command.
 
 Supported label formats for object detection:
 - YOLOv5, YOLOv6, YOLOv7, YOLOv8, YOLOv9, YOLOv10, YOLOv11
-- COCO
+- COCO, RT-DETR, RT-DETRv2
 - VOC
 - Labelbox
 - and many more
