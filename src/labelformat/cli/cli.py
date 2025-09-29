@@ -21,7 +21,7 @@ It provides a CLI interface as well as an easy-to-use Python API.
 The CLI interface is available as the `labelformat` command.
 
 Supported label formats for object detection:
-- YOLOv5, YOLOv6, YOLOv7, YOLOv8, YOLOv9, YOLOv10, YOLOv11, YOLOv26
+- YOLOv5, YOLOv6, YOLOv7, YOLOv8, YOLOv9, YOLOv10, YOLOv11, YOLOv12, YOLOv26
 - COCO
 - VOC
 - Labelbox
