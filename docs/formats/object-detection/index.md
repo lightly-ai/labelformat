@@ -23,3 +23,4 @@ Labelformat supports converting between major object detection annotation format
 - [YOLOv10](./yolov10.md)
 - [YOLOv11](./yolov11.md)
 - [YOLOv12](./yolov12.md)
+- [YOLOv26](./yolov26.md)

@@ -32,6 +32,7 @@ and time-consuming. Labelformat aims to solve this pain.
     - [YOLOv10](https://labelformat.com/formats/object-detection/yolov10/)
     - [YOLOv11](https://labelformat.com/formats/object-detection/yolov11/)
     - [YOLOv12](https://labelformat.com/formats/object-detection/yolov12/)
+    - [YOLOv26](https://labelformat.com/formats/object-detection/yolov26/)
 - instance-segmentation
     - COCO
     - YOLOv8
