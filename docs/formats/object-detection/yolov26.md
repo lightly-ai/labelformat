@@ -8,7 +8,7 @@
 
 ## Key YOLOv26 Features
 
-YOLOv26 maintains full compatibility with the YOLOv8-v11 label format while introducing several breakthrough innovations:
+YOLOv26 maintains full compatibility with the YOLOv8-v12 label format while introducing several breakthrough innovations:
 
 - **End-to-End NMS-Free Inference:** Native end-to-end model producing predictions directly without non-maximum suppression, reducing latency and simplifying deployment
 - **DFL Removal:** Eliminates Distribution Focal Loss module for better export compatibility and broader hardware support on edge devices
