@@ -6,6 +6,8 @@
 - [Labelbox](./object-detection/labelbox.md)
 - [Lightly](./object-detection/lightly.md)
 - [PascalVOC](./object-detection/pascalvoc.md)
+- [RT-DETR](./object-detection/rtdetr.md)
+- [RT-DETRv2](./object-detection/rtdetrv2.md)
 - [YOLOv5](./object-detection/yolov5.md)
 - [YOLOv6](./object-detection/yolov6.md)
 - [YOLOv7](./object-detection/yolov7.md)

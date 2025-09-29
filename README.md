@@ -24,6 +24,8 @@ and time-consuming. Labelformat aims to solve this pain.
     - [Labelbox](https://labelformat.com/formats/object-detection/labelbox/) (input only)
     - [Lightly](https://labelformat.com/formats/object-detection/lightly/)
     - [PascalVOC](https://labelformat.com/formats/object-detection/pascalvoc/)
+    - [RT-DETR](https://labelformat.com/formats/object-detection/rtdetr/)
+    - [RT-DETRv2](https://labelformat.com/formats/object-detection/rtdetrv2/)
     - [YOLOv5](https://labelformat.com/formats/object-detection/yolov5/)
     - [YOLOv6](https://labelformat.com/formats/object-detection/yolov6/)
     - [YOLOv7](https://labelformat.com/formats/object-detection/yolov7/)

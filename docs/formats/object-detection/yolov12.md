@@ -40,8 +40,8 @@ The **YOLOv12 detection format** remains consistent with previous versions (v5-v
 
 - **Object Representation:**
   Each line in the text file represents a single object detected within the image, following the format: `<class_id> <x_center> <y_center> <width> <height>`
-    - **`<class_id>` (Integer):**   An integer representing the object's class.
-    - **`<x_center>` and `<y_center>` (Float):** The normalized coordinates of the object's center relative to the image's width and    height.
+    - **`<class_id>` (Integer):** An integer representing the object's class.
+    - **`<x_center>` and `<y_center>` (Float):** The normalized coordinates of the object's center relative to the image's width and height.
     - **`<width>` and `<height>` (Float):** The normalized width and height of the bounding box encompassing the object.
 
 - **Normalization of Values:**
