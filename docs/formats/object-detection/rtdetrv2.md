@@ -2,7 +2,7 @@
 
 ## Overview
 
-**RT-DETRv2** is an enhanced version of the Real-Time DEtection TRansformer (RT-DETR), introduced in the paper [RT-DETRv2: Improved Baseline with Bag-of-Freebies for Real-Time Detection Transformer](https://arxiv.org/abs/2407.17140). Building upon the groundbreaking end-to-end object detection framework of the original RT-DETR, RT-DETRv2 continues the legacy of eliminating Non-Maximum Suppression (NMS) post-processing while introducing additional improvements in accuracy and efficiency for real-time object detection scenarios.
+**RT-DETRv2** is an enhanced version of the Real-Time DEtection TRansformer ([RT-DETR](https://arxiv.org/abs/2304.08069)), introduced in the paper [RT-DETRv2: Improved Baseline with Bag-of-Freebies for Real-Time Detection Transformer](https://arxiv.org/abs/2407.17140). Building upon the groundbreaking end-to-end object detection framework of the original RT-DETR, RT-DETRv2 continues the legacy of eliminating Non-Maximum Suppression (NMS) post-processing while introducing additional improvements in accuracy and efficiency for real-time object detection scenarios.
 
 > **Info:** RT-DETRv2 was introduced through the technical report "RT-DETRv2: Improved Baseline with Bag-of-Freebies for Real-Time Detection Transformer" published in 2024.
   For the full paper, see: [arXiv:2407.17140](https://arxiv.org/abs/2407.17140)
@@ -10,7 +10,7 @@
   For implementation details and code, see: [GitHub Repository: lyuwenyu/RT-DETR](https://github.com/lyuwenyu/RT-DETR)
 
 > **Availability:** RT-DETRv2 is now available in multiple frameworks:
-  - [Hugging Face Transformers](https://huggingface.co/docs/transformers/model_doc/rt_detr)
+  - [Hugging Face Transformers](https://huggingface.co/docs/transformers/model_doc/rt_detr_v2)
   - [Ultralytics](https://docs.ultralytics.com/models/rtdetr/)
 
 ## Key RT-DETRv2 Model Features
@@ -24,29 +24,29 @@ RT-DETRv2 maintains compatibility with the standard **COCO annotation format** w
 - **Bag-of-Freebies Approach:** Incorporates multiple training improvements that enhance performance without increasing inference cost or model complexity.
 - **Consistent Performance Gains:** Achieves improved accuracy across all model scales (S: +1.4 mAP, M: +1.0 mAP, L: +0.3 mAP) while maintaining the same inference speed as RT-DETR.
 
-These architectural enhancements are handled internally by the model design and training pipeline, requiring no changes to the standard COCO annotation format described below.
+These enhancements are handled internally by the model design and training pipeline, requiring no changes to the standard COCO annotation format described below.
 
 ## Specification of RT-DETRv2 Detection Format
 
 RT-DETRv2 uses the standard **COCO format** for annotations, ensuring complete compatibility with existing COCO datasets and tools. The format specification is identical to the original COCO format:
 
-### Images
+### `images`
 Defines metadata for each image in the dataset:
 ```json
 {
   "id": 0,                    // Unique image ID
   "file_name": "image1.jpg",  // Image filename
-  "width": 640,              // Image width in pixels
-  "height": 416              // Image height in pixels
+  "width": 640,               // Image width in pixels
+  "height": 416               // Image height in pixels
 }
 ```
 
-### Categories
+### `categories`
 Defines the object classes:
 ```json
 {
   "id": 0,                    // Unique category ID
-  "name": "cat"              // Category name
+  "name": "cat"               // Category name
 }
 ```
 
@@ -75,7 +75,6 @@ dataset/
 - **Standard Compatibility:** Uses the widely-adopted COCO format, ensuring compatibility with existing tools and frameworks.
 - **End-to-End Processing:** Maintains the NMS-free architecture for stable and predictable inference performance.
 - **Enhanced Performance:** Improved accuracy and efficiency compared to the original RT-DETR.
-- **Flexible Deployment:** Supports various deployment scenarios with enhanced model scaling options.
 
 ## Converting Annotations to RT-DETRv2 Format with Labelformat
 
@@ -145,7 +144,6 @@ RT-DETRv2 builds upon the foundation of RT-DETR with several key improvements:
 - **Enhanced Architecture:** Refined encoder and decoder designs for better performance
 - **Improved Training:** Advanced training strategies and optimization techniques
 - **Better Accuracy:** Higher detection accuracy across various model scales
-- **Maintained Efficiency:** Preserves the real-time inference capabilities of the original RT-DETR
 
 ## Error Handling in Labelformat
 
@@ -153,10 +151,10 @@ Since RT-DETRv2 uses the COCO format, the same validation and error handling app
 
 - **Invalid JSON Structure:** Proper error reporting for malformed JSON files
 - **Missing Required Fields:** Validation ensures all required COCO fields are present
-- **Reference Integrity:** Checks that image_id and category_id references are valid
-- **Bounding Box Validation:** Ensures bounding boxes are within image boundaries
-
-Example of a properly formatted annotation:
+- **Invalid JSON Structure:** Proper error reporting for malformed JSON files.
+- **Missing Required Fields:** Validation ensures all required COCO fields are present.
+- **Reference Integrity:** Checks that image_id and category_id references are valid.
+- **Bounding Box Validation:** Ensures bounding boxes are within image boundaries.
 ```json
 {
   "images": [{"id": 0, "file_name": "image1.jpg", "width": 640, "height": 480}],

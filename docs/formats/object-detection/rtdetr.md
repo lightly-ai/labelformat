@@ -29,27 +29,27 @@ These architectural innovations are handled internally by the model design and t
 
 RT-DETR uses the standard **COCO format** for annotations, ensuring seamless integration with existing COCO datasets and tools. The format consists of a single JSON file containing three main components:
 
-### Images
+### `images`
 Defines metadata for each image in the dataset:
 ```json
 {
   "id": 0,                    // Unique image ID
   "file_name": "image1.jpg",  // Image filename
-  "width": 640,              // Image width in pixels
-  "height": 416              // Image height in pixels
+  "width": 640,               // Image width in pixels
+  "height": 416               // Image height in pixels
 }
 ```
 
-### Categories
+### `categories`
 Defines the object classes:
 ```json
 {
   "id": 0,                    // Unique category ID
-  "name": "cat"              // Category name
+  "name": "cat"               // Category name
 }
 ```
 
-### Annotations
+### `annotations`
 Defines object instances:
 ```json
 {
@@ -72,7 +72,6 @@ dataset/
 ## Benefits of RT-DETR Format
 
 - **Standard Compatibility:** Uses the widely-adopted COCO format, ensuring compatibility with existing tools and frameworks.
-- **End-to-End Processing:** Eliminates NMS post-processing, providing more stable and predictable inference performance.
 - **Flexibility:** Supports adjustable inference speeds without retraining, making it adaptable to various real-time scenarios.
 - **Superior Accuracy:** Achieves better accuracy than comparable YOLO detectors while maintaining competitive speed.
 
@@ -138,23 +137,6 @@ RTDETRObjectDetectionOutput(
     output_file=Path("dataset/rtdetr_annotations.json")
 ).save(label_input=label_input)
 ```
-
-## Performance Benchmarks
-
-RT-DETR achieves impressive performance across different model scales:
-
-| Model | Input | Dataset | mAP (%) | mAP50 (%) | Parameters (M) | GFLOPs | FPS (T4) |
-|-------|-------|---------|---------|-----------|----------------|--------|----------|
-| RT-DETR-R18 | 640 | COCO | 46.5 | 63.8 | 20 | 60 | 217 |
-| RT-DETR-R34 | 640 | COCO | 48.9 | 66.8 | 31 | 92 | 161 |
-| RT-DETR-R50-m | 640 | COCO | 51.3 | 69.6 | 36 | 100 | 145 |
-| RT-DETR-R50 | 640 | COCO | 53.1 | 71.3 | 42 | 136 | 108 |
-| RT-DETR-R101 | 640 | COCO | 54.3 | 72.7 | 76 | 259 | 74 |
-| **RT-DETR-R18** | 640 | **COCO + Objects365** | **49.2** | **66.6** | 20 | 60 | **217** |
-| **RT-DETR-R50** | 640 | **COCO + Objects365** | **55.3** | **73.4** | 42 | 136 | **108** |
-| **RT-DETR-R101** | 640 | **COCO + Objects365** | **56.2** | **74.6** | 76 | 259 | **74** |
-
-*Performance measured on T4 GPU with TensorRT FP16 precision*
 
 ## Error Handling in Labelformat
 
