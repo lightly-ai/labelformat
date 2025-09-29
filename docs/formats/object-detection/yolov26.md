@@ -1,8 +1,8 @@
-# YOLOv26 Object Detection Format
+# YOLOv26 (YOLO26) Object Detection Format
 
 ## Overview
 
-**YOLOv26** is the latest evolution in the **You Only Look Once (YOLO)** series, engineered specifically for edge and low-power devices. It introduces a streamlined design that removes unnecessary complexity while integrating targeted innovations to deliver faster, lighter, and more accessible deployment. YOLOv26 uses the **same object detection format** as YOLOv8-v12, utilizing normalized coordinates in text files for seamless compatibility.
+**YOLOv26** (also known as **YOLO26**) is the latest evolution in the **You Only Look Once (YOLO)** series, engineered specifically for edge and low-power devices. It introduces a streamlined design that removes unnecessary complexity while integrating targeted innovations to deliver faster, lighter, and more accessible deployment. YOLOv26 uses the **same object detection format** as YOLOv8-v12, utilizing normalized coordinates in text files for seamless compatibility.
 
 > **Info:** YOLOv26 is currently in preview and under development. Performance numbers are preliminary and final releases will follow soon. For the latest updates, see: [GitHub Repository: ultralytics/ultralytics](https://github.com/ultralytics/ultralytics)
 
@@ -41,15 +41,3 @@ labelformat convert \
 ```
 
 The converted output will be fully compatible with YOLOv26 training and inference pipelines.
-
-## Supported Tasks
-
-YOLOv26 extends YOLO's versatility across multiple computer vision tasks:
-
-| Model | Task | Inference | Validation | Training | Export |
-|-------|------|-----------|------------|----------|---------|
-| YOLO26 | Detection | ✅ | ✅ | ✅ | ✅ |
-| YOLO26-seg | Instance Segmentation | ✅ | ✅ | ✅ | ✅ |
-| YOLO26-pose | Pose/Keypoints | ✅ | ✅ | ✅ | ✅ |
-| YOLO26-obb | Oriented Detection | ✅ | ✅ | ✅ | ✅ |
-| YOLO26-cls | Classification | ✅ | ✅ | ✅ | ✅ |
