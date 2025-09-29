@@ -45,6 +45,8 @@ Labelformat offers a robust set of features tailored to meet the diverse needs o
 - **[YOLOv9](formats/object-detection/yolov9.md)**
 - **[YOLOv10](formats/object-detection/yolov10.md)**
 - **[YOLOv11](formats/object-detection/yolov11.md)**
+- **[YOLOv12](formats/object-detection/yolov12.md)**
+- **[YOLOv26](formats/object-detection/yolov26.md)**
 
 ---
 
