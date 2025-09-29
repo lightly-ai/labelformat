@@ -18,7 +18,7 @@ YOLOv26 maintains full compatibility with the YOLOv8-v12 label format while intr
 
 ## Format Specification
 
-YOLOv26 uses the **identical format** as YOLOv8, YOLOv9, YOLOv10, and YOLOv11. Please refer to the [YOLOv8 format documentation](yolov8.md) for complete format specifications, including:
+YOLOv26 uses the **identical format** as YOLOv8, YOLOv9, YOLOv10, YOLOv11, and YOLOv12. Please refer to the [YOLOv8 format documentation](yolov8.md) for complete format specifications, including:
 
 - Text file structure with normalized coordinates
 - Directory organization patterns
