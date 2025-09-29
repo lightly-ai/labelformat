@@ -2,7 +2,7 @@
 
 ## Overview
 
-**YOLOv26** is the latest evolution in the **You Only Look Once (YOLO)** series, engineered specifically for edge and low-power devices. It introduces a streamlined design that removes unnecessary complexity while integrating targeted innovations to deliver faster, lighter, and more accessible deployment. YOLOv26 uses the **same object detection format** as YOLOv8-v11, utilizing normalized coordinates in text files for seamless compatibility.
+**YOLOv26** is the latest evolution in the **You Only Look Once (YOLO)** series, engineered specifically for edge and low-power devices. It introduces a streamlined design that removes unnecessary complexity while integrating targeted innovations to deliver faster, lighter, and more accessible deployment. YOLOv26 uses the **same object detection format** as YOLOv8-v12, utilizing normalized coordinates in text files for seamless compatibility.
 
 > **Info:** YOLOv26 is currently in preview and under development. Performance numbers are preliminary and final releases will follow soon. For the latest updates, see: [GitHub Repository: ultralytics/ultralytics](https://github.com/ultralytics/ultralytics)
 
