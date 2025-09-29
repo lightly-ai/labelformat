@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://labelformat.com/formats/object-detection/yolov8/">
+        <link rel="canonical" href="https://labelformat.com/formats/object-detection/yolov12/">
       
       
-        <link rel="prev" href="../yolov7/">
+        <link rel="prev" href="../yolov11/">
       
       
-        <link rel="next" href="../yolov9/">
+        <link rel="next" href="../yolov26/">
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>YOLOv8 Format - Labelformat Docs</title>
+        <title>YOLOv12 Format - Labelformat Docs</title>
       
     
     
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#yolov8-object-detection-format" class="md-skip">
+        <a href="#yolov12-object-detection-format" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              YOLOv8 Format
+              YOLOv12 Format
             
           </span>
         </div>
@@ -779,30 +779,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    YOLOv8 Format
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../yolov8/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -811,152 +791,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Overview
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#specification-of-yolov8-detection-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      Specification of YOLOv8 Detection Format
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#directory-structure-of-yolov8-dataset" class="md-nav__link">
-    <span class="md-ellipsis">
-      Directory Structure of YOLOv8 Dataset
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Directory Structure of YOLOv8 Dataset">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pattern-1-images-and-labels-as-root-directories" class="md-nav__link">
-    <span class="md-ellipsis">
-      Pattern 1: Images and Labels as Root Directories
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pattern-2-trainval-as-root-directories" class="md-nav__link">
-    <span class="md-ellipsis">
-      Pattern 2: Train/Val as Root Directories
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#benefits-of-yolov8-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      Benefits of YOLOv8 Format
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example-of-yolov8-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      Example of YOLOv8 Format
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Example of YOLOv8 Format">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#normalizing-bounding-box-coordinates-for-yolov8" class="md-nav__link">
-    <span class="md-ellipsis">
-      Normalizing Bounding Box Coordinates for YOLOv8
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#converting-annotations-to-yolov8-format-with-labelformat" class="md-nav__link">
-    <span class="md-ellipsis">
-      Converting Annotations to YOLOv8 Format with Labelformat
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Converting Annotations to YOLOv8 Format with Labelformat">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Installation
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#conversion-example-coco-to-yolov8" class="md-nav__link">
-    <span class="md-ellipsis">
-      Conversion Example: COCO to YOLOv8
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#error-handling-in-labelformat" class="md-nav__link">
-    <span class="md-ellipsis">
-      Error Handling in Labelformat
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1029,10 +863,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../yolov12/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    YOLOv12 Format
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -1041,6 +895,170 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-yolov12-model-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key YOLOv12 Model Features
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardware-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hardware Requirements
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#specification-of-yolov12-detection-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      Specification of YOLOv12 Detection Format
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#directory-structure-of-yolov12-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory Structure of YOLOv12 Dataset
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Directory Structure of YOLOv12 Dataset">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pattern-1-images-and-labels-as-root-directories" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 1: Images and Labels as Root Directories
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pattern-2-trainval-as-root-directories" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern 2: Train/Val as Root Directories
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benefits-of-yolov12-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      Benefits of YOLOv12 Format
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-of-yolov12-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example of YOLOv12 Format
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Example of YOLOv12 Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#normalizing-bounding-box-coordinates-for-yolov12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Normalizing Bounding Box Coordinates for YOLOv12
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#converting-annotations-to-yolov12-format-with-labelformat" class="md-nav__link">
+    <span class="md-ellipsis">
+      Converting Annotations to YOLOv12 Format with Labelformat
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Converting Annotations to YOLOv12 Format with Labelformat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conversion-example-coco-to-yolov12" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conversion Example: COCO to YOLOv12
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling-in-labelformat" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error Handling in Labelformat
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1219,22 +1237,40 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#specification-of-yolov8-detection-format" class="md-nav__link">
+  <a href="#key-yolov12-model-features" class="md-nav__link">
     <span class="md-ellipsis">
-      Specification of YOLOv8 Detection Format
+      Key YOLOv12 Model Features
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#directory-structure-of-yolov8-dataset" class="md-nav__link">
+  <a href="#hardware-requirements" class="md-nav__link">
     <span class="md-ellipsis">
-      Directory Structure of YOLOv8 Dataset
+      Hardware Requirements
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Directory Structure of YOLOv8 Dataset">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#specification-of-yolov12-detection-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      Specification of YOLOv12 Detection Format
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#directory-structure-of-yolov12-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory Structure of YOLOv12 Dataset
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Directory Structure of YOLOv12 Dataset">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1261,28 +1297,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#benefits-of-yolov8-format" class="md-nav__link">
+  <a href="#benefits-of-yolov12-format" class="md-nav__link">
     <span class="md-ellipsis">
-      Benefits of YOLOv8 Format
+      Benefits of YOLOv12 Format
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-of-yolov8-format" class="md-nav__link">
+  <a href="#example-of-yolov12-format" class="md-nav__link">
     <span class="md-ellipsis">
-      Example of YOLOv8 Format
+      Example of YOLOv12 Format
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example of YOLOv8 Format">
+    <nav class="md-nav" aria-label="Example of YOLOv12 Format">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#normalizing-bounding-box-coordinates-for-yolov8" class="md-nav__link">
+  <a href="#normalizing-bounding-box-coordinates-for-yolov12" class="md-nav__link">
     <span class="md-ellipsis">
-      Normalizing Bounding Box Coordinates for YOLOv8
+      Normalizing Bounding Box Coordinates for YOLOv12
     </span>
   </a>
   
@@ -1294,13 +1330,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#converting-annotations-to-yolov8-format-with-labelformat" class="md-nav__link">
+  <a href="#converting-annotations-to-yolov12-format-with-labelformat" class="md-nav__link">
     <span class="md-ellipsis">
-      Converting Annotations to YOLOv8 Format with Labelformat
+      Converting Annotations to YOLOv12 Format with Labelformat
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Converting Annotations to YOLOv8 Format with Labelformat">
+    <nav class="md-nav" aria-label="Converting Annotations to YOLOv12 Format with Labelformat">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1313,9 +1349,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#conversion-example-coco-to-yolov8" class="md-nav__link">
+  <a href="#conversion-example-coco-to-yolov12" class="md-nav__link">
     <span class="md-ellipsis">
-      Conversion Example: COCO to YOLOv8
+      Conversion Example: COCO to YOLOv12
     </span>
   </a>
   
@@ -1353,52 +1389,74 @@
   
 
 
-<h1 id="yolov8-object-detection-format">YOLOv8 Object Detection Format<a class="headerlink" href="#yolov8-object-detection-format" title="Permanent link">&para;</a></h1>
+<h1 id="yolov12-object-detection-format">YOLOv12 Object Detection Format<a class="headerlink" href="#yolov12-object-detection-format" title="Permanent link">&para;</a></h1>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p><strong>YOLOv8</strong> is a well-known object detection model in the <strong>You Only Look Once (YOLO)</strong> series, renowned for its real-time object detection capabilities. Building upon the foundations of YOLOv5 through YOLOv7, YOLOv8 introduces significant advancements in model architecture and training methodologies, enhancing both accuracy and efficiency. Despite these improvements, YOLOv8 retains the same <strong>object detection format</strong> as its predecessors, utilizing normalized coordinates in text files. This consistency ensures seamless integration and compatibility with existing workflows while benefiting from YOLOv8's enhanced performance.</p>
+<p><strong>YOLOv12</strong> is a groundbreaking iteration in the <strong>You Only Look Once (YOLO)</strong> series, introduced in the paper <a href="https://arxiv.org/abs/2502.12524">YOLOv12: Attention-Centric Real-Time Object Detectors</a>. YOLOv12 represents the first attention-centric YOLO framework, departing from the traditional CNN-based approach while maintaining the real-time performance characteristics that define the YOLO series. Building upon the foundations of YOLOv5 through YOLOv11, YOLOv12 introduces revolutionary attention mechanisms and architectural innovations that achieve state-of-the-art accuracy with competitive inference speeds. Despite these architectural advances, YOLOv12 retains the same <strong>object detection format</strong> as its predecessors, utilizing normalized coordinates in text files for seamless integration with existing workflows.</p>
 <blockquote>
-<p><strong>Info:</strong> Unlike other YOLO versions, YOLOv8 was not introduced through an academic paper. The most commonly referenced implementation is the Ultralytics YOLOv8 repository on GitHub, which has become the de facto standard implementation. 
-  For implementation details and specifications, see: <a href="https://github.com/ultralytics/ultralytics">GitHub Repository: ultralytics/yolov8</a></p>
+<p><strong>Info:</strong> YOLOv12 was introduced through the academic paper "YOLOv12: Attention-Centric Real-Time Object Detectors" published in 2025. The official implementation is available on GitHub.
+  For the full paper, see: <a href="https://arxiv.org/abs/2502.12524">arXiv:2502.12524</a>
+  For implementation details and code, see: <a href="https://github.com/sunsmarterjie/yolov12">GitHub Repository: sunsmarterjie/yolov12</a></p>
 </blockquote>
-<h2 id="specification-of-yolov8-detection-format">Specification of YOLOv8 Detection Format<a class="headerlink" href="#specification-of-yolov8-detection-format" title="Permanent link">&para;</a></h2>
-<p>The <strong>YOLOv8 detection format</strong> remains consistent with previous versions (v5-v8), ensuring ease of adoption and compatibility. Below are the detailed specifications:</p>
+<h2 id="key-yolov12-model-features">Key YOLOv12 Model Features<a class="headerlink" href="#key-yolov12-model-features" title="Permanent link">&para;</a></h2>
+<p>YOLOv12 maintains full compatibility with the label format used in YOLOv5-v11, while introducing revolutionary architectural innovations:</p>
+<ul>
+<li><strong>Attention-Centric Architecture:</strong> The first YOLO model to prioritize attention mechanisms over traditional CNNs, leveraging the superior modeling capabilities of attention while maintaining real-time performance.</li>
+<li><strong>Area Attention (A²) Module:</strong> A novel attention mechanism that reduces computational complexity from O(n²) to efficient levels while maintaining large receptive fields through simple area-based partitioning.</li>
+<li><strong>R-ELAN (Residual Efficient Layer Aggregation Networks):</strong> Enhanced feature aggregation with residual connections and scaling techniques, addressing optimization challenges in attention-based architectures.</li>
+<li><strong>FlashAttention Integration:</strong> Optimized memory access patterns that solve the memory bottleneck issues of attention mechanisms, enabling efficient inference on modern GPUs.</li>
+<li><strong>Superior Performance:</strong> Achieves significant improvements over previous YOLO versions (e.g., YOLOv12-N reaches 40.6% mAP, outperforming YOLOv11-N by 1.2% mAP with comparable speed).</li>
+<li><strong>Multi-Scale Excellence:</strong> Consistent performance gains across all model scales (N, S, M, L, X) while maintaining or reducing computational requirements.</li>
+</ul>
+<p>These architectural innovations are handled internally by the model design and training pipeline, requiring no changes to the basic annotation format described below.</p>
+<h2 id="hardware-requirements">Hardware Requirements<a class="headerlink" href="#hardware-requirements" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><strong>Important:</strong> YOLOv12 requires <strong>FlashAttention</strong> for optimal performance, which currently supports specific GPU architectures:</p>
+<ul>
+<li><strong>Supported GPUs:</strong> Turing, Ampere, Ada Lovelace, or Hopper architectures</li>
+<li><strong>Examples:</strong> T4, Quadro RTX series, RTX 20/30/40 series, RTX A5000/A6000, A30/A40, A100, H100</li>
+<li><strong>Note:</strong> Older GPU architectures may not achieve the full performance benefits of YOLOv12's attention mechanisms</li>
+</ul>
+<p>For deployment on unsupported hardware, consider using YOLOv11 or earlier versions for optimal performance.</p>
+</blockquote>
+<h2 id="specification-of-yolov12-detection-format">Specification of YOLOv12 Detection Format<a class="headerlink" href="#specification-of-yolov12-detection-format" title="Permanent link">&para;</a></h2>
+<p>The <strong>YOLOv12 detection format</strong> remains consistent with previous versions (v5-v11), ensuring ease of adoption and compatibility. Below are the detailed specifications:</p>
 <ul>
 <li>
-<p><strong>One Text File per Image:</strong><br />
+<p><strong>One Text File per Image:</strong>
   For every image in your dataset, there exists a corresponding <code>.txt</code> file containing annotation data.</p>
 </li>
 <li>
-<p><strong>Object Representation:</strong><br />
-  Each line in the text file represents a single object detected within the image, following the format: <code>&lt;class_id&gt; &lt;x_center&gt; &lt;y_center&gt; &lt;width&gt; &lt;height&gt;</code>  </p>
+<p><strong>Object Representation:</strong>
+  Each line in the text file represents a single object detected within the image, following the format: <code>&lt;class_id&gt; &lt;x_center&gt; &lt;y_center&gt; &lt;width&gt; &lt;height&gt;</code></p>
 <ul>
-<li><strong><code>&lt;class_id&gt;</code> (Integer):</strong>   An integer representing the object's class.</li>
-<li><strong><code>&lt;x_center&gt;</code> and <code>&lt;y_center&gt;</code> (Float):</strong> The normalized coordinates of the object's center relative to the image's width and    height.</li>
+<li><strong><code>&lt;class_id&gt;</code> (Integer):</strong> An integer representing the object's class.</li>
+<li><strong><code>&lt;x_center&gt;</code> and <code>&lt;y_center&gt;</code> (Float):</strong> The normalized coordinates of the object's center relative to the image's width and height.</li>
 <li><strong><code>&lt;width&gt;</code> and <code>&lt;height&gt;</code> (Float):</strong> The normalized width and height of the bounding box encompassing the object.</li>
 </ul>
 </li>
 <li>
-<p><strong>Normalization of Values:</strong><br />
-  All coordinate and size values are normalized to a range between <code>0.0</code> and <code>1.0</code>.  </p>
+<p><strong>Normalization of Values:</strong>
+  All coordinate and size values are normalized to a range between <code>0.0</code> and <code>1.0</code>.</p>
 </li>
 <li>
-<p><strong>Normalization Formula:</strong><br />
-    To convert pixel values to normalized coordinates:<br />
-    <div class="highlight"><pre><span></span><code>normalized_x = x<span class="ge">_pixel / image_</span>width  
-normalized_y = y<span class="ge">_pixel / image_</span>height  
-normalized_width = box_width_pixel / image_width  
+<p><strong>Normalization Formula:</strong>
+    To convert pixel values to normalized coordinates:
+    <div class="highlight"><pre><span></span><code>normalized_x = x<span class="ge">_pixel / image_</span>width
+normalized_y = y<span class="ge">_pixel / image_</span>height
+normalized_width = box_width_pixel / image_width
 normalized_height = box_height_pixel / image_height
 </code></pre></div></p>
 </li>
 <li>
-<p><strong>Class ID Indexing:</strong><br />
+<p><strong>Class ID Indexing:</strong>
   Class IDs start from <code>0</code>, with each ID corresponding to a specific object category defined in the <code>data.yaml</code> configuration file. Class IDs must be contiguous integers (e.g., 0,1,2 and not 0,2,3) to ensure proper model training and inference.</p>
 </li>
 <li>
-<p><strong>Configuration via <code>data.yaml</code>:</strong><br />
+<p><strong>Configuration via <code>data.yaml</code>:</strong>
   The <code>data.yaml</code> file contains essential configuration settings, including paths to training and validation datasets, number of classes (<code>nc</code>), and a mapping of class names to their respective IDs (<code>names</code>).</p>
 </li>
 </ul>
-<h2 id="directory-structure-of-yolov8-dataset">Directory Structure of YOLOv8 Dataset<a class="headerlink" href="#directory-structure-of-yolov8-dataset" title="Permanent link">&para;</a></h2>
+<h2 id="directory-structure-of-yolov12-dataset">Directory Structure of YOLOv12 Dataset<a class="headerlink" href="#directory-structure-of-yolov12-dataset" title="Permanent link">&para;</a></h2>
 <p>The dataset must maintain a parallel directory structure for images and their corresponding label files. There are two common organizational patterns:</p>
 <h3 id="pattern-1-images-and-labels-as-root-directories">Pattern 1: Images and Labels as Root Directories<a class="headerlink" href="#pattern-1-images-and-labels-as-root-directories" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>dataset/
@@ -1447,14 +1505,14 @@ normalized_height = box_height_pixel / image_height
 <span class="nt">train</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">train/images</span><span class="w">  </span><span class="c1"># Path to training images</span>
 <span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">val/images</span><span class="w">      </span><span class="c1"># Path to validation images</span>
 </code></pre></div>
-<p><strong>Important:</strong> Label files must have the same name as their corresponding image files (excluding the file extension) and must maintain the parallel directory structure, only replacing <code>images</code> with <code>labels</code> in the path. </p>
-<h2 id="benefits-of-yolov8-format">Benefits of YOLOv8 Format<a class="headerlink" href="#benefits-of-yolov8-format" title="Permanent link">&para;</a></h2>
+<p><strong>Important:</strong> Label files must have the same name as their corresponding image files (excluding the file extension) and must maintain the parallel directory structure, only replacing <code>images</code> with <code>labels</code> in the path.</p>
+<h2 id="benefits-of-yolov12-format">Benefits of YOLOv12 Format<a class="headerlink" href="#benefits-of-yolov12-format" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Simplicity: Easy to read and write, facilitating quick dataset preparation.</li>
 <li>Efficiency: Compact representation reduces storage requirements.</li>
 <li>Compatibility: Maintains consistency across YOLO versions, ensuring seamless integration with various tools and frameworks.</li>
 </ul>
-<h2 id="example-of-yolov8-format">Example of YOLOv8 Format<a class="headerlink" href="#example-of-yolov8-format" title="Permanent link">&para;</a></h2>
+<h2 id="example-of-yolov12-format">Example of YOLOv12 Format<a class="headerlink" href="#example-of-yolov12-format" title="Permanent link">&para;</a></h2>
 <p><strong>Example of <code>data.yaml</code>:</strong>
 <div class="highlight"><pre><span></span><code><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span><span class="w">  </span><span class="c1"># Dataset root directory (defaults to current directory if omitted). Can also be `../dataset`.</span>
 <span class="nt">train</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">images/train</span><span class="w">  </span><span class="c1"># Directory for training images</span>
@@ -1474,8 +1532,8 @@ normalized_height = box_height_pixel / image_height
 <p><strong>Explanation:</strong>
 - The first line represents an object of class <code>0</code> (e.g., <code>cat</code>) with its bounding box centered at <code>(0.716797, 0.395833)</code> relative to the image dimensions, and a width and height of <code>0.216406</code> and <code>0.147222</code> respectively.
 - The second line represents an object of class <code>1</code> (e.g., <code>dog</code>) with its own bounding box specifications.</p>
-<h3 id="normalizing-bounding-box-coordinates-for-yolov8">Normalizing Bounding Box Coordinates for YOLOv8<a class="headerlink" href="#normalizing-bounding-box-coordinates-for-yolov8" title="Permanent link">&para;</a></h3>
-<p>To convert pixel values to normalized values required by YOLOv8:</p>
+<h3 id="normalizing-bounding-box-coordinates-for-yolov12">Normalizing Bounding Box Coordinates for YOLOv12<a class="headerlink" href="#normalizing-bounding-box-coordinates-for-yolov12" title="Permanent link">&para;</a></h3>
+<p>To convert pixel values to normalized values required by YOLOv12:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Given pixel values and image dimensions</span>
 <span class="n">x_top_left</span> <span class="o">=</span> <span class="mi">150</span>     <span class="c1"># x coordinate of top-left corner of bounding box</span>
 <span class="n">y_top_left</span> <span class="o">=</span> <span class="mi">200</span>     <span class="c1"># y coordinate of top-left corner of bounding box</span>
@@ -1498,14 +1556,14 @@ normalized_height = box_height_pixel / image_height
 <span class="n">annotation</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;0 </span><span class="si">{</span><span class="n">x_center</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">y_center</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="c1"># Output: &quot;0 0.273438 0.500000 0.078125 0.166667&quot;</span>
 </code></pre></div>
-<h2 id="converting-annotations-to-yolov8-format-with-labelformat">Converting Annotations to YOLOv8 Format with Labelformat<a class="headerlink" href="#converting-annotations-to-yolov8-format-with-labelformat" title="Permanent link">&para;</a></h2>
-<p>Our <strong>Labelformat</strong> framework simplifies the process of converting various annotation formats to the YOLOv8 detection format. Below is a step-by-step guide to perform this conversion.</p>
+<h2 id="converting-annotations-to-yolov12-format-with-labelformat">Converting Annotations to YOLOv12 Format with Labelformat<a class="headerlink" href="#converting-annotations-to-yolov12-format-with-labelformat" title="Permanent link">&para;</a></h2>
+<p>Our <strong>Labelformat</strong> framework simplifies the process of converting various annotation formats to the YOLOv12 detection format. Below is a step-by-step guide to perform this conversion.</p>
 <h3 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h3>
 <p>First, ensure that Labelformat is installed. You can install it via pip:</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>labelformat
 </code></pre></div>
-<h3 id="conversion-example-coco-to-yolov8">Conversion Example: COCO to YOLOv8<a class="headerlink" href="#conversion-example-coco-to-yolov8" title="Permanent link">&para;</a></h3>
-<p>Assume you have annotations in the COCO format and wish to convert them to YOLOv8. Here’s how you can achieve this using Labelformat.</p>
+<h3 id="conversion-example-coco-to-yolov12">Conversion Example: COCO to YOLOv12<a class="headerlink" href="#conversion-example-coco-to-yolov12" title="Permanent link">&para;</a></h3>
+<p>Assume you have annotations in the COCO format and wish to convert them to YOLOv12. Here's how you can achieve this using Labelformat.</p>
 <p><strong>Step 1: Prepare Your Dataset</strong></p>
 <p>Ensure your dataset follows the standard COCO structure:</p>
 <ul>
@@ -1522,19 +1580,19 @@ normalized_height = box_height_pixel / image_height
 │<span class="w">   </span>└──<span class="w"> </span>...
 </code></pre></div></p>
 <p><strong>Step 2: Run the Conversion Command</strong></p>
-<p>Use the Labelformat CLI to convert COCO annotations to YOLOv8:
+<p>Use the Labelformat CLI to convert COCO annotations to YOLOv12:
 <div class="highlight"><pre><span></span><code>labelformat convert \
     --task object-detection \
     --input-format coco \
     --input-file dataset/annotations/instances_train.json \
-    --output-format yolov8 \
-    --output-folder dataset/yolov8_labels \
+    --output-format yolov12 \
+    --output-folder dataset/yolov12_labels \
     --output-split train
 </code></pre></div></p>
 <p><strong>Step 3: Verify the Converted Annotations</strong></p>
 <p>After conversion, your dataset structure will be:
 <div class="highlight"><pre><span></span><code>dataset/
-├── yolov8_labels/
+├── yolov12_labels/
 │   ├── data.yaml
 │   ├── images/
 │   │   ├── image1.jpg
@@ -1609,7 +1667,7 @@ normalized_height = box_height_pixel / image_height
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">January 3, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">September 29, 2025</span>
   </span>
 
     

@@ -8,28 +8,28 @@
       
       
       
-        <link rel="canonical" href="https://labelformat.com/usage/">
+        <link rel="canonical" href="https://labelformat.com/formats/object-detection/yolov26/">
       
       
-        <link rel="prev" href="../quick-start/">
+        <link rel="prev" href="../yolov12/">
       
       
-        <link rel="next" href="../formats/object-detection/">
+        <link rel="next" href="../../../tutorials/converting-coco-to-yolov8/">
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
     
     
       
-        <title>Usage - Labelformat Docs</title>
+        <title>YOLOv26 Format - Labelformat Docs</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.6f8fc17f.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.6f8fc17f.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -48,7 +48,7 @@
       
     
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#detailed-usage-guide" class="md-skip">
+        <a href="#yolov26-yolo26-object-detection-format" class="md-skip">
           Skip to content
         </a>
       
@@ -98,7 +98,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Labelformat Docs" class="md-header__button md-logo" aria-label="Labelformat Docs" data-md-component="logo">
+    <a href="../../.." title="Labelformat Docs" class="md-header__button md-logo" aria-label="Labelformat Docs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Usage
+              YOLOv26 Format
             
           </span>
         </div>
@@ -197,7 +197,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href=".." class="md-tabs__link">
+        <a href="../../.." class="md-tabs__link">
           
   
     
@@ -215,7 +215,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../about-us/" class="md-tabs__link">
+      <a href="../../../about-us/" class="md-tabs__link">
         
   
     
@@ -255,7 +255,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Labelformat Docs" class="md-nav__button md-logo" aria-label="Labelformat Docs" data-md-component="logo">
+    <a href="../../.." title="Labelformat Docs" class="md-nav__button md-logo" aria-label="Labelformat Docs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -323,7 +323,7 @@
           
           
           <div class="md-nav__link md-nav__container">
-            <a href=".." class="md-nav__link ">
+            <a href="../../.." class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -356,7 +356,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../features/" class="md-nav__link">
+      <a href="../../../features/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -377,7 +377,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../installation/" class="md-nav__link">
+      <a href="../../../installation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -398,11 +398,479 @@
   
   
     <li class="md-nav__item">
-      <a href="../quick-start/" class="md-nav__link">
+      <a href="../../../quick-start/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Quick Start
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../usage/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Usage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1_6" id="__nav_1_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Supported Formats
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            Supported Formats
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_6_1" checked>
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Object Detection
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1_6_1" id="__nav_1_6_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_6_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_6_1">
+            <span class="md-nav__icon md-icon"></span>
+            Object Detection
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../coco/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    COCO Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kitti/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KITTI Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../labelbox/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Labelbox Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lightly/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Lightly Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pascalvoc/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PascalVOC Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rtdetr/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RT-DETR Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rtdetrv2/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RT-DETRv2 Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../yolov5/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    YOLOv5 Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../yolov6/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    YOLOv6 Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../yolov7/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    YOLOv7 Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../yolov8/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    YOLOv8 Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../yolov9/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    YOLOv9 Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../yolov10/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    YOLOv10 Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../yolov11/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    YOLOv11 Format
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../yolov12/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    YOLOv12 Format
   </span>
   
 
@@ -432,7 +900,7 @@
           
   
   <span class="md-ellipsis">
-    Usage
+    YOLOv26 Format
   </span>
   
 
@@ -443,7 +911,7 @@
         
   
   <span class="md-ellipsis">
-    Usage
+    YOLOv26 Format
   </span>
   
 
@@ -465,108 +933,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#cli-usage" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
-      CLI Usage
+      Overview
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="CLI Usage">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#basic-conversion-command" class="md-nav__link">
-    <span class="md-ellipsis">
-      Basic Conversion Command
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#advanced-cli-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      Advanced CLI Options
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#python-api-usage" class="md-nav__link">
+  <a href="#key-yolov26-features" class="md-nav__link">
     <span class="md-ellipsis">
-      Python API Usage
+      Key YOLOv26 Features
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Python API Usage">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#basic-conversion" class="md-nav__link">
-    <span class="md-ellipsis">
-      Basic Conversion
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#customizing-conversion" class="md-nav__link">
-    <span class="md-ellipsis">
-      Customizing Conversion
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#common-tasks" class="md-nav__link">
+  <a href="#format-specification" class="md-nav__link">
     <span class="md-ellipsis">
-      Common Tasks
+      Format Specification
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Common Tasks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#handling-category-names" class="md-nav__link">
-    <span class="md-ellipsis">
-      Handling Category Names
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#managing-image-paths" class="md-nav__link">
-    <span class="md-ellipsis">
-      Managing Image Paths
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#tips-and-best-practices" class="md-nav__link">
+  <a href="#converting-annotations-to-yolov26-format" class="md-nav__link">
     <span class="md-ellipsis">
-      Tips and Best Practices
+      Converting Annotations to YOLOv26 Format
     </span>
   </a>
   
@@ -576,474 +972,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_6" >
-        
-          
-          <label class="md-nav__link" for="__nav_1_6" id="__nav_1_6_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    Supported Formats
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_1_6">
-            <span class="md-nav__icon md-icon"></span>
-            Supported Formats
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-          
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_6_1" >
-        
-          
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../formats/object-detection/" class="md-nav__link ">
-              
-  
-  <span class="md-ellipsis">
-    Object Detection
-  </span>
-  
-
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_1_6_1" id="__nav_1_6_1_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_6_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_1_6_1">
-            <span class="md-nav__icon md-icon"></span>
-            Object Detection
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/coco/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    COCO Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/kitti/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    KITTI Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/labelbox/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Labelbox Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/lightly/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Lightly Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/pascalvoc/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    PascalVOC Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/rtdetr/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    RT-DETR Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/rtdetrv2/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    RT-DETRv2 Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/yolov5/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    YOLOv5 Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/yolov6/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    YOLOv6 Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/yolov7/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    YOLOv7 Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/yolov8/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    YOLOv8 Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/yolov9/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    YOLOv9 Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/yolov10/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    YOLOv10 Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/yolov11/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    YOLOv11 Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/yolov12/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    YOLOv12 Format
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../formats/object-detection/yolov26/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    YOLOv26 Format
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -1116,7 +1044,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/converting-coco-to-yolov8/" class="md-nav__link">
+      <a href="../../../tutorials/converting-coco-to-yolov8/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1152,7 +1080,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../about-us/" class="md-nav__link">
+      <a href="../../../about-us/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1192,108 +1120,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#cli-usage" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
-      CLI Usage
+      Overview
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="CLI Usage">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#basic-conversion-command" class="md-nav__link">
-    <span class="md-ellipsis">
-      Basic Conversion Command
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#advanced-cli-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      Advanced CLI Options
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#python-api-usage" class="md-nav__link">
+  <a href="#key-yolov26-features" class="md-nav__link">
     <span class="md-ellipsis">
-      Python API Usage
+      Key YOLOv26 Features
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Python API Usage">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#basic-conversion" class="md-nav__link">
-    <span class="md-ellipsis">
-      Basic Conversion
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#customizing-conversion" class="md-nav__link">
-    <span class="md-ellipsis">
-      Customizing Conversion
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#common-tasks" class="md-nav__link">
+  <a href="#format-specification" class="md-nav__link">
     <span class="md-ellipsis">
-      Common Tasks
+      Format Specification
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Common Tasks">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#handling-category-names" class="md-nav__link">
-    <span class="md-ellipsis">
-      Handling Category Names
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#managing-image-paths" class="md-nav__link">
-    <span class="md-ellipsis">
-      Managing Image Paths
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#tips-and-best-practices" class="md-nav__link">
+  <a href="#converting-annotations-to-yolov26-format" class="md-nav__link">
     <span class="md-ellipsis">
-      Tips and Best Practices
+      Converting Annotations to YOLOv26 Format
     </span>
   </a>
   
@@ -1317,128 +1173,41 @@
   
 
 
-<h1 id="detailed-usage-guide">Detailed Usage Guide<a class="headerlink" href="#detailed-usage-guide" title="Permanent link">&para;</a></h1>
-<p>Labelformat offers both a Command-Line Interface (CLI) and a Python API to cater to different workflows. This guide provides in-depth instructions on how to use both interfaces effectively.</p>
-<p>To get a detailed overview of the supported formats and their specifications, please refer to the <a href="../formats/object-detection/">Supported Object Detection Formats</a> section.</p>
-<h2 id="cli-usage">CLI Usage<a class="headerlink" href="#cli-usage" title="Permanent link">&para;</a></h2>
-<p>Labelformat's CLI provides a straightforward way to convert label formats directly from the terminal.</p>
-<h3 id="basic-conversion-command">Basic Conversion Command<a class="headerlink" href="#basic-conversion-command" title="Permanent link">&para;</a></h3>
-<p><strong>Example:</strong> Convert Object Detection labels from COCO to YOLOv8.</p>
+<h1 id="yolov26-yolo26-object-detection-format">YOLOv26 (YOLO26) Object Detection Format<a class="headerlink" href="#yolov26-yolo26-object-detection-format" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p><strong>YOLOv26</strong> (also known as <strong>YOLO26</strong>) is the latest evolution in the <strong>You Only Look Once (YOLO)</strong> series, engineered specifically for edge and low-power devices. It introduces a streamlined design that removes unnecessary complexity while integrating targeted innovations to deliver faster, lighter, and more accessible deployment. YOLOv26 uses the <strong>same object detection format</strong> as YOLOv8-v12, utilizing normalized coordinates in text files for seamless compatibility.</p>
+<blockquote>
+<p><strong>Info:</strong> YOLOv26 is currently in preview and under development. Performance numbers are preliminary and final releases will follow soon. For the latest updates, see: <a href="https://github.com/ultralytics/ultralytics">GitHub Repository: ultralytics/ultralytics</a></p>
+</blockquote>
+<h2 id="key-yolov26-features">Key YOLOv26 Features<a class="headerlink" href="#key-yolov26-features" title="Permanent link">&para;</a></h2>
+<p>YOLOv26 maintains full compatibility with the YOLOv8-v12 label format while introducing several breakthrough innovations:</p>
+<ul>
+<li><strong>End-to-End NMS-Free Inference:</strong> Native end-to-end model producing predictions directly without non-maximum suppression, reducing latency and simplifying deployment</li>
+<li><strong>DFL Removal:</strong> Eliminates Distribution Focal Loss module for better export compatibility and broader hardware support on edge devices</li>
+<li><strong>MuSGD Optimizer:</strong> Hybrid optimizer combining SGD with Muon, inspired by Moonshot AI's Kimi K2 breakthroughs in LLM training</li>
+<li><strong>ProgLoss + STAL:</strong> Enhanced loss functions with notable improvements in small-object detection accuracy</li>
+<li><strong>43% Faster CPU Inference:</strong> Specifically optimized for edge computing with significant CPU performance gains</li>
+</ul>
+<h2 id="format-specification">Format Specification<a class="headerlink" href="#format-specification" title="Permanent link">&para;</a></h2>
+<p>YOLOv26 uses the <strong>identical format</strong> as YOLOv8, YOLOv9, YOLOv10, YOLOv11, and YOLOv12. Please refer to the <a href="../yolov8/">YOLOv8 format documentation</a> for complete format specifications, including:</p>
+<ul>
+<li>Text file structure with normalized coordinates</li>
+<li>Directory organization patterns</li>
+<li>Configuration via <code>data.yaml</code></li>
+<li>Coordinate normalization formulas</li>
+<li>Example annotations</li>
+</ul>
+<h2 id="converting-annotations-to-yolov26-format">Converting Annotations to YOLOv26 Format<a class="headerlink" href="#converting-annotations-to-yolov26-format" title="Permanent link">&para;</a></h2>
+<p>Since YOLOv26 uses the same format as YOLOv8-v11, you can convert from other formats using Labelformat:</p>
 <div class="highlight"><pre><span></span><code>labelformat<span class="w"> </span>convert<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--task<span class="w"> </span>object-detection<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--input-format<span class="w"> </span>coco<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--input-file<span class="w"> </span>path/to/coco/train.json<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--output-format<span class="w"> </span>yolov8<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--output-file<span class="w"> </span>path/to/yolo/data.yaml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--input-file<span class="w"> </span>dataset/annotations/instances_train.json<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output-format<span class="w"> </span>yolov26<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output-folder<span class="w"> </span>dataset/yolov26_labels<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--output-split<span class="w"> </span>train
 </code></pre></div>
-<p><strong>Parameters:</strong></p>
-<ul>
-<li><code>--task</code>: Specify the task type (<code>object-detection</code> or <code>instance-segmentation</code>).</li>
-<li><code>--input-format</code>: The format of the input labels (e.g., <code>coco</code>).</li>
-<li><code>--input-file</code> or <code>--input-folder</code>: Path to the input label file or folder.</li>
-<li><code>--output-format</code>: The desired output label format (e.g., <code>yolov8</code>).</li>
-<li><code>--output-file</code> or <code>--output-folder</code>: Path to save the converted labels.</li>
-<li><code>--output-split</code>: Define the data split (<code>train</code>, <code>val</code>, <code>test</code>).</li>
-</ul>
-<h3 id="advanced-cli-options">Advanced CLI Options<a class="headerlink" href="#advanced-cli-options" title="Permanent link">&para;</a></h3>
-<p><strong>Listing Supported Formats:</strong></p>
-<p>To see all supported input and output formats for a specific task:</p>
-<div class="highlight"><pre><span></span><code>labelformat<span class="w"> </span>convert<span class="w"> </span>--task<span class="w"> </span>object-detection<span class="w"> </span>--help
-</code></pre></div>
-<p><strong>Specifying Category Names:</strong></p>
-<p>Some formats require explicit category names. The names must be separated by commas and must be in the same order as the categories in the input file.</p>
-<p>Use the <code>--category-names</code> argument to specify the category names:</p>
-<div class="highlight"><pre><span></span><code>labelformat<span class="w"> </span>convert<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--task<span class="w"> </span>object-detection<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--input-format<span class="w"> </span>labelbox<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--input-file<span class="w"> </span>labelbox-export.ndjson<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--category-names<span class="w"> </span>cat,dog,fish<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--output-format<span class="w"> </span>coco<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--output-file<span class="w"> </span>coco-output/train.json<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--output-split<span class="w"> </span>train
-</code></pre></div>
-<p><strong>Handling Missing Images:</strong></p>
-<p>When converting formats that require image files (e.g., YOLO to COCO), ensure your image paths are correctly specified. Use <code>--images-rel-path</code> to define the relative path from the input folder to the images folder:</p>
-<div class="highlight"><pre><span></span><code>labelformat<span class="w"> </span>convert<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--task<span class="w"> </span>object-detection<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--input-format<span class="w"> </span>kitti<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--input-folder<span class="w"> </span>kitti-labels/labels<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--images-rel-path<span class="w"> </span>../images<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--output-format<span class="w"> </span>pascalvoc<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--output-folder<span class="w"> </span>pascalvoc-labels
-</code></pre></div>
-<h2 id="python-api-usage">Python API Usage<a class="headerlink" href="#python-api-usage" title="Permanent link">&para;</a></h2>
-<p>For more flexible integrations, Labelformat provides a Python API.</p>
-<h3 id="basic-conversion">Basic Conversion<a class="headerlink" href="#basic-conversion" title="Permanent link">&para;</a></h3>
-<p><strong>Example:</strong> Convert COCO to YOLOv8.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">labelformat.formats</span> <span class="kn">import</span> <span class="n">COCOObjectDetectionInput</span><span class="p">,</span> <span class="n">YOLOv8ObjectDetectionOutput</span>
-
-<span class="c1"># Initialize input and output classes</span>
-<span class="n">coco_input</span> <span class="o">=</span> <span class="n">COCOObjectDetectionInput</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;coco-labels/train.json&quot;</span><span class="p">))</span>
-<span class="n">yolo_output</span> <span class="o">=</span> <span class="n">YOLOv8ObjectDetectionOutput</span><span class="p">(</span>
-    <span class="n">output_file</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;yolo-labels/data.yaml&quot;</span><span class="p">),</span>
-    <span class="n">output_split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span>
-<span class="p">)</span>
-
-<span class="c1"># Perform the conversion</span>
-<span class="n">yolo_output</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">label_input</span><span class="o">=</span><span class="n">coco_input</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Conversion from COCO to YOLOv8 completed successfully!&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="customizing-conversion">Customizing Conversion<a class="headerlink" href="#customizing-conversion" title="Permanent link">&para;</a></h3>
-<p><strong>Example:</strong> Adding Custom Fields or Handling Special Cases.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">labelformat.formats</span> <span class="kn">import</span> <span class="n">COCOInstanceSegmentationInput</span><span class="p">,</span> <span class="n">YOLOv8InstanceSegmentationOutput</span>
-
-<span class="c1"># Initialize input for instance segmentation</span>
-<span class="n">coco_inst_input</span> <span class="o">=</span> <span class="n">COCOInstanceSegmentationInput</span><span class="p">(</span><span class="n">input_file</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;coco-instance/train.json&quot;</span><span class="p">))</span>
-
-<span class="c1"># Initialize YOLOv8 instance segmentation output</span>
-<span class="n">yolo_inst_output</span> <span class="o">=</span> <span class="n">YOLOv8InstanceSegmentationOutput</span><span class="p">(</span>
-    <span class="n">output_file</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;yolo-instance-labels/data.yaml&quot;</span><span class="p">),</span>
-    <span class="n">output_split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span>
-<span class="p">)</span>
-
-<span class="c1"># Perform the conversion</span>
-<span class="n">yolo_inst_output</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">label_input</span><span class="o">=</span><span class="n">coco_inst_input</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Instance segmentation conversion completed successfully!&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="common-tasks">Common Tasks<a class="headerlink" href="#common-tasks" title="Permanent link">&para;</a></h2>
-<h3 id="handling-category-names">Handling Category Names<a class="headerlink" href="#handling-category-names" title="Permanent link">&para;</a></h3>
-<p>Some label formats require you to specify category names explicitly. Ensure that category names are consistent across your dataset.</p>
-<p><strong>Example:</strong></p>
-<div class="highlight"><pre><span></span><code>labelformat<span class="w"> </span>convert<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--task<span class="w"> </span>object-detection<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--input-format<span class="w"> </span>labelbox<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--input-file<span class="w"> </span>labelbox-export.ndjson<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--category-names<span class="w"> </span>cat,dog,fish<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--output-format<span class="w"> </span>coco<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--output-file<span class="w"> </span>coco-output/train.json<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--output-split<span class="w"> </span>train
-</code></pre></div>
-<h3 id="managing-image-paths">Managing Image Paths<a class="headerlink" href="#managing-image-paths" title="Permanent link">&para;</a></h3>
-<p>When converting formats that reference image files, accurately specify the relative paths to avoid missing files.</p>
-<p><strong>Example:</strong></p>
-<div class="highlight"><pre><span></span><code>labelformat<span class="w"> </span>convert<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--task<span class="w"> </span>object-detection<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--input-format<span class="w"> </span>kitti<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--input-folder<span class="w"> </span>kitti-labels/labels<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--images-rel-path<span class="w"> </span>../images<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--output-format<span class="w"> </span>pascalvoc<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--output-folder<span class="w"> </span>pascalvoc-labels
-</code></pre></div>
-<hr />
-<h2 id="tips-and-best-practices">Tips and Best Practices<a class="headerlink" href="#tips-and-best-practices" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Backup Your Data:</strong> Always keep a backup of your original labels before performing conversions.</li>
-<li><strong>Validate Output:</strong> After conversion, verify the output labels to ensure accuracy.</li>
-<li><strong>Consistent Naming:</strong> Maintain consistent naming conventions for categories and files across different formats.</li>
-<li><strong>Leverage Round-Trip Tests:</strong> Use Labelformat's testing capabilities to ensure label consistency when converting back and forth between formats.</li>
-</ul>
-<p>For more detailed examples and advanced usage scenarios, explore our <a href="../tutorials/converting-coco-to-yolov8/">Tutorials</a> section.</p>
+<p>The converted output will be fully compatible with YOLOv26 training and inference pipelines.</p>
 
 
 
@@ -1459,7 +1228,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">January 4, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">September 29, 2025</span>
   </span>
 
     
@@ -1590,12 +1359,12 @@
       </div>
       <script>var consent=__md_get("__consent");if(consent)for(var input of document.forms.consent.elements)input.name&&(input.checked=consent[input.name]||!1);else"file:"!==location.protocol&&setTimeout((function(){document.querySelector("[data-md-component=consent]").hidden=!1}),250);var form=document.forms.consent;for(var action of["submit","reset"])form.addEventListener(action,(function(e){if(e.preventDefault(),"reset"===e.type)for(var n of document.forms.consent.elements)n.name&&(n.checked=!1);__md_set("__consent",Object.fromEntries(Array.from(new FormData(form).keys()).map((function(e){return[e,!0]})))),location.hash="",location.reload()}))</script>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.expand", "search.highlight", "navigation.top", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.tabs.link"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.instant", "navigation.expand", "search.highlight", "navigation.top", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.88dd0f4e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.88dd0f4e.min.js"></script>
       
-        <script src="../assets/js/analytics.js"></script>
+        <script src="../../../assets/js/analytics.js"></script>
       
     
   </body>
