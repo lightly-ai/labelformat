@@ -42,6 +42,7 @@ nav:
               - YOLOv9 Format: formats/object-detection/yolov9.md
               - YOLOv10 Format: formats/object-detection/yolov10.md
               - YOLOv11 Format: formats/object-detection/yolov11.md
+              - YOLOv26 Format: formats/object-detection/yolov26.md
       - Tutorials:
           - Converting COCO to YOLOv8: tutorials/converting-coco-to-yolov8.md
   - About Us: about-us.md
