@@ -10,6 +10,8 @@ Assumptions for this initial version:
 TODOs for future extensions (intentionally not implemented yet):
 - Support non-PNG masks and custom pairing strategies (e.g., ``*_mask.png``).
 - Support palettized/RGB masks with arbitrary pixel_value -> class_id mappings.
+- Support an optional ignore_index to allow a void label and optionally exclude it
+  from categories.
 """
 
 from dataclasses import dataclass
@@ -20,6 +22,7 @@ import numpy as np
 from PIL import Image as PILImage
 
 from labelformat.model.category import Category
+from labelformat.model.image import Image
 from labelformat.model.semantic_segmentation import (
     SemanticSegmentationInput,
     SemSegMask,
@@ -31,26 +34,23 @@ from labelformat.utils import IMAGE_EXTENSIONS, get_image_dimensions
 class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
     _images_dir: Path
     _masks_dir: Path
-    _image_relpaths: list[str]
+    _images: list[Image]
     _categories: list[Category]
-    _class_id_to_name: dict[int, str]
-    _ignore_index: int | None
+    # TODO: Add optional ignore_index handling in the future.
 
     @classmethod
     def from_dirs(
         cls,
         images_dir: Path,
         masks_dir: Path,
-        class_id_to_name: Mapping[int | str, str],
-        ignore_index: int | None = 255,
+        class_id_to_name: Mapping[int, str],
     ) -> "PascalVOCSemanticSegmentationInput":
         """Create a PascalVOCSemanticSegmentationInput from directory pairs.
 
         Args:
             images_dir: Root directory containing images (nested structure allowed).
             masks_dir: Root directory containing PNG masks mirroring images structure.
-            class_id_to_name: Mapping of class_id -> class name. Keys may be str or int.
-            ignore_index: Optional value used in masks to indicate 'void' (default 255).
+            class_id_to_name: Mapping of class_id -> class name, with integer keys.
 
         Raises:
             ValueError: If directories are invalid, a mask is missing or not PNG,
@@ -61,20 +61,14 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
         if not masks_dir.is_dir():
             raise ValueError(f"Masks directory is not a directory: {masks_dir}")
 
-        # Normalize class id mapping (coerce keys to int)
-        norm_mapping: dict[int, str] = {}
-        for k, v in class_id_to_name.items():
-            norm_mapping[int(k)] = v
-
-        # Build categories excluding ignore_index
+        # Build categories from mapping (no ignore_index handling here)
         categories = [
-            Category(id=cid, name=norm_mapping[cid])
-            for cid in sorted(norm_mapping.keys())
-            if ignore_index is None or cid != ignore_index
+            Category(id=cid, name=cname) for cid, cname in class_id_to_name.items()
         ]
 
         # Collect images and ensure a PNG mask exists for each
-        image_relpaths: list[str] = []
+        images: list[Image] = []
+        image_id = 0
         for img_path in sorted(images_dir.rglob("*")):
             if not img_path.is_file():
                 continue
@@ -94,34 +88,37 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
                     + str(mask_path)
                 )
 
-            image_relpaths.append(rel_str)
+            # Read image dimensions once and store
+            width, height = get_image_dimensions(img_path)
+            images.append(
+                Image(id=image_id, filename=rel_str, width=width, height=height)
+            )
+            image_id += 1
 
         return cls(
             images_dir,
             masks_dir,
-            image_relpaths,
+            images,
             categories,
-            norm_mapping,
-            ignore_index,
         )
 
-    # --- Public API ---
     def get_categories(self) -> Iterable[Category]:
-        # Exclude ignore_index by construction
         return list(self._categories)
 
-    def get_images(self) -> list[str]:
-        return list(self._image_relpaths)
+    def get_images(self) -> Iterable[Image]:
+        yield from self._images
 
     def get_mask(self, image_filepath: str) -> SemSegMask:
         # Validate image exists in our index
-        if image_filepath not in self._image_relpaths:
+        image_obj = next(
+            (img for img in self._images if img.filename == image_filepath), None
+        )
+        if image_obj is None:
             raise ValueError(
                 f"Unknown image filepath (relative): {image_filepath}. "
                 "Use one returned by get_images()."
             )
 
-        image_path = self._images_dir / image_filepath
         mask_path = self._masks_dir / Path(image_filepath).with_suffix(".png")
 
         # 1) Enforce PNG mask
@@ -151,7 +148,7 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
             )
 
         # 3) Validate shape matches image dimensions
-        img_w, img_h = get_image_dimensions(image_path)
+        img_w, img_h = image_obj.width, image_obj.height
         mh, mw = int(mask_np.shape[0]), int(mask_np.shape[1])
         if (mw, mh) != (img_w, img_h):
             raise ValueError(
@@ -160,16 +157,13 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
                 + f"': mask (W,H)=({mw},{mh}) vs image (W,H)=({img_w},{img_h})"
             )
 
-        # 4) Validate values are within known class ids (or ignore_index)
+        # 4) Validate values are within known class ids
         uniques = np.unique(mask_np)
         # Convert to Python ints for set operations
         unique_values = {int(x) for x in uniques.tolist()}
-        valid_class_ids = set(self._class_id_to_name.keys())
-        if self._ignore_index is not None:
-            valid_or_ignore = valid_class_ids | {self._ignore_index}
-        else:
-            valid_or_ignore = valid_class_ids
-        unknown_values = unique_values.difference(valid_or_ignore)
+        valid_class_ids = {cat.id for cat in self._categories}
+        # TODO: support optional ignore_index in value validation.
+        unknown_values = unique_values.difference(valid_class_ids)
         if unknown_values:
             # Per requirement: raise an error for absent/extra class IDs
             raise ValueError(
@@ -177,6 +171,5 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
                 + ", ".join(map(str, sorted(unknown_values)))
             )
 
-        return SemSegMask(
-            array=mask_np.astype(np.int_), ignore_index=self._ignore_index
-        )
+        # TODO: Add ignore_index support to SemSegMask usage if desired.
+        return SemSegMask(array=mask_np.astype(np.int_))

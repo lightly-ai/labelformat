@@ -16,6 +16,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from labelformat.model.category import Category
+from labelformat.model.image import Image
 
 
 @dataclass(frozen=True)
@@ -56,8 +57,8 @@ class SemanticSegmentationInput(ABC):
         """
 
     @abstractmethod
-    def get_images(self) -> list[str]:
-        """Returns a list of image filepaths (relative to the dataset root)."""
+    def get_images(self) -> Iterable[Image]:
+        """Yields Image objects for the dataset images (relative filenames)."""
 
     @abstractmethod
     def get_mask(self, image_filepath: str) -> SemSegMask:
