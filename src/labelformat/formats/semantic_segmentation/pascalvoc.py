@@ -103,34 +103,40 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
         # Load and validate mask by shape and value set.
         with PILImage.open(mask_path) as mimg:
             mask_np: NDArray[np.int_] = np.asarray(mimg, dtype=np.int_)
-        self._validate_mask(image_obj=image_obj, mask_np=mask_np)
+        _validate_mask(
+            image_obj=image_obj,
+            mask_np=mask_np,
+            valid_class_ids={c.id for c in self._categories},
+        )
 
         return SemSegMask(array=mask_np)
 
-    def _validate_mask(self, image_obj: Image, mask_np: NDArray[np.int_]) -> None:
-        """Validate mask shape and value set.
 
-        - Ensures mask is 2D (single-channel).
-        - Ensures mask shape matches image dimensions.
-        - Ensures mask values are subset of known category IDs.
-        """
-        if mask_np.ndim != 2:
-            raise ValueError(
-                f"Mask must be 2D (H, W) for: {image_obj.filename}. Got shape {mask_np.shape}"
-            )
+def _validate_mask(
+    image_obj: Image, mask_np: NDArray[np.int_], valid_class_ids: set[int]
+) -> None:
+    """Validate mask shape and value set.
 
-        mh, mw = int(mask_np.shape[0]), int(mask_np.shape[1])
-        if (mw, mh) != (image_obj.width, image_obj.height):
-            raise ValueError(
-                f"Mask shape must match image dimensions for '{image_obj.filename}': "
-                f"mask (W,H)=({mw},{mh}) vs image (W,H)=({image_obj.width},{image_obj.height})"
-            )
+    - Ensures mask is 2D (single-channel).
+    - Ensures mask shape matches image dimensions.
+    - Ensures mask values are subset of known category IDs.
+    """
+    if mask_np.ndim != 2:
+        raise ValueError(
+            f"Mask must be 2D (H, W) for: {image_obj.filename}. Got shape {mask_np.shape}"
+        )
 
-        uniques = np.unique(mask_np)
-        unique_values = {int(x) for x in uniques.tolist()}
-        valid_class_ids = {cat.id for cat in self._categories}
-        unknown_values = unique_values.difference(valid_class_ids)
-        if unknown_values:
-            raise ValueError(
-                f"Mask contains unknown class ids: {', '.join(map(str, sorted(unknown_values)))}"
-            )
+    mh, mw = int(mask_np.shape[0]), int(mask_np.shape[1])
+    if (mw, mh) != (image_obj.width, image_obj.height):
+        raise ValueError(
+            f"Mask shape must match image dimensions for '{image_obj.filename}': "
+            f"mask (W,H)=({mw},{mh}) vs image (W,H)=({image_obj.width},{image_obj.height})"
+        )
+
+    uniques = np.unique(mask_np)
+    unique_values = {int(x) for x in uniques.tolist()}
+    unknown_values = unique_values.difference(valid_class_ids)
+    if unknown_values:
+        raise ValueError(
+            f"Mask contains unknown class ids: {', '.join(map(str, sorted(unknown_values)))}"
+        )
