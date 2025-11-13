@@ -13,6 +13,7 @@ https://docs.lightly.ai/train/stable/semantic_segmentation.html#data
 - Support using a template against the image filepath. https://docs.lightly.ai/train/stable/semantic_segmentation.html#using-a-template-against-the-image-filepath
 - Support using multi-channel masks. https://docs.lightly.ai/train/stable/semantic_segmentation.html#using-multi-channel-masks
 - Support optional ignore_classes: list[int] that should be ignored during training.
+- Support merging multiple labels into one class during training. https://docs.lightly.ai/train/stable/semantic_segmentation.html#specify-training-classes
 """
 
 from dataclasses import dataclass
