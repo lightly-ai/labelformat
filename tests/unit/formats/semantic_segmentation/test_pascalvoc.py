@@ -8,9 +8,9 @@ import numpy as np
 import pytest
 from PIL import Image as PILImage
 
+from labelformat.formats.semantic_segmentation import pascalvoc as pascalvoc_module
 from labelformat.formats.semantic_segmentation.pascalvoc import (
     PascalVOCSemanticSegmentationInput,
-    _validate_mask,
 )
 from labelformat.model.image import Image
 from tests.unit.test_utils import FIXTURES_DIR
@@ -96,7 +96,9 @@ def test__validate_mask__unknown_class_value_raises() -> None:
 
     # Act/Assert
     with pytest.raises(ValueError, match=r"Mask contains unknown class ids: 254"):
-        _validate_mask(image_obj=img, mask_np=mask, valid_class_ids=valid_ids)
+        pascalvoc_module._validate_mask(
+            image_obj=img, mask_np=mask, valid_class_ids=valid_ids
+        )
 
 
 def test__validate_mask__shape_mismatch_raises() -> None:
@@ -106,7 +108,9 @@ def test__validate_mask__shape_mismatch_raises() -> None:
     valid_ids = set(_load_class_mapping_int_keys().keys())
 
     with pytest.raises(ValueError, match=r"Mask shape must match image dimensions"):
-        _validate_mask(image_obj=img, mask_np=mask, valid_class_ids=valid_ids)
+        pascalvoc_module._validate_mask(
+            image_obj=img, mask_np=mask, valid_class_ids=valid_ids
+        )
 
 
 def test__validate_mask__non_2d_mask_raises() -> None:
@@ -116,4 +120,6 @@ def test__validate_mask__non_2d_mask_raises() -> None:
     valid_ids = set(_load_class_mapping_int_keys().keys())
 
     with pytest.raises(ValueError, match=r"Mask must be 2D \(H, W\)"):
-        _validate_mask(image_obj=img, mask_np=mask, valid_class_ids=valid_ids)
+        pascalvoc_module._validate_mask(
+            image_obj=img, mask_np=mask, valid_class_ids=valid_ids
+        )

@@ -6,31 +6,31 @@ Assumptions:
 - Masks live under a separate directory mirroring the images directory structure.
 - For each image at ``images_dir/<rel>.ext``, the mask is at ``masks_dir/<rel>.png``.
 - Masks are PNGs with pixel values equal to class IDs.
-
-TODO (Malte, 11/2025)
-Support what is already supported in LightlyTrain:
-https://docs.lightly.ai/train/stable/semantic_segmentation.html#data
-- Support using a template against the image filepath. https://docs.lightly.ai/train/stable/semantic_segmentation.html#using-a-template-against-the-image-filepath
-- Support using multi-channel masks. https://docs.lightly.ai/train/stable/semantic_segmentation.html#using-multi-channel-masks
-- Support optional ignore_classes: list[int] that should be ignored during training.
-- Support merging multiple labels into one class during training. https://docs.lightly.ai/train/stable/semantic_segmentation.html#specify-training-classes
 """
 
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Mapping
 
 import numpy as np
 from numpy.typing import NDArray
 from PIL import Image as PILImage
 
+from labelformat import utils
 from labelformat.model.category import Category
 from labelformat.model.image import Image
 from labelformat.model.semantic_segmentation import (
     SemanticSegmentationInput,
     SemSegMask,
 )
-from labelformat.utils import get_images_from_folder
+
+"""TODO(Malte, 11/2025):
+Support what is already supported in LightlyTrain. https://docs.lightly.ai/train/stable/semantic_segmentation.html#data
+Support using a template against the image filepath. https://docs.lightly.ai/train/stable/semantic_segmentation.html#using-a-template-against-the-image-filepath
+Support using multi-channel masks. https://docs.lightly.ai/train/stable/semantic_segmentation.html#using-multi-channel-masks
+Support optional ignore_classes: list[int] that should be ignored during training. https://docs.lightly.ai/train/stable/semantic_segmentation.html#specify-training-classes
+Support merging multiple labels into one class during training. https://docs.lightly.ai/train/stable/semantic_segmentation.html#specify-training-classes
+"""
 
 
 @dataclass
@@ -68,9 +68,9 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
             Category(id=cid, name=cname) for cid, cname in class_id_to_name.items()
         ]
 
-        # Collect images using helper and ensure a PNG mask exists for each
+        # Collect images using helper and ensure a PNG mask exists for each.
         images_by_filename: dict[str, Image] = {}
-        for img in get_images_from_folder(images_dir):
+        for img in utils.get_images_from_folder(images_dir):
             mask_path = masks_dir / Path(img.filename).with_suffix(".png")
             if not mask_path.is_file():
                 raise ValueError(
@@ -78,7 +78,12 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
                 )
             images_by_filename[img.filename] = img
 
-        return cls(images_dir, masks_dir, images_by_filename, categories)
+        return cls(
+            _images_dir=images_dir,
+            _masks_dir=masks_dir,
+            _filename_to_image=images_by_filename,
+            _categories=categories,
+        )
 
     def get_categories(self) -> Iterable[Category]:
         return list(self._categories)
@@ -115,11 +120,16 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
 def _validate_mask(
     image_obj: Image, mask_np: NDArray[np.int_], valid_class_ids: set[int]
 ) -> None:
-    """Validate mask shape and value set.
+    """Validate a semantic segmentation mask against an image and categories.
 
-    - Ensures mask is 2D (single-channel).
-    - Ensures mask shape matches image dimensions.
-    - Ensures mask values are subset of known category IDs.
+    Args:
+        image_obj: The image metadata with filename, width, and height used for shape validation.
+        mask_np: The mask as a 2D numpy array with integer class IDs.
+        valid_class_ids: The set of allowed class IDs that may appear in the mask.
+
+    Raises:
+        ValueError: If the mask is not 2D, does not match the image size, or contains
+            class IDs not present in `valid_class_ids`.
     """
     if mask_np.ndim != 2:
         raise ValueError(

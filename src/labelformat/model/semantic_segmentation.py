@@ -9,8 +9,8 @@ Design goals:
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 import numpy as np
 from numpy.typing import NDArray
@@ -21,17 +21,17 @@ from labelformat.model.image import Image
 
 @dataclass(frozen=True)
 class SemSegMask:
-    """A semantic segmentation mask.
+    """Semantic segmentation mask with integer class IDs.
 
-    Internally represented as a 2D numpy array of integer class IDs with shape (H, W).
-    The optional ``ignore_index`` indicates a label value that should be treated as
-    "void" and excluded from categories/training, but allowed to appear in the mask.
+    The mask is stored as a 2D numpy array of integer class IDs with shape (H, W).
+
+    Args:
+        array: The 2D numpy array with integer class IDs of shape (H, W).
     """
 
     array: NDArray[np.int_]
-    ignore_index: int | None = None
 
-    def __post_init__(self) -> None:  # pragma: no cover - simple validation
+    def __post_init__(self) -> None:
         if not isinstance(self.array, np.ndarray):
             raise TypeError("SemSegMask.array must be a numpy ndarray.")
         if self.array.ndim != 2:
@@ -41,28 +41,18 @@ class SemSegMask:
 
 
 class SemanticSegmentationInput(ABC):
-    """Abstract interface for semantic segmentation datasets.
-
-    Notes:
-    - No CLI interface is provided yet. TODO: add CLI integration if needed later.
-    - ``get_images`` returns relative filepaths as strings.
-    - ``get_mask`` returns a SemSegMask with class-id values per pixel.
-    """
 
     @abstractmethod
     def get_categories(self) -> Iterable[Category]:
-        """Returns the list of trainable categories.
-
-        Implementations should typically exclude ``ignore_index`` from categories.
-        """
+        raise NotImplementedError()
 
     @abstractmethod
     def get_images(self) -> Iterable[Image]:
-        """Yields Image objects for the dataset images (relative filenames)."""
+        raise NotImplementedError()
 
     @abstractmethod
     def get_mask(self, image_filepath: str) -> SemSegMask:
-        """Returns the semantic mask for a given image filepath (relative)."""
+        raise NotImplementedError()
 
 
 # Intentionally no Output class here. The consumer can convert and save as needed.
