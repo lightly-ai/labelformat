@@ -95,12 +95,6 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
             )
 
         mask_path = self._masks_dir / Path(image_filepath).with_suffix(".png")
-
-        # Enforce PNG mask.
-        if mask_path.suffix.lower() != ".png":
-            raise ValueError(
-                f"Mask must be a PNG file for image '{image_filepath}', got: {mask_path.name}"
-            )
         if not mask_path.is_file():
             raise ValueError(
                 f"Mask PNG not found for image '{image_filepath}': {mask_path}"
@@ -114,7 +108,7 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
         return SemSegMask(array=mask_np)
 
     def _validate_mask(self, image_obj: Image, mask_np: NDArray[np.int_]) -> None:
-        """Validate mask shape and value set; return int-casted mask.
+        """Validate mask shape and value set.
 
         - Ensures mask is 2D (single-channel).
         - Ensures mask shape matches image dimensions.
