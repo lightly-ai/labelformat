@@ -2,16 +2,17 @@ from __future__ import annotations
 
 """Pascal VOC semantic segmentation input.
 
-Assumptions for this initial version:
+Assumptions:
 - Masks live under a separate directory mirroring the images directory structure.
 - For each image at ``images_dir/<rel>.ext``, the mask is at ``masks_dir/<rel>.png``.
-- Masks are single-channel PNGs (mode 'L' or 'P') with pixel values equal to class IDs.
+- Masks are PNGs with pixel values equal to class IDs.
 
-TODOs for future extensions (intentionally not implemented yet):
-- Support non-PNG masks and custom pairing strategies (e.g., ``*_mask.png``).
-- Support palettized/RGB masks with arbitrary pixel_value -> class_id mappings.
-- Support an optional ignore_index to allow a void label and optionally exclude it
-  from categories.
+TODO (Malte, 11/2025)
+Support what is already supported in LightlyTrain:
+https://docs.lightly.ai/train/stable/semantic_segmentation.html#data
+- Support using a template against the image filepath. https://docs.lightly.ai/train/stable/semantic_segmentation.html#using-a-template-against-the-image-filepath
+- Support using multi-channel masks. https://docs.lightly.ai/train/stable/semantic_segmentation.html#using-multi-channel-masks
+- Support optional ignore_classes: list[int] that should be ignored during training.
 """
 
 from dataclasses import dataclass
@@ -19,6 +20,7 @@ from pathlib import Path
 from typing import Iterable, Mapping
 
 import numpy as np
+from numpy.typing import NDArray
 from PIL import Image as PILImage
 
 from labelformat.model.category import Category
@@ -27,16 +29,15 @@ from labelformat.model.semantic_segmentation import (
     SemanticSegmentationInput,
     SemSegMask,
 )
-from labelformat.utils import IMAGE_EXTENSIONS, get_image_dimensions
+from labelformat.utils import get_images_from_folder
 
 
 @dataclass
 class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
     _images_dir: Path
     _masks_dir: Path
-    _images: list[Image]
+    _filename_to_image: dict[str, Image]
     _categories: list[Category]
-    # TODO: Add optional ignore_index handling in the future.
 
     @classmethod
     def from_dirs(
@@ -66,62 +67,35 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
             Category(id=cid, name=cname) for cid, cname in class_id_to_name.items()
         ]
 
-        # Collect images and ensure a PNG mask exists for each
-        images: list[Image] = []
-        image_id = 0
-        for img_path in sorted(images_dir.rglob("*")):
-            if not img_path.is_file():
-                continue
-            if img_path.suffix.lower() not in IMAGE_EXTENSIONS:
-                continue
-            rel = img_path.relative_to(images_dir)
-            rel_str = str(rel)
-
-            # Mask must be a PNG alongside the mirrored relative path
-            mask_rel = rel.with_suffix(".png")
-            mask_path = masks_dir / mask_rel
+        # Collect images using helper and ensure a PNG mask exists for each
+        images_by_filename: dict[str, Image] = {}
+        for img in get_images_from_folder(images_dir):
+            mask_path = masks_dir / Path(img.filename).with_suffix(".png")
             if not mask_path.is_file():
                 raise ValueError(
-                    "Missing mask PNG for image '"
-                    + rel_str
-                    + "' at path: "
-                    + str(mask_path)
+                    f"Missing mask PNG for image '{img.filename}' at path: {mask_path}"
                 )
+            images_by_filename[img.filename] = img
 
-            # Read image dimensions once and store
-            width, height = get_image_dimensions(img_path)
-            images.append(
-                Image(id=image_id, filename=rel_str, width=width, height=height)
-            )
-            image_id += 1
-
-        return cls(
-            images_dir,
-            masks_dir,
-            images,
-            categories,
-        )
+        return cls(images_dir, masks_dir, images_by_filename, categories)
 
     def get_categories(self) -> Iterable[Category]:
         return list(self._categories)
 
     def get_images(self) -> Iterable[Image]:
-        yield from self._images
+        yield from self._filename_to_image.values()
 
     def get_mask(self, image_filepath: str) -> SemSegMask:
-        # Validate image exists in our index
-        image_obj = next(
-            (img for img in self._images if img.filename == image_filepath), None
-        )
+        # Validate image exists in our index.
+        image_obj = self._filename_to_image.get(image_filepath)
         if image_obj is None:
             raise ValueError(
-                f"Unknown image filepath (relative): {image_filepath}. "
-                "Use one returned by get_images()."
+                f"Unknown image filepath (relative): {image_filepath}. Use one returned by get_images()."
             )
 
         mask_path = self._masks_dir / Path(image_filepath).with_suffix(".png")
 
-        # 1) Enforce PNG mask
+        # Enforce PNG mask.
         if mask_path.suffix.lower() != ".png":
             raise ValueError(
                 f"Mask must be a PNG file for image '{image_filepath}', got: {mask_path.name}"
@@ -131,45 +105,37 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
                 f"Mask PNG not found for image '{image_filepath}': {mask_path}"
             )
 
-        # 2) Enforce single-channel (accept 'L' or 'P')
+        # Load and validate mask by shape and value set.
         with PILImage.open(mask_path) as mimg:
-            mode = mimg.mode
-            if mode not in {"L", "P"}:
-                raise ValueError(
-                    "Mask must be single-channel ('L' or 'P'), "
-                    f"but got mode '{mode}' for: {mask_path}. "
-                    "TODO: support additional modes."
-                )
-            mask_np = np.asarray(mimg)
+            mask_np: NDArray[np.int_] = np.asarray(mimg, dtype=np.int_)
+        self._validate_mask(image_obj=image_obj, mask_np=mask_np)
 
+        return SemSegMask(array=mask_np)
+
+    def _validate_mask(self, image_obj: Image, mask_np: NDArray[np.int_]) -> None:
+        """Validate mask shape and value set; return int-casted mask.
+
+        - Ensures mask is 2D (single-channel).
+        - Ensures mask shape matches image dimensions.
+        - Ensures mask values are subset of known category IDs.
+        """
         if mask_np.ndim != 2:
             raise ValueError(
-                f"Mask must be 2D (H, W) for: {mask_path}. Got shape {mask_np.shape}"
+                f"Mask must be 2D (H, W) for: {image_obj.filename}. Got shape {mask_np.shape}"
             )
 
-        # 3) Validate shape matches image dimensions
-        img_w, img_h = image_obj.width, image_obj.height
         mh, mw = int(mask_np.shape[0]), int(mask_np.shape[1])
-        if (mw, mh) != (img_w, img_h):
+        if (mw, mh) != (image_obj.width, image_obj.height):
             raise ValueError(
-                "Mask shape must match image dimensions for '"
-                + image_filepath
-                + f"': mask (W,H)=({mw},{mh}) vs image (W,H)=({img_w},{img_h})"
+                f"Mask shape must match image dimensions for '{image_obj.filename}': "
+                f"mask (W,H)=({mw},{mh}) vs image (W,H)=({image_obj.width},{image_obj.height})"
             )
 
-        # 4) Validate values are within known class ids
         uniques = np.unique(mask_np)
-        # Convert to Python ints for set operations
         unique_values = {int(x) for x in uniques.tolist()}
         valid_class_ids = {cat.id for cat in self._categories}
-        # TODO: support optional ignore_index in value validation.
         unknown_values = unique_values.difference(valid_class_ids)
         if unknown_values:
-            # Per requirement: raise an error for absent/extra class IDs
             raise ValueError(
-                "Mask contains unknown class ids: "
-                + ", ".join(map(str, sorted(unknown_values)))
+                f"Mask contains unknown class ids: {', '.join(map(str, sorted(unknown_values)))}"
             )
-
-        # TODO: Add ignore_index support to SemSegMask usage if desired.
-        return SemSegMask(array=mask_np.astype(np.int_))
