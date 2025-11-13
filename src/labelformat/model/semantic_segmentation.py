@@ -19,7 +19,7 @@ from labelformat.model.category import Category
 from labelformat.model.image import Image
 
 
-@dataclass(frozen=True)
+@dataclass
 class SemSegMask:
     """Semantic segmentation mask with integer class IDs.
 
@@ -32,12 +32,8 @@ class SemSegMask:
     array: NDArray[np.int_]
 
     def __post_init__(self) -> None:
-        if not isinstance(self.array, np.ndarray):
-            raise TypeError("SemSegMask.array must be a numpy ndarray.")
         if self.array.ndim != 2:
             raise ValueError("SemSegMask.array must be 2D with shape (H, W).")
-        if not np.issubdtype(self.array.dtype, np.integer):
-            raise TypeError("SemSegMask.array must have an integer dtype.")
 
 
 class SemanticSegmentationInput(ABC):
@@ -53,6 +49,3 @@ class SemanticSegmentationInput(ABC):
     @abstractmethod
     def get_mask(self, image_filepath: str) -> SemSegMask:
         raise NotImplementedError()
-
-
-# Intentionally no Output class here. The consumer can convert and save as needed.
