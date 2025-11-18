@@ -43,7 +43,7 @@ class TestPascalVOCSemanticSegmentationInput:
         imgs = list(ds.get_images())
         assert len(imgs) == 2
         filenames = {img.filename for img in imgs}
-        assert filenames == {"2007_000032.jpg", "2007_000033.jpg"}
+        assert filenames == {"2007_000032.jpg", "subdir/2007_000033.jpg"}
 
     def test_get_mask__returns_int2d_and_matches_image_shape(self) -> None:
         mapping = _load_class_mapping_int_keys()
@@ -66,7 +66,7 @@ class TestPascalVOCSemanticSegmentationInput:
         )
 
         with pytest.raises(
-            ValueError, match=r"Missing mask PNG for image '2007_000033\.jpg'"
+            ValueError, match=r"Missing mask PNG for image 'subdir/2007_000033\.jpg'"
         ):
             PascalVOCSemanticSegmentationInput.from_dirs(
                 images_dir=IMAGES_DIR,
@@ -82,7 +82,7 @@ class TestPascalVOCSemanticSegmentationInput:
         )
         with pytest.raises(
             ValueError,
-            match=r"Unknown image filepath \(relative\): does_not_exist\.jpg",
+            match=r"Unknown image filepath does_not_exist\.jpg",
         ):
             ds.get_mask("does_not_exist.jpg")
 
