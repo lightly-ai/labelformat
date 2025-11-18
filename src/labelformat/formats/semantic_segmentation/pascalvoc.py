@@ -21,7 +21,7 @@ from labelformat.model.category import Category
 from labelformat.model.image import Image
 from labelformat.model.semantic_segmentation import (
     SemanticSegmentationInput,
-    SemSegMask,
+    SemanticSegmentationMask,
 )
 
 """TODO(Malte, 11/2025):
@@ -91,7 +91,7 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
     def get_images(self) -> Iterable[Image]:
         yield from self._filename_to_image.values()
 
-    def get_mask(self, image_filepath: str) -> SemSegMask:
+    def get_mask(self, image_filepath: str) -> SemanticSegmentationMask:
         # Validate image exists in our index.
         image_obj = self._filename_to_image.get(image_filepath)
         if image_obj is None:
@@ -114,7 +114,7 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
             valid_class_ids={c.id for c in self._categories},
         )
 
-        return SemSegMask(array=mask_np)
+        return SemanticSegmentationMask(array=mask_np)
 
 
 def _validate_mask(
@@ -143,8 +143,8 @@ def _validate_mask(
             f"mask (W,H)=({mw},{mh}) vs image (W,H)=({image_obj.width},{image_obj.height})"
         )
 
-    uniques = np.unique(mask_np)
-    unique_values = {int(x) for x in uniques.tolist()}
+    uniques = np.unique(mask_np.astype(int))
+    unique_values = set(uniques)
     unknown_values = unique_values.difference(valid_class_ids)
     if unknown_values:
         raise ValueError(

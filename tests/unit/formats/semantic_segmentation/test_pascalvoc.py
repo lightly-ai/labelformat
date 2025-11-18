@@ -52,10 +52,10 @@ class TestPascalVOCSemanticSegmentationInput:
         )
 
         for img in ds.get_images():
-            m = ds.get_mask(img.filename)
-            assert m.array.ndim == 2
-            assert np.issubdtype(m.array.dtype, np.integer)
-            assert m.array.shape == (img.height, img.width)
+            mask = ds.get_mask(img.filename)
+            assert mask.array.ndim == 2
+            assert np.issubdtype(mask.array.dtype, np.integer)
+            assert mask.array.shape == (img.height, img.width)
 
     def test_from_dirs__missing_mask_raises(self, tmp_path: Path) -> None:
         masks_tmp = tmp_path / "SegmentationClass"

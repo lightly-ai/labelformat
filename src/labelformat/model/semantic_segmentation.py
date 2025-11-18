@@ -1,11 +1,6 @@
 from __future__ import annotations
 
 """Semantic segmentation core types and input interface.
-
-Design goals:
-- Keep the API minimal and numpy-first (no RLE here).
-- Avoid CLI wiring for now (TODO: add CLI integration later if needed).
-- Mirror patterns from existing model modules while focusing on semseg specifics.
 """
 
 from abc import ABC, abstractmethod
@@ -20,7 +15,7 @@ from labelformat.model.image import Image
 
 
 @dataclass
-class SemSegMask:
+class SemanticSegmentationMask:
     """Semantic segmentation mask with integer class IDs.
 
     The mask is stored as a 2D numpy array of integer class IDs with shape (H, W).
@@ -38,6 +33,8 @@ class SemSegMask:
 
 class SemanticSegmentationInput(ABC):
 
+    # TODO(Malte, 11/2025): Add a CLI interface later if needed.
+
     @abstractmethod
     def get_categories(self) -> Iterable[Category]:
         raise NotImplementedError()
@@ -47,5 +44,5 @@ class SemanticSegmentationInput(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_mask(self, image_filepath: str) -> SemSegMask:
+    def get_mask(self, image_filepath: str) -> SemanticSegmentationMask:
         raise NotImplementedError()
