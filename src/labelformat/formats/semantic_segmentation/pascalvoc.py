@@ -63,7 +63,7 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
         if not masks_dir.is_dir():
             raise ValueError(f"Masks directory is not a directory: {masks_dir}")
 
-        # Build categories from mapping (no ignore_index handling here)
+        # Build categories from mapping
         categories = [
             Category(id=cid, name=cname) for cid, cname in class_id_to_name.items()
         ]
@@ -96,7 +96,7 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
         image_obj = self._filename_to_image.get(image_filepath)
         if image_obj is None:
             raise ValueError(
-                f"Unknown image filepath (relative): {image_filepath}. Use one returned by get_images()."
+                f"Unknown image filepath {image_filepath}. Use one returned by get_images()."
             )
 
         mask_path = self._masks_dir / Path(image_filepath).with_suffix(".png")
