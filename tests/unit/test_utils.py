@@ -14,16 +14,6 @@ from labelformat.utils import (
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 
 
-def create_test_jpeg(
-    path: Path,
-    size: Tuple[int, int],
-    progressive: bool = False,
-    optimize: bool = False,
-) -> None:
-    img = PIL.Image.new("RGB", size, color="red")
-    img.save(path, "JPEG", progressive=progressive, optimize=optimize)
-
-
 def test_get_jpeg_dimensions() -> None:
     image_path = FIXTURES_DIR / "instance_segmentation/YOLOv8/images/000000109005.jpg"
     width, height = get_jpeg_dimensions(image_path)
@@ -32,8 +22,9 @@ def test_get_jpeg_dimensions() -> None:
 
 
 def test_get_jpeg_dimensions__baseline(tmp_path: Path) -> None:
+    # Tests SOF0 (0xC0) - Baseline DCT.
     jpeg_path = tmp_path / "baseline.jpg"
-    create_test_jpeg(path=jpeg_path, size=(800, 600))
+    _create_test_jpeg(path=jpeg_path, size=(800, 600))
 
     width, height = get_jpeg_dimensions(jpeg_path)
     assert width == 800
@@ -41,8 +32,9 @@ def test_get_jpeg_dimensions__baseline(tmp_path: Path) -> None:
 
 
 def test_get_jpeg_dimensions__progressive(tmp_path: Path) -> None:
+    # Tests SOF2 (0xC2) - Progressive DCT with DHT markers before SOF.
     jpeg_path = tmp_path / "progressive.jpg"
-    create_test_jpeg(path=jpeg_path, size=(1920, 1440), progressive=True)
+    _create_test_jpeg(path=jpeg_path, size=(1920, 1440), progressive=True)
 
     width, height = get_jpeg_dimensions(jpeg_path)
     assert width == 1920
@@ -50,8 +42,9 @@ def test_get_jpeg_dimensions__progressive(tmp_path: Path) -> None:
 
 
 def test_get_jpeg_dimensions__optimized(tmp_path: Path) -> None:
+    # Tests SOF0 (0xC0) with custom Huffman tables (more DHT markers before SOF).
     jpeg_path = tmp_path / "optimized.jpg"
-    create_test_jpeg(path=jpeg_path, size=(1024, 768), optimize=True)
+    _create_test_jpeg(path=jpeg_path, size=(1024, 768), optimize=True)
 
     width, height = get_jpeg_dimensions(jpeg_path)
     assert width == 1024
@@ -59,8 +52,11 @@ def test_get_jpeg_dimensions__optimized(tmp_path: Path) -> None:
 
 
 def test_get_jpeg_dimensions__progressive_optimized(tmp_path: Path) -> None:
+    # Tests SOF2 (0xC2) with custom Huffman tables.
     jpeg_path = tmp_path / "progressive_optimized.jpg"
-    create_test_jpeg(path=jpeg_path, size=(2048, 1536), progressive=True, optimize=True)
+    _create_test_jpeg(
+        path=jpeg_path, size=(2048, 1536), progressive=True, optimize=True
+    )
 
     width, height = get_jpeg_dimensions(jpeg_path)
     assert width == 2048
@@ -121,3 +117,13 @@ def test_get_image_dimensions__unsupported_format() -> None:
     yaml_file = FIXTURES_DIR / "object_detection/YOLOv8/example.yaml"
     with pytest.raises(Exception):
         get_image_dimensions(yaml_file)
+
+
+def _create_test_jpeg(
+    path: Path,
+    size: Tuple[int, int],
+    progressive: bool = False,
+    optimize: bool = False,
+) -> None:
+    img = PIL.Image.new("RGB", size, color="red")
+    img.save(path, "JPEG", progressive=progressive, optimize=optimize)

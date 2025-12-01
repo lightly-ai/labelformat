@@ -20,6 +20,25 @@ IMAGE_EXTENSIONS = {
     ".webp",
 }
 
+# JPEG SOF (Start of Frame) markers that contain image dimensions.
+# Excludes 0xC4 (DHT - Define Huffman Table) and 0xC8 (JPG reserved).
+# List from https://www.disktuna.com/list-of-jpeg-markers/
+JPEG_SOF_MARKERS = {
+    0xC0,  # SOF0 - Baseline DCT
+    0xC1,  # SOF1 - Extended Sequential DCT
+    0xC2,  # SOF2 - Progressive DCT
+    0xC3,  # SOF3 - Lossless (sequential)
+    0xC5,  # SOF5 - Differential sequential DCT
+    0xC6,  # SOF6 - Differential progressive DCT
+    0xC7,  # SOF7 - Differential lossless (sequential)
+    0xC9,  # SOF9 - Extended sequential DCT, Arithmetic coding
+    0xCA,  # SOF10 - Progressive DCT, Arithmetic coding
+    0xCB,  # SOF11 - Lossless (sequential), Arithmetic coding
+    0xCD,  # SOF13 - Differential sequential DCT, Arithmetic coding
+    0xCE,  # SOF14 - Differential progressive DCT, Arithmetic coding
+    0xCF,  # SOF15 - Differential lossless (sequential), Arithmetic coding
+}
+
 
 class ImageDimensionError(Exception):
     """Raised when unable to extract image dimensions using fast methods."""
@@ -50,23 +69,6 @@ def get_jpeg_dimensions(file_path: Path) -> Tuple[int, int]:
     Raises:
         ImageDimensionError: If dimensions cannot be extracted from headers
     """
-    # Most important SOF markers that contain image dimensions.
-    # List from https://www.disktuna.com/list-of-jpeg-markers/
-    sof_markers = {
-        0xC0,  # SOF0 - Baseline DCT
-        0xC1,  # SOF1 - Extended Sequential DCT
-        0xC2,  # SOF2 - Progressive DCT
-        0xC3,  # SOF3 - Lossless (sequential)
-        0xC5,  # SOF5 - Differential sequential DCT
-        0xC6,  # SOF6 - Differential progressive DCT
-        0xC7,  # SOF7 - Differential lossless (sequential)
-        0xC9,  # SOF9 - Extended sequential DCT, Arithmetic coding
-        0xCA,  # SOF10 - Progressive DCT, Arithmetic coding
-        0xCB,  # SOF11 - Lossless (sequential), Arithmetic coding
-        0xCD,  # SOF13 - Differential sequential DCT, Arithmetic coding
-        0xCE,  # SOF14 - Differential progressive DCT, Arithmetic coding
-        0xCF,  # SOF15 - Differential lossless (sequential), Arithmetic coding
-    }
     try:
         with open(file_path, "rb") as img_file:
             # Skip SOI marker
@@ -76,7 +78,7 @@ def get_jpeg_dimensions(file_path: Path) -> Tuple[int, int]:
                 if len(marker) < 2:
                     raise ImageDimensionError("Invalid JPEG format")
                 # Find SOFn marker
-                if marker[0] == 0xFF and marker[1] in sof_markers:
+                if marker[0] == 0xFF and marker[1] in JPEG_SOF_MARKERS:
                     # Skip marker length
                     img_file.seek(3, 1)
                     h = int.from_bytes(img_file.read(2), "big")
