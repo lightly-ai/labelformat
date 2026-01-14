@@ -32,7 +32,7 @@ class VideoObjectDetectionTrack:
         number_of_frames = self.video.number_of_frames
 
         for obj in self.objects:
-            if len(object.boxes) != number_of_frames:
+            if len(obj.boxes) != number_of_frames:
                 raise ValueError(
                     "Length of object detection track does not match the number of frames in the video."
                 )
