@@ -12,7 +12,7 @@ from labelformat.model.video import Video
 
 
 class TestVideoObjectDetectionTrack:
-    def test_frames_equal_boxes_length__valid(self) -> None:
+    def test_post_init__frames_equal_boxes_length__valid(self) -> None:
         track_a = SingleObjectDetectionTrack(
             category=Category(id=0, name="cat"),
             boxes=[BoundingBox(xmin=0, ymin=0, xmax=1, ymax=1) for _ in range(2)],
@@ -32,7 +32,7 @@ class TestVideoObjectDetectionTrack:
         assert len(detections.objects) == 2
         assert len(detections.objects[0].boxes) == 2
 
-    def test_frames_equal_boxes_length___invalid(self) -> None:
+    def test_post_init__frames_equal_boxes_length___invalid(self) -> None:
         track_a = SingleObjectDetectionTrack(
             category=Category(id=0, name="cat"),
             boxes=[BoundingBox(xmin=0, ymin=0, xmax=1, ymax=1) for _ in range(2)],
