@@ -21,10 +21,8 @@ class SingleObjectDetectionTrack:
 class VideoObjectDetectionTrack:
     """
     The base class for a video alongside with its object detection track annotations.
-    A a video contains of N frames and of M objects. Each object contains N boxes.
-    The number of frames and the number of annotations for each object must match
-    --> one annotation per frame.
-    If a object is not present on a frame, the corresponding entry has to be None.
+    A video consists of N frames and M objects. Each object is defined by N boxes - one for each frame.
+    If an object is not present on a frame, the corresponding entry is set to None.
     """
 
     video: Video
@@ -33,7 +31,7 @@ class VideoObjectDetectionTrack:
     def __post_init__(self) -> None:
         number_of_frames = self.video.number_of_frames
 
-        for object in self.objects:
+        for obj in self.objects:
             if len(object.boxes) != number_of_frames:
                 raise ValueError(
                     "Length of object detection track does not match the number of frames in the video."
