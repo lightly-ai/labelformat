@@ -45,7 +45,7 @@ class TestPascalVOCSemanticSegmentationInput:
         filenames = {img.filename for img in imgs}
         assert filenames == {"2007_000032.jpg", "subdir/2007_000033.jpg"}
 
-    def test_get_mask__returns_int2d_and_matches_image_shape(self) -> None:
+    def test_get_mask__returns_rle_and_matches_image_length(self) -> None:
         mapping = _load_class_mapping_int_keys()
         ds = PascalVOCSemanticSegmentationInput.from_dirs(
             images_dir=IMAGES_DIR, masks_dir=MASKS_DIR, class_id_to_name=mapping
@@ -53,9 +53,8 @@ class TestPascalVOCSemanticSegmentationInput:
 
         for img in ds.get_images():
             mask = ds.get_mask(img.filename)
-            assert mask.array.ndim == 2
-            assert np.issubdtype(mask.array.dtype, np.integer)
-            assert mask.array.shape == (img.height, img.width)
+            length = sum(run_length for _, run_length in mask.category_id_rle)
+            assert length == img.width * img.height
 
     def test_from_dirs__missing_mask_raises(self, tmp_path: Path) -> None:
         masks_tmp = tmp_path / "SegmentationClass"

@@ -114,7 +114,7 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
             valid_class_ids={c.id for c in self._categories},
         )
 
-        return SemanticSegmentationMask(array=mask_np)
+        return SemanticSegmentationMask.from_array(array=mask_np)
 
 
 def _validate_mask(
