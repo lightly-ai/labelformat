@@ -25,9 +25,7 @@ from labelformat.model.instance_segmentation import (
     InstanceSegmentationInput,
     SingleInstanceSegmentation,
 )
-from labelformat.model.semantic_segmentation import (
-    SemanticSegmentationMask,
-)
+from labelformat.model.semantic_segmentation import SemanticSegmentationMask
 
 """TODO(Malte, 11/2025):
 Support what is already supported in LightlyTrain. https://docs.lightly.ai/train/stable/semantic_segmentation.html#data
