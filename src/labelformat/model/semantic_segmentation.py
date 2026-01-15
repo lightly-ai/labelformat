@@ -1,22 +1,14 @@
 from __future__ import annotations
 
-from typing import List, Optional, Tuple
-
 from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
-from labelformat.model.instance_segmentation import SingleInstanceSegmentation
 
 """Semantic segmentation core types and input interface.
 """
 
-from abc import ABC, abstractmethod
-from collections.abc import Iterable
 from dataclasses import dataclass
 
 import numpy as np
 from numpy.typing import NDArray
-
-from labelformat.model.category import Category
-from labelformat.model.image import Image
 
 
 @dataclass
@@ -29,7 +21,7 @@ class SemanticSegmentationMask:
         array: The 2D numpy array with integer class IDs of shape (H, W).
     """
 
-    category_id_rle: List[Tuple[int, int]]
+    category_id_rle: list[tuple[int, int]]
     """The mask as a run-length encoding (RLE) list of (category_id, run_length) tuples."""
     width: int
     height: int
@@ -40,9 +32,9 @@ class SemanticSegmentationMask:
         if array.ndim != 2:
             raise ValueError("SemSegMask.array must be 2D with shape (H, W).")
 
-        category_id_rle: List[Tuple[int, int]] = []
+        category_id_rle: list[tuple[int, int]] = []
 
-        cur_cat_id: Optional[int] = None
+        cur_cat_id: int | None = None
         cur_run_length = 0
         for cat_id in array.flatten():
             if cat_id == cur_cat_id:
@@ -81,19 +73,6 @@ class SemanticSegmentationMask:
             height=self.height,
         )
 
-
-class SemanticSegmentationInput(ABC):
-
-    # TODO(Malte, 11/2025): Add a CLI interface later if needed.
-
-    @abstractmethod
-    def get_categories(self) -> Iterable[Category]:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def get_images(self) -> Iterable[Image]:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def get_mask(self, image_filepath: str) -> SemanticSegmentationMask:
-        raise NotImplementedError()
+    def category_ids(self) -> set[int]:
+        """Get the set of category IDs present in the mask."""
+        return {cat_id for cat_id, _ in self.category_id_rle}

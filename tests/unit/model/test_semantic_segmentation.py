@@ -57,3 +57,15 @@ class TestSemanticSegmentationMask:
             [0, 0, 0, 0],
             [0, 0, 0, 0],
         ]
+
+    def test_category_ids(self) -> None:
+        mask = SemanticSegmentationMask.from_array(
+            array=np.array(
+                [
+                    [1, 1, 4],
+                    [4, 1, 1],
+                ],
+                dtype=np.int_,
+            )
+        )
+        assert mask.category_ids() == {1, 4}
