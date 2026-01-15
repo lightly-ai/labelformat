@@ -83,11 +83,11 @@ def _get_object_track_boxes(
     for bbox in ann["bboxes"]:
         if bbox is None or len(bbox) == 0:
             boxes.append(None)
-            continue
-        boxes.append(
-            BoundingBox.from_format(
-                bbox=[float(x) for x in bbox],
-                format=BoundingBoxFormat.XYWH,
+        else:
+            boxes.append(
+                BoundingBox.from_format(
+                    bbox=[float(x) for x in bbox],
+                    format=BoundingBoxFormat.XYWH,
+                )
             )
-        )
     return boxes

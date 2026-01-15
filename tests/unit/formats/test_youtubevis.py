@@ -13,13 +13,13 @@ from labelformat.model.video import Video
 
 class TestYouTubeVISObjectDetectionTrackInput:
     def test_get_categories(self, tmp_path: Path) -> None:
-        input_file = _write_youtube_vis_json(tmp_path)
+        input_file = _write_youtube_vis_json(tmp_path / "instances.json")
         label_input = YouTubeVISObjectDetectionTrackInput(input_file=input_file)
 
         assert list(label_input.get_categories()) == [Category(id=1, name="cat")]
 
     def test_get_videos(self, tmp_path: Path) -> None:
-        input_file = _write_youtube_vis_json(tmp_path)
+        input_file = _write_youtube_vis_json(tmp_path / "instances.json")
         label_input = YouTubeVISObjectDetectionTrackInput(input_file=input_file)
 
         assert list(label_input.get_videos()) == [
@@ -33,7 +33,7 @@ class TestYouTubeVISObjectDetectionTrackInput:
         ]
 
     def test_get_labels(self, tmp_path: Path) -> None:
-        input_file = _write_youtube_vis_json(tmp_path)
+        input_file = _write_youtube_vis_json(tmp_path / "instances.json")
         label_input = YouTubeVISObjectDetectionTrackInput(input_file=input_file)
 
         assert list(label_input.get_labels()) == [
@@ -62,7 +62,7 @@ class TestYouTubeVISObjectDetectionTrackInput:
             )
         ]
 
-def _write_youtube_vis_json(tmp_path: Path) -> Path:
+def _write_youtube_vis_json(input_file: Path) -> Path:
     data = {
         "categories": [
             {"id": 1, "name": "cat"},
@@ -87,6 +87,5 @@ def _write_youtube_vis_json(tmp_path: Path) -> Path:
             }
         ],
     }
-    input_file = tmp_path / "instances.json"
     input_file.write_text(json.dumps(data))
     return input_file
