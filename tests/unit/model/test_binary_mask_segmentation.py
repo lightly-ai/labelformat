@@ -65,6 +65,15 @@ class TestBinaryMaskSegmentation:
         )
         assert np.array_equal(binary_mask_segmentation.get_binary_mask(), expected)
 
+    def test_get_rle(self) -> None:
+        binary_mask_segmentation = BinaryMaskSegmentation.from_rle(
+            rle_row_wise=[1, 2, 3],
+            width=3,
+            height=2,
+            bounding_box=None,
+        )
+        assert binary_mask_segmentation.get_rle() == [1, 2, 3]
+
 
 class TestRLEDecoderEncoder:
     def test_encode_row_wise_rle(self) -> None:

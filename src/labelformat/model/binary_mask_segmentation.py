@@ -72,6 +72,15 @@ class BinaryMaskSegmentation:
             self._rle_row_wise, self.height, self.width
         )
 
+    def get_rle(self) -> list[int]:
+        """
+        Get the run-length encoding (RLE) of the binary mask in row-wise format.
+
+        The first element corresponds to the number of 0s at the start of the mask.
+        If the mask starts with a 1, the first element will be 0. No other zeros can appear.
+        """
+        return self._rle_row_wise
+
 
 class RLEDecoderEncoder:
     """
