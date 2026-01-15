@@ -139,6 +139,11 @@ class RLEDecoderEncoder:
 def _compute_bbox_from_rle(
     rle_row_wise: list[int], width: int, height: int
 ) -> BoundingBox:
+    """Compute bounding box from row-wise RLE.
+
+    Scans through the RLE and tracks the min/max x/y coordinates of the '1' pixels.
+    The time complexity is O(len(rle_row_wise)).
+    """
     xmin = width
     ymin = height
     xmax = 0
