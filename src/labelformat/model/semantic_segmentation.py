@@ -15,16 +15,17 @@ from numpy.typing import NDArray
 class SemanticSegmentationMask:
     """Semantic segmentation mask with integer class IDs.
 
-    The mask is stored as a 2D numpy array of integer class IDs with shape (H, W).
+    For internal purposes only, interface might change between minor versions!
 
-    Args:
-        array: The 2D numpy array with integer class IDs of shape (H, W).
+    The mask is stored as multiclass run-length encoding (RLE).
     """
 
     category_id_rle: list[tuple[int, int]]
     """The mask as a run-length encoding (RLE) list of (category_id, run_length) tuples."""
     width: int
+    """Width of the mask in pixels."""
     height: int
+    """Height of the mask in pixels."""
 
     @classmethod
     def from_array(cls, array: NDArray[np.int_]) -> "SemanticSegmentationMask":
