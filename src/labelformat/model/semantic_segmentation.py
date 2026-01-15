@@ -28,6 +28,8 @@ class SemanticSegmentationMask:
 
     category_id_rle: List[Tuple[int, int]]
     """The mask as a run-length encoding (RLE) list of (category_id, run_length) tuples."""
+    width: int
+    height: int
 
     @classmethod
     def from_array(cls, array: NDArray[np.int_]) -> "SemanticSegmentationMask":
@@ -50,7 +52,9 @@ class SemanticSegmentationMask:
         if cur_cat_id is not None:
             category_id_rle.append((cur_cat_id, cur_run_length))
 
-        return cls(category_id_rle=category_id_rle)
+        return cls(
+            category_id_rle=category_id_rle, width=array.shape[1], height=array.shape[0]
+        )
 
 
 class SemanticSegmentationInput(ABC):

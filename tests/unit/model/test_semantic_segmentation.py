@@ -23,3 +23,5 @@ class TestSemanticSegmentationMask:
         ]
         mask = SemanticSegmentationMask.from_array(array=array)
         assert mask.category_id_rle == expected_rle
+        assert mask.width == 4
+        assert mask.height == 3
