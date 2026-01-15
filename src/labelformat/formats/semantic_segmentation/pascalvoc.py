@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """Pascal VOC semantic segmentation input.
 
 Assumptions:
@@ -8,6 +6,9 @@ Assumptions:
 - Masks are PNGs with pixel values equal to class IDs.
 """
 
+from __future__ import annotations
+
+from argparse import ArgumentParser
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -19,10 +20,12 @@ from PIL import Image as PILImage
 from labelformat import utils
 from labelformat.model.category import Category
 from labelformat.model.image import Image
-from labelformat.model.semantic_segmentation import (
-    SemanticSegmentationInput,
-    SemanticSegmentationMask,
+from labelformat.model.instance_segmentation import (
+    ImageInstanceSegmentation,
+    InstanceSegmentationInput,
+    SingleInstanceSegmentation,
 )
+from labelformat.model.semantic_segmentation import SemanticSegmentationMask
 
 """TODO(Malte, 11/2025):
 Support what is already supported in LightlyTrain. https://docs.lightly.ai/train/stable/semantic_segmentation.html#data
@@ -34,11 +37,18 @@ Support merging multiple labels into one class during training. https://docs.lig
 
 
 @dataclass
-class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
+class PascalVOCSemanticSegmentationInput(InstanceSegmentationInput):
+    """Pascal VOC semantic segmentation input format."""
+
     _images_dir: Path
     _masks_dir: Path
     _filename_to_image: dict[str, Image]
     _categories: list[Category]
+
+    @staticmethod
+    def add_cli_arguments(parser: ArgumentParser) -> None:
+        # TODO(Michal, 01/2026): Implement when needed.
+        raise NotImplementedError()
 
     @classmethod
     def from_dirs(
@@ -91,7 +101,30 @@ class PascalVOCSemanticSegmentationInput(SemanticSegmentationInput):
     def get_images(self) -> Iterable[Image]:
         yield from self._filename_to_image.values()
 
-    def get_mask(self, image_filepath: str) -> SemanticSegmentationMask:
+    def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
+        """Get semantic segmentation labels.
+
+        Yields an object per image, with one binary mask per category present in the mask.
+        The order of objects is sorted by category ID. Reuses the ImageInstanceSegmentation
+        as the return type for convenience.
+        """
+        category_id_to_category = {c.id: c for c in self._categories}
+        for image in self.get_images():
+            mask = self._get_mask(image_filepath=image.filename)
+            category_ids_in_mask = mask.category_ids()
+            objects = [
+                SingleInstanceSegmentation(
+                    category=category_id_to_category[cid],
+                    segmentation=mask.to_binary_mask(category_id=cid),
+                )
+                for cid in sorted(category_ids_in_mask)
+            ]
+            yield ImageInstanceSegmentation(
+                image=image,
+                objects=objects,
+            )
+
+    def _get_mask(self, image_filepath: str) -> SemanticSegmentationMask:
         # Validate image exists in our index.
         image_obj = self._filename_to_image.get(image_filepath)
         if image_obj is None:
