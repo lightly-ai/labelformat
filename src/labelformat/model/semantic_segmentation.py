@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import List, Optional, Tuple
 
+from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
+from labelformat.model.instance_segmentation import SingleInstanceSegmentation
+
 """Semantic segmentation core types and input interface.
 """
 
@@ -54,6 +57,28 @@ class SemanticSegmentationMask:
 
         return cls(
             category_id_rle=category_id_rle, width=array.shape[1], height=array.shape[0]
+        )
+
+    def to_binary_mask(self, category_id: int) -> BinaryMaskSegmentation:
+        """Get a binary mask for a given category ID."""
+        binary_rle = []
+
+        symbol = 0
+        run_length = 0
+        for cat_id, cur_run_length in self.category_id_rle:
+            cur_symbol = 1 if cat_id == category_id else 0
+            if symbol == cur_symbol:
+                run_length += cur_run_length
+            else:
+                binary_rle.append(run_length)
+                symbol = cur_symbol
+                run_length = cur_run_length
+
+        binary_rle.append(run_length)
+        return BinaryMaskSegmentation.from_rle(
+            rle_row_wise=binary_rle,
+            width=self.width,
+            height=self.height,
         )
 
 
