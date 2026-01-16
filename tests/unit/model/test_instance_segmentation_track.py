@@ -44,6 +44,7 @@ class TestVideoInstanceSegmentationTrack:
             segmentations=[
                 MultiPolygon(polygons=[[(0.0, 0.0), (1.0, 0.0), (1.0, 1.0)]]),
                 None,
+                None,
             ],
         )
 
