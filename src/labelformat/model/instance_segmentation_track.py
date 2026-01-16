@@ -7,8 +7,8 @@ from typing import Iterable
 
 from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
 from labelformat.model.category import Category
-from labelformat.model.video import Video
 from labelformat.model.multipolygon import MultiPolygon
+from labelformat.model.video import Video
 
 
 @dataclass(frozen=True)
@@ -36,6 +36,7 @@ class VideoInstanceSegmentationTrack:
                 raise ValueError(
                     "Length of instance segmentation track does not match the number of frames in the video."
                 )
+
 
 class InstanceSegmentationTrackInput(ABC):
     @staticmethod

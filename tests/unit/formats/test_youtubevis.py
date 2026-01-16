@@ -62,6 +62,7 @@ class TestYouTubeVISObjectDetectionTrackInput:
             )
         ]
 
+
 def _write_youtube_vis_json(input_file: Path) -> Path:
     data = {
         "categories": [
