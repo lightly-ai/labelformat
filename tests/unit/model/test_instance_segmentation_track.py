@@ -47,15 +47,6 @@ class TestVideoInstanceSegmentationTrack:
             ],
         )
 
-        track_b = SingleInstanceSegmentationTrack(
-            category=Category(id=1, name="dog"),
-            segmentations=[
-                MultiPolygon(polygons=[[(2.0, 2.0), (3.0, 2.0), (3.0, 3.0)]]),
-                MultiPolygon(polygons=[[(4.0, 4.0), (5.0, 4.0), (5.0, 5.0)]]),
-                None,
-            ],
-        )
-
         video = Video(id=0, filename="test.mov", width=1, height=1, number_of_frames=2)
 
         with pytest.raises(
@@ -64,5 +55,5 @@ class TestVideoInstanceSegmentationTrack:
         ):
             VideoInstanceSegmentationTrack(
                 video=video,
-                objects=[track_a, track_b],
+                objects=[track_a],
             )
