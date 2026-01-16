@@ -6,6 +6,12 @@ from pathlib import Path
 from typing import Dict, Iterable, List
 
 from labelformat.cli.registry import Task, cli_register
+from labelformat.formats.coco_segmentation_helpers import (
+    COCOInstanceSegmentationMultiPolygon,
+    COCOInstanceSegmentationRLE,
+    coco_segmentation_to_binary_mask_rle,
+    coco_segmentation_to_multipolygon,
+)
 from labelformat.model.binary_mask_segmentation import (
     BinaryMaskSegmentation,
     RLEDecoderEncoder,
@@ -25,12 +31,6 @@ from labelformat.model.object_detection import (
     ObjectDetectionInput,
     ObjectDetectionOutput,
     SingleObjectDetection,
-)
-from labelformat.formats.coco_segmentation_helpers import (
-    coco_segmentation_to_binary_mask_rle,
-    coco_segmentation_to_multipolygon,
-    COCOInstanceSegmentationMultiPolygon,
-    COCOInstanceSegmentationRLE,
 )
 from labelformat.types import JsonDict, ParseError
 

@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import List, TypedDict
 
 from labelformat.model.binary_mask_segmentation import (
@@ -16,6 +17,7 @@ class COCOInstanceSegmentationRLE(TypedDict):
 
 
 COCOInstanceSegmentationMultiPolygon = List[List[float]]
+
 
 def coco_segmentation_to_binary_mask_rle(
     segmentation: COCOInstanceSegmentationRLE, bbox: list[float]
