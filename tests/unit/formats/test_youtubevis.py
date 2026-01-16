@@ -3,8 +3,10 @@ from pathlib import Path
 
 import numpy as np
 
-from labelformat.formats.youtubevis import YouTubeVISObjectDetectionTrackInput
-from labelformat.formats.youtubevis import YouTubeVISInstanceSegmentationTrackInput
+from labelformat.formats.youtubevis import (
+    YouTubeVISInstanceSegmentationTrackInput,
+    YouTubeVISObjectDetectionTrackInput,
+)
 from labelformat.model.binary_mask_segmentation import (
     BinaryMaskSegmentation,
     RLEDecoderEncoder,
