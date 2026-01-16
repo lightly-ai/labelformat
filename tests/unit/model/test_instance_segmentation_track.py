@@ -44,14 +44,6 @@ class TestVideoInstanceSegmentationTrack:
             segmentations=[
                 MultiPolygon(polygons=[[(0.0, 0.0), (1.0, 0.0), (1.0, 1.0)]]),
                 None,
-            ],
-        )
-
-        track_b = SingleInstanceSegmentationTrack(
-            category=Category(id=1, name="dog"),
-            segmentations=[
-                MultiPolygon(polygons=[[(2.0, 2.0), (3.0, 2.0), (3.0, 3.0)]]),
-                MultiPolygon(polygons=[[(4.0, 4.0), (5.0, 4.0), (5.0, 5.0)]]),
                 None,
             ],
         )
@@ -64,5 +56,5 @@ class TestVideoInstanceSegmentationTrack:
         ):
             VideoInstanceSegmentationTrack(
                 video=video,
-                objects=[track_a, track_b],
+                objects=[track_a],
             )
