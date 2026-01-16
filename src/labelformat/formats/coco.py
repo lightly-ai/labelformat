@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Dict, Iterable, List, TypedDict
+from typing import Dict, Iterable, List
 
 from labelformat.cli.registry import Task, cli_register
 from labelformat.model.binary_mask_segmentation import (
@@ -25,6 +25,12 @@ from labelformat.model.object_detection import (
     ObjectDetectionInput,
     ObjectDetectionOutput,
     SingleObjectDetection,
+)
+from labelformat.formats.coco_segmentation_helpers import (
+    coco_segmentation_to_binary_mask_rle,
+    coco_segmentation_to_multipolygon,
+    COCOInstanceSegmentationMultiPolygon,
+    COCOInstanceSegmentationRLE,
 )
 from labelformat.types import JsonDict, ParseError
 
@@ -58,14 +64,6 @@ class _COCOBaseInput:
                 width=int(image["width"]),
                 height=int(image["height"]),
             )
-
-
-class _COCOInstanceSegmentationRLE(TypedDict):
-    counts: list[int]
-    size: list[int]
-
-
-_COCOInstanceSegmentationMultiPolygon = List[List[float]]
 
 
 @cli_register(format="coco", task=Task.OBJECT_DETECTION)
@@ -119,11 +117,11 @@ class COCOInstanceSegmentationInput(_COCOBaseInput, InstanceSegmentationInput):
                     raise ParseError(f"Segmentation missing for image id {image_id}")
                 segmentation: MultiPolygon | BinaryMaskSegmentation
                 if ann["iscrowd"] == 1:
-                    segmentation = _coco_segmentation_to_binary_mask_rle(
+                    segmentation = coco_segmentation_to_binary_mask_rle(
                         segmentation=ann["segmentation"], bbox=ann["bbox"]
                     )
                 else:
-                    segmentation = _coco_segmentation_to_multipolygon(
+                    segmentation = coco_segmentation_to_multipolygon(
                         coco_segmentation=ann["segmentation"]
                     )
                 objects.append(
@@ -189,7 +187,7 @@ class COCOInstanceSegmentationOutput(_COCOBaseOutput, InstanceSegmentationOutput
         for label in label_input.get_labels():
             for obj in label.objects:
                 segmentation: (
-                    _COCOInstanceSegmentationMultiPolygon | _COCOInstanceSegmentationRLE
+                    COCOInstanceSegmentationMultiPolygon | COCOInstanceSegmentationRLE
                 )
                 if isinstance(obj.segmentation, BinaryMaskSegmentation):
                     segmentation = _binary_mask_rle_to_coco_segmentation(
@@ -231,28 +229,9 @@ class COCOInstanceSegmentationOutput(_COCOBaseOutput, InstanceSegmentationOutput
             json.dump(data, file, indent=2)
 
 
-def _coco_segmentation_to_multipolygon(
-    coco_segmentation: _COCOInstanceSegmentationMultiPolygon,
-) -> MultiPolygon:
-    """Convert COCO segmentation to MultiPolygon."""
-    polygons = []
-    for polygon in coco_segmentation:
-        if len(polygon) % 2 != 0:
-            raise ParseError(f"Invalid polygon with {len(polygon)} points: {polygon}")
-        polygons.append(
-            list(
-                zip(
-                    [float(x) for x in polygon[0::2]],
-                    [float(x) for x in polygon[1::2]],
-                )
-            )
-        )
-    return MultiPolygon(polygons=polygons)
-
-
 def _multipolygon_to_coco_segmentation(
     multipolygon: MultiPolygon,
-) -> _COCOInstanceSegmentationMultiPolygon:
+) -> COCOInstanceSegmentationMultiPolygon:
     """Convert MultiPolygon to COCO segmentation."""
     coco_segmentation = []
     for polygon in multipolygon.polygons:
@@ -260,21 +239,9 @@ def _multipolygon_to_coco_segmentation(
     return coco_segmentation
 
 
-def _coco_segmentation_to_binary_mask_rle(
-    segmentation: _COCOInstanceSegmentationRLE, bbox: list[float]
-) -> BinaryMaskSegmentation:
-    counts = segmentation["counts"]
-    height, width = segmentation["size"]
-    binary_mask = RLEDecoderEncoder.decode_column_wise_rle(counts, height, width)
-    bounding_box = BoundingBox.from_format(bbox=bbox, format=BoundingBoxFormat.XYWH)
-    return BinaryMaskSegmentation.from_binary_mask(
-        binary_mask, bounding_box=bounding_box
-    )
-
-
 def _binary_mask_rle_to_coco_segmentation(
     binary_mask_rle: BinaryMaskSegmentation,
-) -> _COCOInstanceSegmentationRLE:
+) -> COCOInstanceSegmentationRLE:
     binary_mask = binary_mask_rle.get_binary_mask()
     counts = RLEDecoderEncoder.encode_column_wise_rle(binary_mask)
     return {"counts": counts, "size": [binary_mask_rle.height, binary_mask_rle.width]}
