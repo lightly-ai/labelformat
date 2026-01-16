@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from typing import Dict
 
+import cv2
 import numpy as np
 import pytest
 from PIL import Image as PILImage
@@ -12,6 +13,7 @@ from labelformat.formats.semantic_segmentation import pascalvoc as pascalvoc_mod
 from labelformat.formats.semantic_segmentation.pascalvoc import (
     PascalVOCSemanticSegmentationInput,
 )
+from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
 from labelformat.model.image import Image
 from tests.unit.test_utils import FIXTURES_DIR
 
@@ -45,17 +47,16 @@ class TestPascalVOCSemanticSegmentationInput:
         filenames = {img.filename for img in imgs}
         assert filenames == {"2007_000032.jpg", "subdir/2007_000033.jpg"}
 
-    def test_get_mask__returns_int2d_and_matches_image_shape(self) -> None:
+    def test_get_mask__returns_rle_and_matches_image_length(self) -> None:
         mapping = _load_class_mapping_int_keys()
         ds = PascalVOCSemanticSegmentationInput.from_dirs(
             images_dir=IMAGES_DIR, masks_dir=MASKS_DIR, class_id_to_name=mapping
         )
 
         for img in ds.get_images():
-            mask = ds.get_mask(img.filename)
-            assert mask.array.ndim == 2
-            assert np.issubdtype(mask.array.dtype, np.integer)
-            assert mask.array.shape == (img.height, img.width)
+            mask = ds._get_mask(img.filename)
+            length = sum(run_length for _, run_length in mask.category_id_rle)
+            assert length == img.width * img.height
 
     def test_from_dirs__missing_mask_raises(self, tmp_path: Path) -> None:
         masks_tmp = tmp_path / "SegmentationClass"
@@ -84,7 +85,77 @@ class TestPascalVOCSemanticSegmentationInput:
             ValueError,
             match=r"Unknown image filepath does_not_exist\.jpg",
         ):
-            ds.get_mask("does_not_exist.jpg")
+            ds._get_mask("does_not_exist.jpg")
+
+    def test_get_labels(self, tmp_path: Path) -> None:
+        images_dir = tmp_path / "images"
+        images_dir.mkdir()
+        masks_dir = tmp_path / "masks"
+        masks_dir.mkdir()
+
+        # Create a simple image and mask
+        image0_bgr = np.full((3, 4, 3), (255, 0, 0), dtype=np.uint8)
+        cv2.imwrite(str(images_dir / "image0.jpg"), image0_bgr)
+        mask0 = np.array([[1, 0, 0, 0], [1, 0, 2, 2], [0, 0, 2, 0]], dtype=np.uint8)
+        cv2.imwrite(str(masks_dir / "image0.png"), mask0)
+
+        # Create another image and mask
+        image1_bgr = np.full((2, 2, 3), (0, 255, 0), dtype=np.uint8)
+        cv2.imwrite(str(images_dir / "image1.jpg"), image1_bgr)
+        mask1 = np.array([[1, 1], [1, 1]], dtype=np.uint8)
+        cv2.imwrite(str(masks_dir / "image1.png"), mask1)
+
+        # Create input instance
+        label_input = PascalVOCSemanticSegmentationInput.from_dirs(
+            images_dir=images_dir,
+            masks_dir=masks_dir,
+            class_id_to_name={0: "a", 1: "b", 2: "c", 3: "d"},
+        )
+
+        # Call get_labels
+        labels = sorted(label_input.get_labels(), key=lambda x: x.image.filename)
+        assert len(labels) == 2
+
+        # Verify first image labels
+        assert labels[0].image.filename == "image0.jpg"
+        objects = labels[0].objects
+        assert len(objects) == 3
+        assert objects[0].category.id == 0
+        assert objects[0].category.name == "a"
+        assert isinstance(objects[0].segmentation, BinaryMaskSegmentation)
+        assert objects[0].segmentation.get_binary_mask().tolist() == [
+            [0, 1, 1, 1],
+            [0, 1, 0, 0],
+            [1, 1, 0, 1],
+        ]
+        assert objects[1].category.id == 1
+        assert objects[1].category.name == "b"
+        assert isinstance(objects[1].segmentation, BinaryMaskSegmentation)
+        assert objects[1].segmentation.get_binary_mask().tolist() == [
+            [1, 0, 0, 0],
+            [1, 0, 0, 0],
+            [0, 0, 0, 0],
+        ]
+        assert objects[2].category.id == 2
+        assert objects[2].category.name == "c"
+        assert isinstance(objects[2].segmentation, BinaryMaskSegmentation)
+        assert objects[2].segmentation.get_binary_mask().tolist() == [
+            [0, 0, 0, 0],
+            [0, 0, 1, 1],
+            [0, 0, 1, 0],
+        ]
+
+        # Verify second image labels
+        assert labels[1].image.filename == "image1.jpg"
+        assert len(labels[1].objects) == 1
+        obj = labels[1].objects[0]
+        assert obj.category.id == 1
+        assert obj.category.name == "b"
+        assert isinstance(obj.segmentation, BinaryMaskSegmentation)
+        assert obj.segmentation.get_binary_mask().tolist() == [
+            [1, 1],
+            [1, 1],
+        ]
 
 
 def test__validate_mask__unknown_class_value_raises() -> None:

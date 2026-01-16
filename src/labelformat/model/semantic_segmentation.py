@@ -1,48 +1,79 @@
 from __future__ import annotations
 
+from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
+
 """Semantic segmentation core types and input interface.
 """
 
-from abc import ABC, abstractmethod
-from collections.abc import Iterable
 from dataclasses import dataclass
 
 import numpy as np
 from numpy.typing import NDArray
-
-from labelformat.model.category import Category
-from labelformat.model.image import Image
 
 
 @dataclass
 class SemanticSegmentationMask:
     """Semantic segmentation mask with integer class IDs.
 
-    The mask is stored as a 2D numpy array of integer class IDs with shape (H, W).
+    For internal purposes only, interface might change between minor versions!
 
-    Args:
-        array: The 2D numpy array with integer class IDs of shape (H, W).
+    The mask is stored as multiclass run-length encoding (RLE).
     """
 
-    array: NDArray[np.int_]
+    category_id_rle: list[tuple[int, int]]
+    """The mask as a run-length encoding (RLE) list of (category_id, run_length) tuples."""
+    width: int
+    """Width of the mask in pixels."""
+    height: int
+    """Height of the mask in pixels."""
 
-    def __post_init__(self) -> None:
-        if self.array.ndim != 2:
+    @classmethod
+    def from_array(cls, array: NDArray[np.int_]) -> "SemanticSegmentationMask":
+        """Create a SemanticSegmentationMask from a 2D numpy array."""
+        if array.ndim != 2:
             raise ValueError("SemSegMask.array must be 2D with shape (H, W).")
 
+        category_id_rle: list[tuple[int, int]] = []
 
-class SemanticSegmentationInput(ABC):
+        cur_cat_id: int | None = None
+        cur_run_length = 0
+        for cat_id in array.flatten():
+            if cat_id == cur_cat_id:
+                cur_run_length += 1
+            else:
+                if cur_cat_id is not None:
+                    category_id_rle.append((cur_cat_id, cur_run_length))
+                cur_cat_id = cat_id
+                cur_run_length = 1
+        if cur_cat_id is not None:
+            category_id_rle.append((cur_cat_id, cur_run_length))
 
-    # TODO(Malte, 11/2025): Add a CLI interface later if needed.
+        return cls(
+            category_id_rle=category_id_rle, width=array.shape[1], height=array.shape[0]
+        )
 
-    @abstractmethod
-    def get_categories(self) -> Iterable[Category]:
-        raise NotImplementedError()
+    def to_binary_mask(self, category_id: int) -> BinaryMaskSegmentation:
+        """Get a binary mask for a given category ID."""
+        binary_rle = []
 
-    @abstractmethod
-    def get_images(self) -> Iterable[Image]:
-        raise NotImplementedError()
+        symbol = 0
+        run_length = 0
+        for cat_id, cur_run_length in self.category_id_rle:
+            cur_symbol = 1 if cat_id == category_id else 0
+            if symbol == cur_symbol:
+                run_length += cur_run_length
+            else:
+                binary_rle.append(run_length)
+                symbol = cur_symbol
+                run_length = cur_run_length
 
-    @abstractmethod
-    def get_mask(self, image_filepath: str) -> SemanticSegmentationMask:
-        raise NotImplementedError()
+        binary_rle.append(run_length)
+        return BinaryMaskSegmentation.from_rle(
+            rle_row_wise=binary_rle,
+            width=self.width,
+            height=self.height,
+        )
+
+    def category_ids(self) -> set[int]:
+        """Get the set of category IDs present in the mask."""
+        return {cat_id for cat_id, _ in self.category_id_rle}

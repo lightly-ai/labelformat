@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
 
+from labelformat.model import binary_mask_segmentation
 from labelformat.model.binary_mask_segmentation import (
     BinaryMaskSegmentation,
     RLEDecoderEncoder,
@@ -21,6 +22,57 @@ class TestBinaryMaskSegmentation:
         assert binary_mask_segmentation.height == 2
         assert binary_mask_segmentation.bounding_box == bounding_box
         assert np.array_equal(binary_mask_segmentation.get_binary_mask(), binary_mask)
+
+    def test_from_rle(self) -> None:
+        binary_mask_segmentation = BinaryMaskSegmentation.from_rle(
+            rle_row_wise=[1, 1, 4, 2, 1, 3, 2, 1, 5],
+            width=5,
+            height=4,
+            bounding_box=None,
+        )
+        assert binary_mask_segmentation.width == 5
+        assert binary_mask_segmentation.height == 4
+        assert binary_mask_segmentation.bounding_box == BoundingBox(0, 0, 4, 2)
+        expected: NDArray[np.int_] = np.array(
+            [
+                [0, 1, 0, 0, 0],
+                [0, 1, 1, 0, 1],
+                [1, 1, 0, 0, 1],
+                [0, 0, 0, 0, 0],
+            ],
+            dtype=np.int_,
+        )
+        assert np.array_equal(binary_mask_segmentation.get_binary_mask(), expected)
+
+        # Test with provided bounding box
+        # The box is larger than the actual mask, but should be preserved
+        binary_mask_segmentation = BinaryMaskSegmentation.from_rle(
+            rle_row_wise=[6, 3],
+            width=3,
+            height=3,
+            bounding_box=BoundingBox(0, 0, 2, 2),
+        )
+        assert binary_mask_segmentation.width == 3
+        assert binary_mask_segmentation.height == 3
+        assert binary_mask_segmentation.bounding_box == BoundingBox(0, 0, 2, 2)
+        expected = np.array(
+            [
+                [0, 0, 0],
+                [0, 0, 0],
+                [1, 1, 1],
+            ],
+            dtype=np.int_,
+        )
+        assert np.array_equal(binary_mask_segmentation.get_binary_mask(), expected)
+
+    def test_get_rle(self) -> None:
+        binary_mask_segmentation = BinaryMaskSegmentation.from_rle(
+            rle_row_wise=[1, 2, 3],
+            width=3,
+            height=2,
+            bounding_box=None,
+        )
+        assert binary_mask_segmentation.get_rle() == [1, 2, 3]
 
 
 class TestRLEDecoderEncoder:
@@ -79,3 +131,41 @@ class TestRLEDecoderEncoder:
             rle, mask.shape[0], mask.shape[1]
         )
         assert np.array_equal(mask, mask_inverse_column_wise)
+
+
+def test_compute_bbox_from_rle() -> None:
+    # 0011
+    # 1111
+    # 1100
+    bbox = binary_mask_segmentation._compute_bbox_from_rle(
+        rle_row_wise=[2, 8, 2],
+        width=4,
+        height=3,
+    )
+    assert bbox == BoundingBox(xmin=0, ymin=0, xmax=3, ymax=2)
+
+    # 0011
+    # 0000
+    bbox = binary_mask_segmentation._compute_bbox_from_rle(
+        rle_row_wise=[2, 2, 4],
+        width=4,
+        height=2,
+    )
+    assert bbox == BoundingBox(xmin=2, ymin=0, xmax=3, ymax=0)
+
+    # 0011
+    # 1000
+    bbox = binary_mask_segmentation._compute_bbox_from_rle(
+        rle_row_wise=[2, 3, 3],
+        width=4,
+        height=2,
+    )
+    assert bbox == BoundingBox(xmin=0, ymin=0, xmax=3, ymax=1)
+
+    # 1111
+    bbox = binary_mask_segmentation._compute_bbox_from_rle(
+        rle_row_wise=[0, 4],
+        width=4,
+        height=1,
+    )
+    assert bbox == BoundingBox(xmin=0, ymin=0, xmax=3, ymax=0)

@@ -42,6 +42,28 @@ class BinaryMaskSegmentation:
             bounding_box=bounding_box,
         )
 
+    @classmethod
+    def from_rle(
+        cls,
+        rle_row_wise: list[int],
+        width: int,
+        height: int,
+        bounding_box: BoundingBox | None = None,
+    ) -> "BinaryMaskSegmentation":
+        """
+        Create a BinaryMaskSegmentation instance from row-wise RLE format.
+        """
+        if bounding_box is None:
+            bounding_box = _compute_bbox_from_rle(
+                rle_row_wise=rle_row_wise, width=width, height=height
+            )
+        return cls(
+            _rle_row_wise=rle_row_wise,
+            width=width,
+            height=height,
+            bounding_box=bounding_box,
+        )
+
     def get_binary_mask(self) -> NDArray[np.int_]:
         """
         Get the binary mask (2D numpy array) from the RLE format.
@@ -49,6 +71,15 @@ class BinaryMaskSegmentation:
         return RLEDecoderEncoder.decode_row_wise_rle(
             self._rle_row_wise, self.height, self.width
         )
+
+    def get_rle(self) -> list[int]:
+        """
+        Get the run-length encoding (RLE) of the binary mask in row-wise format.
+
+        The first element corresponds to the number of 0s at the start of the mask.
+        If the mask starts with a 1, the first element will be 0. No other zeros can appear.
+        """
+        return self._rle_row_wise
 
 
 class RLEDecoderEncoder:
@@ -112,3 +143,49 @@ class RLEDecoderEncoder:
             decoded.extend([run_val] * count)
             run_val = 1 - run_val
         return np.array(decoded, dtype=np.int_).reshape((height, width), order="F")
+
+
+def _compute_bbox_from_rle(
+    rle_row_wise: list[int], width: int, height: int
+) -> BoundingBox:
+    """Compute bounding box from row-wise RLE.
+
+    Scans through the RLE and tracks the min/max x/y coordinates of the '1' pixels.
+    The time complexity is O(len(rle_row_wise)).
+    """
+    xmin = width
+    ymin = height
+    xmax = 0
+    ymax = 0
+
+    x = 0
+    y = 0
+    next_symbol = 0
+    for run_length in rle_row_wise:
+        if next_symbol == 1:
+            # Compute coordinates for the end of the run
+            run_end_x = x + run_length - 1
+            run_end_y = y
+            if run_end_x >= width:
+                run_end_y += run_end_x // width
+                run_end_x = run_end_x % width
+
+            # Update bounding box
+            ymin = min(ymin, y)
+            ymax = max(ymax, run_end_y)
+            if run_end_y > y:
+                xmin = 0
+                xmax = width - 1
+            else:
+                xmin = min(xmin, x)
+                xmax = max(xmax, run_end_x)
+
+        # Compute coordinates for the start of the next run
+        x += run_length
+        if x >= width:
+            y += x // width
+            x = x % width
+
+        next_symbol = 1 - next_symbol
+
+    return BoundingBox(xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
