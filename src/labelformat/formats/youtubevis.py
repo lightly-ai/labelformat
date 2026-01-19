@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, cast
 
 import labelformat.formats.coco_segmentation_helpers as segmentation_helpers
 from labelformat.formats.coco_segmentation_helpers import (
@@ -150,19 +150,17 @@ def _get_object_track_segmentations(
             segmentations.append(None)
             continue
         if isinstance(segmentation, dict):
-            segmentation_rle: COCOInstanceSegmentationRLE = segmentation
+            segmentation_rle = cast(COCOInstanceSegmentationRLE, segmentation)
             segmentations.append(
                 segmentation_helpers.coco_segmentation_to_binary_mask_rle(
                     segmentation=segmentation_rle, bbox=bboxes[index]
                 )
             )
         elif isinstance(segmentation, list):
-            segmentation_multipolygon: COCOInstanceSegmentationMultiPolygon = (
-                segmentation
-            )
+            segmentation_mp = cast(COCOInstanceSegmentationMultiPolygon, segmentation)
             segmentations.append(
                 segmentation_helpers.coco_segmentation_to_multipolygon(
-                    coco_segmentation=segmentation_multipolygon
+                    coco_segmentation=segmentation_mp
                 )
             )
     return segmentations
