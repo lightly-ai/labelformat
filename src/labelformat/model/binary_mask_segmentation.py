@@ -172,13 +172,13 @@ def _compute_bbox_from_rle(
 
             # Update bounding box
             ymin = min(ymin, y)
-            ymax = max(ymax, run_end_y)
+            ymax = max(ymax, run_end_y + 1)
             if run_end_y > y:
                 xmin = 0
-                xmax = width - 1
+                xmax = width
             else:
                 xmin = min(xmin, x)
-                xmax = max(xmax, run_end_x)
+                xmax = max(xmax, run_end_x + 1)
 
         # Compute coordinates for the start of the next run
         x += run_length

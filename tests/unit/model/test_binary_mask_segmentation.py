@@ -32,7 +32,7 @@ class TestBinaryMaskSegmentation:
         )
         assert binary_mask_segmentation.width == 5
         assert binary_mask_segmentation.height == 4
-        assert binary_mask_segmentation.bounding_box == BoundingBox(0, 0, 4, 2)
+        assert binary_mask_segmentation.bounding_box == BoundingBox(0, 0, 5, 3)
         expected: NDArray[np.int_] = np.array(
             [
                 [0, 1, 0, 0, 0],
@@ -142,7 +142,7 @@ def test_compute_bbox_from_rle() -> None:
         width=4,
         height=3,
     )
-    assert bbox == BoundingBox(xmin=0, ymin=0, xmax=3, ymax=2)
+    assert bbox == BoundingBox(xmin=0, ymin=0, xmax=4, ymax=3)
 
     # 0011
     # 0000
@@ -151,7 +151,7 @@ def test_compute_bbox_from_rle() -> None:
         width=4,
         height=2,
     )
-    assert bbox == BoundingBox(xmin=2, ymin=0, xmax=3, ymax=0)
+    assert bbox == BoundingBox(xmin=2, ymin=0, xmax=4, ymax=1)
 
     # 0011
     # 1000
@@ -160,7 +160,7 @@ def test_compute_bbox_from_rle() -> None:
         width=4,
         height=2,
     )
-    assert bbox == BoundingBox(xmin=0, ymin=0, xmax=3, ymax=1)
+    assert bbox == BoundingBox(xmin=0, ymin=0, xmax=4, ymax=2)
 
     # 1111
     bbox = binary_mask_segmentation._compute_bbox_from_rle(
@@ -168,4 +168,4 @@ def test_compute_bbox_from_rle() -> None:
         width=4,
         height=1,
     )
-    assert bbox == BoundingBox(xmin=0, ymin=0, xmax=3, ymax=0)
+    assert bbox == BoundingBox(xmin=0, ymin=0, xmax=4, ymax=1)
