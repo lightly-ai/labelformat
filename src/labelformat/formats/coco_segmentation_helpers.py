@@ -24,10 +24,12 @@ def coco_segmentation_to_binary_mask_rle(
 ) -> BinaryMaskSegmentation:
     counts = segmentation["counts"]
     height, width = segmentation["size"]
-    binary_mask = RLEDecoderEncoder.decode_column_wise_rle(counts, height, width)
+    binary_mask = RLEDecoderEncoder.decode_column_wise_rle(
+        rle=counts, height=height, width=width
+    )
     bounding_box = BoundingBox.from_format(bbox=bbox, format=BoundingBoxFormat.XYWH)
     return BinaryMaskSegmentation.from_binary_mask(
-        binary_mask, bounding_box=bounding_box
+        binary_mask=binary_mask, bounding_box=bounding_box
     )
 
 
