@@ -5,12 +5,11 @@ from argparse import ArgumentParser
 from pathlib import Path
 from typing import Dict, Iterable, List
 
+import labelformat.formats.coco_segmentation_helpers as segmentation_helpers
 from labelformat.cli.registry import Task, cli_register
 from labelformat.formats.coco_segmentation_helpers import (
     COCOInstanceSegmentationMultiPolygon,
     COCOInstanceSegmentationRLE,
-    coco_segmentation_to_binary_mask_rle,
-    coco_segmentation_to_multipolygon,
 )
 from labelformat.model.binary_mask_segmentation import (
     BinaryMaskSegmentation,
@@ -117,12 +116,16 @@ class COCOInstanceSegmentationInput(_COCOBaseInput, InstanceSegmentationInput):
                     raise ParseError(f"Segmentation missing for image id {image_id}")
                 segmentation: MultiPolygon | BinaryMaskSegmentation
                 if ann["iscrowd"] == 1:
-                    segmentation = coco_segmentation_to_binary_mask_rle(
-                        segmentation=ann["segmentation"], bbox=ann["bbox"]
+                    segmentation = (
+                        segmentation_helpers.coco_segmentation_to_binary_mask_rle(
+                            segmentation=ann["segmentation"], bbox=ann["bbox"]
+                        )
                     )
                 else:
-                    segmentation = coco_segmentation_to_multipolygon(
-                        coco_segmentation=ann["segmentation"]
+                    segmentation = (
+                        segmentation_helpers.coco_segmentation_to_multipolygon(
+                            coco_segmentation=ann["segmentation"]
+                        )
                     )
                 objects.append(
                     SingleInstanceSegmentation(
