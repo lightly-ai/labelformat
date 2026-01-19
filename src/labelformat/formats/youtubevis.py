@@ -157,7 +157,9 @@ def _get_object_track_segmentations(
                 )
             )
         elif isinstance(segmentation, list):
-            segmentation_multipolygon: COCOInstanceSegmentationMultiPolygon = segmentation
+            segmentation_multipolygon: COCOInstanceSegmentationMultiPolygon = (
+                segmentation
+            )
             segmentations.append(
                 segmentation_helpers.coco_segmentation_to_multipolygon(
                     coco_segmentation=segmentation_multipolygon
