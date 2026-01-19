@@ -5,10 +5,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 from typing import Dict, Iterable, List
 
-from labelformat.formats.coco_segmentation_helpers import (
-    coco_segmentation_to_binary_mask_rle,
-    coco_segmentation_to_multipolygon,
-)
+import labelformat.formats.coco_segmentation_helpers as segmentation_helpers
 from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
 from labelformat.model.bounding_box import BoundingBox, BoundingBoxFormat
 from labelformat.model.category import Category
@@ -150,12 +147,12 @@ def _get_object_track_segmentations(
             continue
         if isinstance(segmentation, dict):
             segmentations.append(
-                coco_segmentation_to_binary_mask_rle(
+                segmentation_helpers.coco_segmentation_to_binary_mask_rle(
                     segmentation=segmentation, bbox=bboxes[index]
                 )
             )
         elif isinstance(segmentation, list):
             segmentations.append(
-                coco_segmentation_to_multipolygon(coco_segmentation=segmentation)
+                segmentation_helpers.coco_segmentation_to_multipolygon(coco_segmentation=segmentation)
             )
     return segmentations
