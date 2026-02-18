@@ -1,3 +1,4 @@
+import pytest
 from fsspec.core import url_to_fs
 
 from labelformat.formats.coco import COCOObjectDetectionInput
@@ -8,7 +9,8 @@ COCO_S3_ANNOTATION_FILE = (
 COCO_S3_IMAGES_DIR = "s3://studio-test-datasets-eu/coco_subset_128_images/images/"
 
 
-def test_coco_od_inputs_read_from_s3() -> None:
+@pytest.mark.skip(reason="Requires access to S3 dataset")
+def test_coco_od_inputs_read_from_s3__unmocked() -> None:
     object_detection_input = COCOObjectDetectionInput(
         input_file=COCO_S3_ANNOTATION_FILE
     )
