@@ -25,15 +25,16 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
+      - name: Set up Uv
+        uses: astral-sh/setup-uv@v6
         with:
-          version: 1.4.2
+          version: "0.10.4"
+          enable-cache: true
 
       - name: Install the package and dependencies
         run: |
-          poetry install
+          uv sync --all-groups --locked --python ${{ matrix.python }}
 
       - name: Run tests
         run: |
-          poetry run make all-checks
+          make all-checks
