@@ -35,7 +35,9 @@ IMAGE_EXTENSIONS = {
 }
 
 
-def iter_files_from_path(path: str, allowed_extensions: set[str] | None = None) -> Iterator[str]:
+def iter_files_from_path(
+    path: str, allowed_extensions: set[str] | None = None
+) -> Iterator[str]:
     """List all files from a single path, handling directories, globs, and individual files.
 
     Args:
@@ -57,11 +59,17 @@ def iter_files_from_path(path: str, allowed_extensions: set[str] | None = None) 
         if not cleaned_path:
             return
         fs = _get_filesystem(cleaned_path)
-        yield from _process_single_path_streaming(fs, cleaned_path, seen, pbar, extensions)
+        yield from _process_single_path_streaming(
+            fs, cleaned_path, seen, pbar, extensions
+        )
 
 
 def _process_single_path_streaming(
-    fs: fsspec.AbstractFileSystem, path: str, seen: set[str], pbar: tqdm[Any], extensions: set[str]
+    fs: fsspec.AbstractFileSystem,
+    path: str,
+    seen: set[str],
+    pbar: tqdm[Any],
+    extensions: set[str],
 ) -> Iterator[str]:
     """Process a single path and yield matching image files.
 
@@ -100,7 +108,11 @@ def _process_single_path_streaming(
 
 
 def _process_glob_pattern(
-    fs: fsspec.AbstractFileSystem, path: str, seen: set[str], pbar: tqdm[Any], extensions: set[str]
+    fs: fsspec.AbstractFileSystem,
+    path: str,
+    seen: set[str],
+    pbar: tqdm[Any],
+    extensions: set[str],
 ) -> Iterator[str]:
     """Process glob pattern and yield matching image files.
 
@@ -120,7 +132,11 @@ def _process_glob_pattern(
         if _needs_protocol_prefix(path_str, fs):
             protocol = _get_protocol_string(fs)
             path_str = f"{protocol}{PROTOCOL_SEPARATOR}{path_str}"
-        if fs.isfile(path_str) and _is_image_file(path_str, extensions) and path_str not in seen:
+        if (
+            fs.isfile(path_str)
+            and _is_image_file(path_str, extensions)
+            and path_str not in seen
+        ):
             seen.add(path_str)
             pbar.update(1)
             yield path_str
@@ -150,7 +166,9 @@ def _stream_files_from_directory(
                     if fs.isfile(p) and _is_image_file(p, extensions):
                         yield p
             except Exception as e:
-                logging.warning(f"fs.find() failed for {path}, trying alternative method: {e}")
+                logging.warning(
+                    f"fs.find() failed for {path}, trying alternative method: {e}"
+                )
                 yield from _stream_files_using_walk(fs, path, extensions)
     except Exception as e:
         logging.error(f"Error streaming files from '{path}': {e}")
@@ -199,7 +217,11 @@ def _get_filesystem(path: str) -> fsspec.AbstractFileSystem:
     Raises:
         ValueError: If the protocol cannot be determined or is invalid.
     """
-    protocol = path.split(PROTOCOL_SEPARATOR)[0] if PROTOCOL_SEPARATOR in path else DEFAULT_PROTOCOL
+    protocol = (
+        path.split(PROTOCOL_SEPARATOR)[0]
+        if PROTOCOL_SEPARATOR in path
+        else DEFAULT_PROTOCOL
+    )
 
     # Ensure protocol is a string, not a tuple
     if isinstance(protocol, (list, tuple)):

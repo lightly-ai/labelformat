@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Dict, Iterable, List
 
 import fsspec
+
 import labelformat.formats.coco_segmentation_helpers as segmentation_helpers
 from labelformat.cli.registry import Task, cli_register
 from labelformat.formats.coco_segmentation_helpers import (
