@@ -16,9 +16,9 @@ Labelformat is available on PyPI and can be installed using various package mana
     pip install labelformat
     ```
 
-=== "Poetry"
+=== "uv"
     ```bash
-    poetry add labelformat
+    uv add labelformat
     ```
 
 === "Conda"
@@ -41,13 +41,13 @@ If you prefer to install Labelformat from the source code, follow these steps:
    cd labelformat
    ```
 2. Install Dependencies:
-   Labelformat uses Poetry for dependency management. Ensure you have Poetry installed:
+   Labelformat uses uv for dependency management. Ensure you have uv installed:
    ```bash
-   pip install poetry
+   pip install uv
    ```
 3. Set Up the Development Environment:
    ```bash
-   poetry install
+   uv sync --all-groups
    ```
 
 ## Updating Labelformat
