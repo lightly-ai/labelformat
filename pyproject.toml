@@ -60,10 +60,6 @@ strict = true
 disallow_untyped_defs = true
 ignore_missing_imports = false
 
-[[tool.mypy.overrides]]
-module = "fsspec.*"
-ignore_missing_imports = true
-
 # Print format
 show_error_codes = true
 show_error_context = true
