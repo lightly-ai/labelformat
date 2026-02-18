@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 from typing import Dict, Iterable, List
 
+import fsspec
 import labelformat.formats.coco_segmentation_helpers as segmentation_helpers
 from labelformat.cli.registry import Task, cli_register
 from labelformat.formats.coco_segmentation_helpers import (
@@ -39,13 +40,13 @@ class _COCOBaseInput:
     def add_cli_arguments(parser: ArgumentParser) -> None:
         parser.add_argument(
             "--input-file",
-            type=Path,
+            type=str,
             required=True,
-            help="Path to input COCO JSON file",
+            help="Path or URI to input COCO JSON file",
         )
 
-    def __init__(self, input_file: Path) -> None:
-        with input_file.open() as file:
+    def __init__(self, input_file: str | Path) -> None:
+        with fsspec.open(str(input_file), mode="r") as file:
             self._data = json.load(file)
 
     def get_categories(self) -> Iterable[Category]:
