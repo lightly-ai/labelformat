@@ -7,10 +7,8 @@ from pytest_mock import MockerFixture
 
 from labelformat.formats.coco import COCOObjectDetectionInput
 
-COCO_S3_ANNOTATION_FILE = (
-    "s3://studio-test-datasets-eu/coco_subset_128_images/instances_train2017.json"
-)
-COCO_S3_IMAGES_DIR = "s3://studio-test-datasets-eu/coco_subset_128_images/images/"
+COCO_S3_ANNOTATION_FILE = "s3://some_bucket/some_file.json"
+COCO_S3_IMAGES_DIR = "s3://some_bucket/some_images/"
 
 MOCK_COCO_PAYLOAD: Dict[str, Any] = {
     "categories": [
