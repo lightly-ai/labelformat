@@ -464,23 +464,22 @@ We also welcome contributions, please submit a PR.
 
 ### Development
 
-The library targets python 3.8 and higher. We use poetry to manage the development environment.
+The library targets python 3.8 and higher. We use uv to manage the development environment.
 
 Here is an example development workflow:
 
 ```bash
 # Create a virtual environment with development dependencies
-poetry env use python3.8
-poetry install
+uv sync --all-groups --python 3.8
 
 # Make changes
 ...
 
 # Autoformat the code
-poetry run make format
+make format
 
 # Run tests
-poetry run make all-checks
+make all-checks
 ```
 
 ## Maintained By
