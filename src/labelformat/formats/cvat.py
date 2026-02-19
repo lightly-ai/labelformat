@@ -22,33 +22,33 @@ logger = logging.getLogger(__name__)
 
 
 # The following Pydantic XML models describe the structure of CVAT XML files.
-class CVATLabel(BaseXmlModel, tag="label", search_mode="unordered"):  # type: ignore
+class CVATLabel(BaseXmlModel, tag="label", search_mode="unordered"):
     name: str = element()
 
 
-class CVATLabels(BaseXmlModel, tag="labels", search_mode="unordered"):  # type: ignore
+class CVATLabels(BaseXmlModel, tag="labels", search_mode="unordered"):
     label_list: List[CVATLabel] = element(tag="label")
 
 
-class CVATTask(BaseXmlModel, tag="task", search_mode="unordered"):  # type: ignore
+class CVATTask(BaseXmlModel, tag="task", search_mode="unordered"):
     labels: Optional[CVATLabels] = element(tag="labels")
 
 
-class CVATJob(BaseXmlModel, tag="job", search_mode="unordered"):  # type: ignore
+class CVATJob(BaseXmlModel, tag="job", search_mode="unordered"):
     labels: Optional[CVATLabels] = element(tag="labels")
 
 
-class CVATProject(BaseXmlModel, tag="project", search_mode="unordered"):  # type: ignore
+class CVATProject(BaseXmlModel, tag="project", search_mode="unordered"):
     labels: Optional[CVATLabels] = element(tag="labels")
 
 
-class CVATMeta(BaseXmlModel, tag="meta", search_mode="unordered"):  # type: ignore
+class CVATMeta(BaseXmlModel, tag="meta", search_mode="unordered"):
     task: Optional[CVATTask] = element(default=None)
     job: Optional[CVATJob] = element(default=None)
     project: Optional[CVATProject] = element(default=None)
 
 
-class CVATBox(BaseXmlModel, tag="box", search_mode="unordered"):  # type: ignore
+class CVATBox(BaseXmlModel, tag="box", search_mode="unordered"):
     label: str = attr()
     xtl: float = attr()
     ytl: float = attr()
@@ -56,7 +56,7 @@ class CVATBox(BaseXmlModel, tag="box", search_mode="unordered"):  # type: ignore
     ybr: float = attr()
 
 
-class CVATImage(BaseXmlModel, tag="image", search_mode="unordered"):  # type: ignore
+class CVATImage(BaseXmlModel, tag="image", search_mode="unordered"):
     id: int = attr()
     name: str = attr()  # Filename
     width: int = attr()
@@ -64,7 +64,7 @@ class CVATImage(BaseXmlModel, tag="image", search_mode="unordered"):  # type: ig
     boxes: List[CVATBox] = element(tag="box", default=[])
 
 
-class CVATAnnotations(BaseXmlModel, tag="annotations", search_mode="unordered"):  # type: ignore
+class CVATAnnotations(BaseXmlModel, tag="annotations", search_mode="unordered"):
     meta: CVATMeta = element()
     images: List[CVATImage] = element(tag="image", default=[])
 

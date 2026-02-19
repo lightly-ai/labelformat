@@ -31,6 +31,7 @@ dev = [
   "types-Pillow",
   "types-PyYAML",
   "opencv-python",
+  "types-tqdm>=4.67.0.20241221",
 ]
 
 [build-system]
@@ -55,32 +56,9 @@ pythonpath = [
 profile = "black"
 
 [tool.mypy]
-ignore_missing_imports = true
-python_version = 3.8
-warn_unused_configs = true
-strict_equality = true
-# Disallow dynamic typing
-#disallow_any_unimported = true # because mypy fails to follow some imports, e.g. for PIL.Image.Image and matplotlib.Figure
-#disallow_any_expr = true # because intermediate expressions do not need to be typed
-disallow_any_decorated = true
-disallow_any_explicit = true
-disallow_any_generics = true
-disallow_subclassing_any = true
-# Disallow untyped definitions
-#disallow_untyped_calls = true # otherwise all external functions called must be typed e.g. calls to torch functions
+strict = true
 disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-# None and optional handling
-no_implicit_optional = true
-strict_optional = true
-# Configuring warnings
-warn_unused_ignores = true
-warn_no_return = true
-warn_return_any = true
-warn_redundant_casts = true
-warn_unreachable = true
+ignore_missing_imports = false
 
 # Print format
 show_error_codes = true

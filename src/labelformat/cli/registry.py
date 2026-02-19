@@ -18,7 +18,7 @@ class Task(Enum):
 
 
 @dataclass
-class Registry:  # type: ignore[misc]
+class Registry:
     input: Dict[Task, Dict[str, Type]]  # type: ignore[type-arg]
     output: Dict[Task, Dict[str, Type]]  # type: ignore[type-arg]
 
