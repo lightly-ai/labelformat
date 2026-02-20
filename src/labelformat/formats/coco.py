@@ -33,7 +33,7 @@ from labelformat.model.object_detection import (
     ObjectDetectionOutput,
     SingleObjectDetection,
 )
-from labelformat.types import JsonDict, ParseError
+from labelformat.types import JsonDict, ParseError, PathLike
 
 
 class _COCOBaseInput:
@@ -46,7 +46,7 @@ class _COCOBaseInput:
             help="Path or URI to input COCO JSON file",
         )
 
-    def __init__(self, input_file: str | Path) -> None:
+    def __init__(self, input_file: PathLike) -> None:
         with fsspec.open(str(input_file), mode="r") as file:
             self._data = json.load(file)
 
