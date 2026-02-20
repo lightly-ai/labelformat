@@ -68,6 +68,28 @@ This package is compatible with the following platforms:
 pip install labelformat
 ```
 
+### ☁️ Using Cloud Storage
+
+To work with annotations stored in cloud storage (like AWS S3,
+GCS, or Azure), install the cloud storage dependencies:
+
+```shell
+pip install "labelformat[cloud-storage]"
+```
+
+This installs the required libraries: `s3fs` (for S3), `gcsfs` (for GCS), and
+`adlfs` (for Azure).
+
+Labelformat uses `fsspec`, which also supports other file systems. If you need a
+different provider (for example FTP or SSH), check the
+[fsspec documentation](https://filesystem-spec.readthedocs.io/en/latest/api.html#other-known-implementations)
+and install the matching implementation manually (for example `pip install sftpfs`).
+
+**Current Support Limitations:**
+
+- **Input format:** Cloud URIs are currently supported only for COCO input (`--input-format coco`).
+
+
 ## Usage
 
 ### CLI
