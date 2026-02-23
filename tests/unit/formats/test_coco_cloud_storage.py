@@ -13,7 +13,7 @@ MOCK_COCO_PAYLOAD = {
 }
 
 
-def test_coco_od_inputs_read_from_s3_mocked(mocker: MockerFixture) -> None:
+def test_coco_od_inputs_read_from_s3__mocked(mocker: MockerFixture) -> None:
     mock_open = mocker.patch(
         "labelformat.formats.coco.fsspec.open",
         return_value=io.StringIO(json.dumps(MOCK_COCO_PAYLOAD)),
