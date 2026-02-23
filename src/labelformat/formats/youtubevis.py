@@ -84,6 +84,7 @@ class YouTubeVISObjectDetectionTrackInput(
                     SingleObjectDetectionTrack(
                         category=category_id_to_category[track["category_id"]],
                         boxes=boxes,
+                        object_track_id=track.get("id"),
                     )
                 )
             yield VideoObjectDetectionTrack(
@@ -115,6 +116,7 @@ class YouTubeVISInstanceSegmentationTrackInput(
                     SingleInstanceSegmentationTrack(
                         category=category_id_to_category[track["category_id"]],
                         segmentations=segmentations,
+                        object_track_id=track.get("id"),
                     )
                 )
             yield VideoInstanceSegmentationTrack(

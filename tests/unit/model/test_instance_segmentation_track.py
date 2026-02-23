@@ -19,6 +19,7 @@ class TestVideoInstanceSegmentationTrack:
                 MultiPolygon(polygons=[[(0.0, 0.0), (1.0, 0.0), (1.0, 1.0)]]),
                 None,
             ],
+            object_track_id=0,
         )
 
         track_b = SingleInstanceSegmentationTrack(
@@ -27,6 +28,7 @@ class TestVideoInstanceSegmentationTrack:
                 MultiPolygon(polygons=[[(2.0, 2.0), (3.0, 2.0), (3.0, 3.0)]]),
                 MultiPolygon(polygons=[[(4.0, 4.0), (5.0, 4.0), (5.0, 5.0)]]),
             ],
+            object_track_id=1,
         )
 
         video = Video(id=0, filename="test.mov", width=1, height=1, number_of_frames=2)
@@ -46,6 +48,7 @@ class TestVideoInstanceSegmentationTrack:
                 None,
                 None,
             ],
+            object_track_id=0,
         )
 
         video = Video(id=0, filename="test.mov", width=1, height=1, number_of_frames=2)

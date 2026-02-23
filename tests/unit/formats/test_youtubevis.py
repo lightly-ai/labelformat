@@ -70,6 +70,7 @@ class TestYouTubeVISObjectDetectionTrackInput:
                             ),
                             None,
                         ],
+                        object_track_id=10,
                     )
                 ],
             )
@@ -103,6 +104,7 @@ class TestYouTubeVISInstanceSegmentationTrackInput:
                     SingleInstanceSegmentationTrack(
                         category=Category(id=1, name="cat"),
                         segmentations=[expected_segmentation, None],
+                        object_track_id=20,
                     )
                 ],
             )
@@ -125,6 +127,7 @@ def _write_youtube_vis_json(input_file: Path) -> Path:
         ],
         "annotations": [
             {
+                "id": 10,
                 "video_id": 5,
                 "category_id": 1,
                 "bboxes": [
@@ -156,6 +159,7 @@ def _write_youtube_vis_instance_segmentation_json(input_file: Path) -> Path:
         ],
         "annotations": [
             {
+                "id": 20,
                 "video_id": 5,
                 "category_id": 1,
                 "bboxes": [

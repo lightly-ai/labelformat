@@ -16,11 +16,13 @@ class TestVideoObjectDetectionTrack:
         track_a = SingleObjectDetectionTrack(
             category=Category(id=0, name="cat"),
             boxes=[BoundingBox(xmin=0, ymin=0, xmax=1, ymax=1) for _ in range(2)],
+            object_track_id=0,
         )
 
         track_b = SingleObjectDetectionTrack(
             category=Category(id=1, name="dog"),
             boxes=[BoundingBox(xmin=0, ymin=0, xmax=1, ymax=1) for _ in range(2)],
+            object_track_id=1,
         )
 
         video = Video(id=0, filename="test.mov", width=1, height=1, number_of_frames=2)
@@ -36,11 +38,13 @@ class TestVideoObjectDetectionTrack:
         track_a = SingleObjectDetectionTrack(
             category=Category(id=0, name="cat"),
             boxes=[BoundingBox(xmin=0, ymin=0, xmax=1, ymax=1) for _ in range(2)],
+            object_track_id=0,
         )
 
         track_b = SingleObjectDetectionTrack(
             category=Category(id=1, name="dog"),
             boxes=[BoundingBox(xmin=0, ymin=0, xmax=1, ymax=1) for _ in range(3)],
+            object_track_id=1,
         )
 
         video = Video(id=0, filename="test.mov", width=1, height=1, number_of_frames=2)
