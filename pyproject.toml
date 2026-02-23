@@ -13,10 +13,18 @@ dependencies = [
   "pydantic==2.10.6",
   "pydantic-xml==2.17.3",
   "numpy",
+  "fsspec>=2023.1.0",
 ]
 
 [project.scripts]
 labelformat = "labelformat.cli.cli:main"
+
+[project.optional-dependencies]
+cloud-storage = [
+  "s3fs>=2023.1.0",
+  "gcsfs>=2023.1.0",
+  "adlfs>=2023.1.0",
+]
 
 [dependency-groups]
 dev = [
@@ -59,6 +67,10 @@ profile = "black"
 strict = true
 disallow_untyped_defs = true
 ignore_missing_imports = false
+
+[[tool.mypy.overrides]]
+module = "fsspec.*"
+ignore_missing_imports = true
 
 # Print format
 show_error_codes = true
