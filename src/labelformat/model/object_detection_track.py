@@ -14,6 +14,7 @@ from labelformat.model.video import Video
 class SingleObjectDetectionTrack:
     category: Category
     boxes: list[BoundingBox | None]
+    object_track_id: int | None = None
     # TODO (Jonas, 01/2026): Add confidence
 
 

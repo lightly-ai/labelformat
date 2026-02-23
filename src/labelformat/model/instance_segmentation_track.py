@@ -15,6 +15,7 @@ from labelformat.model.video import Video
 class SingleInstanceSegmentationTrack:
     category: Category
     segmentations: list[MultiPolygon | BinaryMaskSegmentation | None]
+    object_track_id: int | None = None
 
 
 @dataclass(frozen=True)
