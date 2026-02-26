@@ -9,6 +9,9 @@ COCO_S3_ANNOTATION_FILE = (
 COCO_S3_IMAGES_DIR = "s3://studio-test-datasets-eu/coco_subset_128_images/images/"
 
 
+# FOR DEVELOPERS:
+# Remove the skip decorator and run this test to test the integration with S3.
+# Note that this test will fail if you don't have access to the S3 dataset, so it is skipped by default.
 @pytest.mark.skip(reason="Requires access to S3 dataset")
 def test_coco_od_inputs_read_from_s3__unmocked() -> None:
     object_detection_input = COCOObjectDetectionInput(
