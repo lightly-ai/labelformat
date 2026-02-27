@@ -2530,7 +2530,7 @@ wheels = [
 
 [[package]]
 name = "labelformat"
-version = "0.1.11"
+version = "0.1.12"
 source = { editable = "." }
 dependencies = [
     { name = "fsspec", version = "2024.10.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },

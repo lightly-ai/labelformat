@@ -1,6 +1,6 @@
 [project]
 name = "labelformat"
-version = "0.1.11"
+version = "0.1.12"
 authors = [{ name = "Lightly.ai" }]
 description = "A tool for converting computer vision label formats."
 readme = "README.md"
