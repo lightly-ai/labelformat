@@ -125,24 +125,48 @@ class RLEDecoderEncoder:
         rle: list[int], height: int, width: int
     ) -> NDArray[np.int_]:
         # Decodes a row-major run-length encoded list into a 2D binary mask.
-        run_val = 0
-        decoded = []
-        for count in rle:
-            decoded.extend([run_val] * count)
-            run_val = 1 - run_val
-        return np.array(decoded, dtype=np.int_).reshape((height, width), order="C")
+        rle_array = np.asarray(rle, dtype=np.int64)
+
+        expected = height * width
+        total = rle_array.sum()
+        if total != expected:
+            raise ValueError(
+                f"RLE decodes to {total} pixels, expected {expected} (=height*width)."
+            )
+
+        if total == 0:
+            return np.empty((height, width), dtype=np.int_)
+
+        # Run-lengths alternate between 0-run and 1-run. `arange(n) & 1` yields 0,1,0,1,...
+        vals = (np.arange(rle_array.size, dtype=np.int_) & 1).astype(
+            np.int_, copy=False
+        )
+        flat = np.repeat(vals, rle_array)
+        return flat.reshape((height, width), order="C").astype(np.int_, copy=False)
 
     @staticmethod
     def decode_column_wise_rle(
         rle: list[int], height: int, width: int
     ) -> NDArray[np.int_]:
         # Decodes a column-major run-length encoded list into a 2D binary mask.
-        run_val = 0
-        decoded = []
-        for count in rle:
-            decoded.extend([run_val] * count)
-            run_val = 1 - run_val
-        return np.array(decoded, dtype=np.int_).reshape((height, width), order="F")
+        rle_array = np.asarray(rle, dtype=np.int64)
+
+        expected = height * width
+        total = rle_array.sum()
+        if total != expected:
+            raise ValueError(
+                f"RLE decodes to {total} pixels, expected {expected} (=height*width)."
+            )
+
+        if total == 0:
+            return np.empty((height, width), dtype=np.int_)
+
+        # Run-lengths alternate between 0-run and 1-run. `arange(n) & 1` yields 0,1,0,1,...
+        vals = (np.arange(rle_array.size, dtype=np.int_) & 1).astype(
+            np.int_, copy=False
+        )
+        flat = np.repeat(vals, rle_array)
+        return flat.reshape((height, width), order="F").astype(np.int_, copy=False)
 
 
 def _compute_bbox_from_rle(
