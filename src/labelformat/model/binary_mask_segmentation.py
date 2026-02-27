@@ -126,13 +126,9 @@ class RLEDecoderEncoder:
     ) -> NDArray[np.int_]:
         # Decodes a row-major run-length encoded list into a 2D binary mask.
         rle_array = np.asarray(rle, dtype=np.int64)
-        if rle_array.ndim != 1:
-            raise ValueError("RLE must be a 1D list of run lengths.")
-        if np.any(rle_array < 0):
-            raise ValueError("RLE run lengths must be non-negative.")
 
-        expected = int(height) * int(width)
-        total = int(rle_array.sum())
+        expected = height * width
+        total = rle_array.sum()
         if total != expected:
             raise ValueError(
                 f"RLE decodes to {total} pixels, expected {expected} (=height*width)."
@@ -141,6 +137,7 @@ class RLEDecoderEncoder:
         if total == 0:
             return np.empty((height, width), dtype=np.int_)
 
+        # Run-lengths alternate between 0-run and 1-run. `arange(n) & 1` yields 0,1,0,1,...
         vals = (np.arange(rle_array.size, dtype=np.int_) & 1).astype(
             np.int_, copy=False
         )
@@ -153,13 +150,9 @@ class RLEDecoderEncoder:
     ) -> NDArray[np.int_]:
         # Decodes a column-major run-length encoded list into a 2D binary mask.
         rle_array = np.asarray(rle, dtype=np.int64)
-        if rle_array.ndim != 1:
-            raise ValueError("RLE must be a 1D list of run lengths.")
-        if np.any(rle_array < 0):
-            raise ValueError("RLE run lengths must be non-negative.")
 
-        expected = int(height) * int(width)
-        total = int(rle_array.sum())
+        expected = height * width
+        total = rle_array.sum()
         if total != expected:
             raise ValueError(
                 f"RLE decodes to {total} pixels, expected {expected} (=height*width)."
@@ -168,6 +161,7 @@ class RLEDecoderEncoder:
         if total == 0:
             return np.empty((height, width), dtype=np.int_)
 
+        # Run-lengths alternate between 0-run and 1-run. `arange(n) & 1` yields 0,1,0,1,...
         vals = (np.arange(rle_array.size, dtype=np.int_) & 1).astype(
             np.int_, copy=False
         )
