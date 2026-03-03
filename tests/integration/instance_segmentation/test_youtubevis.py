@@ -22,4 +22,3 @@ def test_youtubevis_instance_segmentation_import_export(tmp_path: Path) -> None:
     expected_json = json.loads(youtubevis_file.read_text())
 
     assert output_json == expected_json
-

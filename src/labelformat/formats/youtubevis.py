@@ -158,7 +158,6 @@ class YouTubeVISInstanceSegmentationTrackOutput(
             json.dump(data, f, indent=2)
 
 
-
 def _get_output_videos_dict(videos: Iterable[Video]) -> List[JsonDict]:
     """Get the 'videos' list for YouTube-VIS JSON."""
     result = []
