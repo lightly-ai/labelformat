@@ -70,6 +70,7 @@ from labelformat.formats.yolov26 import (
 )
 from labelformat.formats.youtubevis import (
     YouTubeVISInstanceSegmentationTrackInput,
+    YouTubeVISInstanceSegmentationTrackOutput,
     YouTubeVISObjectDetectionTrackInput,
 )
 
@@ -114,5 +115,6 @@ __all__ = [
     "YOLOv26ObjectDetectionOutput",
     "MaskPairInstanceSegmentationInput",
     "YouTubeVISInstanceSegmentationTrackInput",
+    "YouTubeVISInstanceSegmentationTrackOutput",
     "YouTubeVISObjectDetectionTrackInput",
 ]

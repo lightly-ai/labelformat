@@ -1,0 +1,78 @@
+{
+  "info": {
+    "description": "YouTube-VIS export"
+  },
+  "videos": [
+    {
+      "id": 1,
+      "file_names": [
+        "video_1/00000.jpg",
+        "video_1/00001.jpg"
+      ],
+      "width": 640,
+      "height": 480,
+      "length": 2
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "person"
+    }
+  ],
+  "annotations": [
+    {
+      "id": 99,
+      "video_id": 1,
+      "category_id": 1,
+      "bboxes": [
+        [
+          10.0,
+          20.0,
+          30.0,
+          40.0
+        ],
+        [
+          15.0,
+          25.0,
+          35.0,
+          45.0
+        ]
+      ],
+      "segmentations": [
+        [
+          [
+            10.0,
+            20.0,
+            40.0,
+            20.0,
+            40.0,
+            60.0,
+            10.0,
+            60.0
+          ]
+        ],
+        [
+          [
+            15.0,
+            25.0,
+            50.0,
+            25.0,
+            50.0,
+            70.0,
+            15.0,
+            70.0
+          ]
+        ]
+      ],
+      "areas": [
+        1200,
+        1575
+      ],
+      "iscrowd": 0,
+      "height": 480,
+      "width": 640,
+      "length": 2
+    }
+  ]
+}
