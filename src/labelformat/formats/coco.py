@@ -191,7 +191,9 @@ class COCOInstanceSegmentationOutput(_COCOBaseOutput, InstanceSegmentationOutput
         data["annotations"] = []
         for label in label_input.get_labels():
             for obj in label.objects:
-                segmentation, bbox, is_crowd = segmentation_helpers.get_coco_segmentation(obj.segmentation)
+                segmentation, bbox, is_crowd = (
+                    segmentation_helpers.get_coco_segmentation(obj.segmentation)
+                )
                 annotation = {
                     "image_id": label.image.id,
                     "category_id": obj.category.id,

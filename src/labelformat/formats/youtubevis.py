@@ -208,9 +208,13 @@ def _get_output_annotations_dict(
                     segmentations_list.append(None)
                     areas_list.append(None)
                     continue
-                segmentation, bbox, iscrowd = segmentation_helpers.get_coco_segmentation(seg)
-                if isinstance(segmentation, dict): # RLE segmentation
-                  area = sum(segmentation["counts"][1::2])  # foreground runs at odd indices
+                segmentation, bbox, iscrowd = (
+                    segmentation_helpers.get_coco_segmentation(seg)
+                )
+                if isinstance(segmentation, dict):  # RLE segmentation
+                    area = sum(
+                        segmentation["counts"][1::2]
+                    )  # foreground runs at odd indices
                 else:
                     area = None
                 bboxes_list.append(bbox)
