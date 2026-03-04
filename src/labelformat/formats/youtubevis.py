@@ -154,8 +154,8 @@ class YouTubeVISInstanceSegmentationTrackOutput(
             "annotations": _get_output_annotations_dict(label_input.get_labels()),
         }
         self.output_file.parent.mkdir(parents=True, exist_ok=True)
-        with self.output_file.open("w") as f:
-            json.dump(data, f, indent=2)
+        with self.output_file.open("w") as file:
+            json.dump(data, file, indent=2)
 
 
 def _get_output_videos_dict(videos: Iterable[Video]) -> List[JsonDict]:
@@ -201,34 +201,27 @@ def _get_output_annotations_dict(
                 | None
             ] = []
             areas_list: List[int | None] = []
+            iscrowd = 0
             for seg in obj.segmentations:
                 if seg is None:
                     bboxes_list.append(None)
                     segmentations_list.append(None)
                     areas_list.append(None)
                     continue
-                out_seg = _segmentation_to_youtube_vis(seg, None)
-                if isinstance(seg, BinaryMaskSegmentation):
-                    bbox_xywh = [
-                        float(v)
-                        for v in seg.bounding_box.to_format(BoundingBoxFormat.XYWH)
-                    ]
-                    col_rle = RLEDecoderEncoder.encode_column_wise_rle(
-                        seg.get_binary_mask()
-                    )
-                    area = sum(col_rle[1::2])  # foreground runs at odd indices
-                elif isinstance(seg, MultiPolygon):
-                    bbox = seg.bounding_box()
-                    bbox_xywh = [
-                        float(v) for v in bbox.to_format(BoundingBoxFormat.XYWH)
-                    ]
-                    area = int(bbox_xywh[2] * bbox_xywh[3])
+                segmentation, bbox, iscrowd = segmentation_helpers.get_coco_segmentation(seg)
+                if isinstance(segmentation, dict): # RLE segmentation
+                  area = sum(segmentation["counts"][1::2])  # foreground runs at odd indices
                 else:
-                    bbox_xywh = None
                     area = None
-                bboxes_list.append(bbox_xywh)
-                segmentations_list.append(out_seg)
+                bboxes_list.append(bbox)
+                segmentations_list.append(segmentation)
                 areas_list.append(area)
+            if not (
+                length == len(segmentations_list) == len(bboxes_list) == len(areas_list)
+            ):
+                raise ValueError(
+                    f"Length mismatch: {length} != {len(segmentations_list)} != {len(bboxes_list)} != {len(areas_list)}"
+                )
             result.append(
                 {
                     "id": obj.object_track_id,
@@ -237,32 +230,13 @@ def _get_output_annotations_dict(
                     "bboxes": bboxes_list,
                     "segmentations": segmentations_list,
                     "areas": areas_list,
-                    "iscrowd": 0,
+                    "iscrowd": iscrowd,
                     "height": height,
                     "width": width,
                     "length": length,
                 }
             )
     return result
-
-
-def _segmentation_to_youtube_vis(
-    segmentation: MultiPolygon | BinaryMaskSegmentation | None,
-    bbox_xywh: list[float] | None,
-) -> COCOInstanceSegmentationRLE | COCOInstanceSegmentationMultiPolygon | None:
-    """Convert a single-frame segmentation to YouTube-VIS format (RLE or polygon list)."""
-    if segmentation is None:
-        return None
-    if isinstance(segmentation, BinaryMaskSegmentation):
-        binary_mask = segmentation.get_binary_mask()
-        counts = RLEDecoderEncoder.encode_column_wise_rle(binary_mask)
-        return {"counts": counts, "size": [segmentation.height, segmentation.width]}
-    if isinstance(segmentation, MultiPolygon):
-        coco_seg = []
-        for polygon in segmentation.polygons:
-            coco_seg.append([x for point in polygon for x in point])
-        return coco_seg
-    return None
 
 
 def _get_object_track_boxes(
