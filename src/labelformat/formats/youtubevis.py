@@ -10,11 +10,15 @@ from labelformat.formats.coco_segmentation_helpers import (
     COCOInstanceSegmentationMultiPolygon,
     COCOInstanceSegmentationRLE,
 )
-from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
+from labelformat.model.binary_mask_segmentation import (
+    BinaryMaskSegmentation,
+    RLEDecoderEncoder,
+)
 from labelformat.model.bounding_box import BoundingBox, BoundingBoxFormat
 from labelformat.model.category import Category
 from labelformat.model.instance_segmentation_track import (
     InstanceSegmentationTrackInput,
+    InstanceSegmentationTrackOutput,
     SingleInstanceSegmentationTrack,
     VideoInstanceSegmentationTrack,
 )
@@ -123,6 +127,120 @@ class YouTubeVISInstanceSegmentationTrackInput(
                 video=video,
                 objects=objects,
             )
+
+
+class _YouTubeVISBaseOutput:
+    @staticmethod
+    def add_cli_arguments(parser: ArgumentParser) -> None:
+        parser.add_argument(
+            "--output-file",
+            type=Path,
+            required=True,
+            help="Path to output YouTube-VIS JSON file",
+        )
+
+    def __init__(self, output_file: Path) -> None:
+        self.output_file = output_file
+
+
+class YouTubeVISInstanceSegmentationTrackOutput(
+    _YouTubeVISBaseOutput, InstanceSegmentationTrackOutput
+):
+    def save(self, label_input: InstanceSegmentationTrackInput) -> None:
+        data: JsonDict = {
+            "info": {"description": "YouTube-VIS export"},
+            "videos": _get_output_videos_dict(label_input.get_videos()),
+            "categories": _get_output_categories_dict(label_input.get_categories()),
+            "annotations": _get_output_annotations_dict(label_input.get_labels()),
+        }
+        self.output_file.parent.mkdir(parents=True, exist_ok=True)
+        with self.output_file.open("w") as file:
+            json.dump(data, file, indent=2)
+
+
+def _get_output_videos_dict(videos: Iterable[Video]) -> List[JsonDict]:
+    """Get the 'videos' list for YouTube-VIS JSON."""
+    result = []
+    for video in videos:
+        file_names = [
+            f"{video.filename}/{i:05d}.jpg" for i in range(video.number_of_frames)
+        ]
+        result.append(
+            {
+                "id": video.id,
+                "file_names": file_names,
+                "width": video.width,
+                "height": video.height,
+                "length": video.number_of_frames,
+            }
+        )
+    return result
+
+
+def _get_output_categories_dict(
+    categories: Iterable[Category],
+) -> List[JsonDict]:
+    """Get the 'categories' list for YouTube-VIS JSON."""
+    return [{"id": category.id, "name": category.name} for category in categories]
+
+
+def _get_output_annotations_dict(
+    labels: Iterable[VideoInstanceSegmentationTrack],
+) -> List[JsonDict]:
+    """Get the 'annotations' list for YouTube-VIS JSON."""
+    result: List[JsonDict] = []
+    for label in labels:
+        video = label.video
+        length = video.number_of_frames
+        height, width = video.height, video.width
+        for obj in label.objects:
+            bboxes_list: List[list[float] | None] = []
+            segmentations_list: List[
+                COCOInstanceSegmentationRLE
+                | COCOInstanceSegmentationMultiPolygon
+                | None
+            ] = []
+            areas_list: List[int | None] = []
+            iscrowd = 0
+            for seg in obj.segmentations:
+                if seg is None:
+                    bboxes_list.append(None)
+                    segmentations_list.append(None)
+                    areas_list.append(None)
+                    continue
+                segmentation, bbox, iscrowd = (
+                    segmentation_helpers.get_coco_segmentation(seg)
+                )
+                if isinstance(segmentation, dict):  # RLE segmentation
+                    area = sum(
+                        segmentation["counts"][1::2]
+                    )  # foreground runs at odd indices
+                else:
+                    area = None
+                bboxes_list.append(bbox)
+                segmentations_list.append(segmentation)
+                areas_list.append(area)
+            if not (
+                length == len(segmentations_list) == len(bboxes_list) == len(areas_list)
+            ):
+                raise ValueError(
+                    f"Length mismatch: {length} != {len(segmentations_list)} != {len(bboxes_list)} != {len(areas_list)}"
+                )
+            result.append(
+                {
+                    "id": obj.object_track_id,
+                    "video_id": video.id,
+                    "category_id": obj.category.id,
+                    "bboxes": bboxes_list,
+                    "segmentations": segmentations_list,
+                    "areas": areas_list,
+                    "iscrowd": iscrowd,
+                    "height": height,
+                    "width": width,
+                    "length": length,
+                }
+            )
+    return result
 
 
 def _get_object_track_boxes(

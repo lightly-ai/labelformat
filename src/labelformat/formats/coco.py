@@ -191,40 +191,14 @@ class COCOInstanceSegmentationOutput(_COCOBaseOutput, InstanceSegmentationOutput
         data["annotations"] = []
         for label in label_input.get_labels():
             for obj in label.objects:
-                segmentation: (
-                    COCOInstanceSegmentationMultiPolygon | COCOInstanceSegmentationRLE
+                segmentation, bbox, is_crowd = (
+                    segmentation_helpers.get_coco_segmentation(obj.segmentation)
                 )
-                if isinstance(obj.segmentation, BinaryMaskSegmentation):
-                    segmentation = _binary_mask_rle_to_coco_segmentation(
-                        binary_mask_rle=obj.segmentation
-                    )
-                    bbox = [
-                        float(v)
-                        for v in obj.segmentation.bounding_box.to_format(
-                            BoundingBoxFormat.XYWH
-                        )
-                    ]
-                    iscrowd = 1
-                elif isinstance(obj.segmentation, MultiPolygon):
-                    segmentation = _multipolygon_to_coco_segmentation(
-                        multipolygon=obj.segmentation
-                    )
-                    bbox = [
-                        float(v)
-                        for v in obj.segmentation.bounding_box().to_format(
-                            BoundingBoxFormat.XYWH
-                        )
-                    ]
-                    iscrowd = 0
-                else:
-                    raise ParseError(
-                        f"Unsupported segmentation type: {type(obj.segmentation)}"
-                    )
                 annotation = {
                     "image_id": label.image.id,
                     "category_id": obj.category.id,
                     "bbox": bbox,
-                    "iscrowd": iscrowd,
+                    "iscrowd": is_crowd,
                     "segmentation": segmentation,
                 }
                 data["annotations"].append(annotation)
@@ -232,24 +206,6 @@ class COCOInstanceSegmentationOutput(_COCOBaseOutput, InstanceSegmentationOutput
         self.output_file.parent.mkdir(parents=True, exist_ok=True)
         with self.output_file.open("w") as file:
             json.dump(data, file, indent=2)
-
-
-def _multipolygon_to_coco_segmentation(
-    multipolygon: MultiPolygon,
-) -> COCOInstanceSegmentationMultiPolygon:
-    """Convert MultiPolygon to COCO segmentation."""
-    coco_segmentation = []
-    for polygon in multipolygon.polygons:
-        coco_segmentation.append([x for point in polygon for x in point])
-    return coco_segmentation
-
-
-def _binary_mask_rle_to_coco_segmentation(
-    binary_mask_rle: BinaryMaskSegmentation,
-) -> COCOInstanceSegmentationRLE:
-    binary_mask = binary_mask_rle.get_binary_mask()
-    counts = RLEDecoderEncoder.encode_column_wise_rle(binary_mask)
-    return {"counts": counts, "size": [binary_mask_rle.height, binary_mask_rle.width]}
 
 
 def _get_output_images_dict(
