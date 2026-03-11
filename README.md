@@ -492,7 +492,7 @@ Here is an example development workflow:
 
 ```bash
 # Create a virtual environment with development dependencies
-uv sync --all-groups --python 3.14
+uv sync --all-groups --python 3.8
 
 # Make changes
 ...
