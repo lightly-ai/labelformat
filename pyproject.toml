@@ -6,12 +6,22 @@ description = "A tool for converting computer vision label formats."
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.8"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
 dependencies = [
   "tqdm",
   "pyyaml",
   "pillow",
-  "pydantic==2.10.6",
-  "pydantic-xml==2.17.3",
+  "pydantic>=2.10.6",
+  "pydantic-xml>=2.17.3",
   "numpy",
   "fsspec>=2023.1.0",
 ]
@@ -32,7 +42,7 @@ dev = [
   "black",
   "isort",
   "flake8",
-  "pytest<8",
+  "pytest>=8",
   "pytest-mock",
   "build",
   "twine",
