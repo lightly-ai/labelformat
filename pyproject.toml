@@ -42,7 +42,7 @@ dev = [
   "black",
   "isort",
   "flake8",
-  "pytest>=8",
+  "pytest==8",
   "pytest-mock",
   "build",
   "twine",
