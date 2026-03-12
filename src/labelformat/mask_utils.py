@@ -234,7 +234,7 @@ def _trace_outer_contour(binary_mask: NDArray[np.uint8]) -> List[Tuple[float, fl
     dirs = [(0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)]
 
     def is_boundary(y: int, x: int) -> bool:
-        return 0 <= y < h and 0 <= x < w and boundary[y, x] == 1
+        return bool(0 <= y < h and 0 <= x < w and boundary[y, x] == 1)
 
     contour: List[Tuple[float, float]] = []
     y, x = sy, sx

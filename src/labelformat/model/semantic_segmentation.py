@@ -43,7 +43,7 @@ class SemanticSegmentationMask:
             else:
                 if cur_cat_id is not None:
                     category_id_rle.append((cur_cat_id, cur_run_length))
-                cur_cat_id = cat_id
+                cur_cat_id = int(cat_id)
                 cur_run_length = 1
         if cur_cat_id is not None:
             category_id_rle.append((cur_cat_id, cur_run_length))

@@ -44,7 +44,7 @@ and time-consuming. Labelformat aims to solve this pain.
 
 - Support for common dataset label formats (more coming soon)
 - Support for common tool formats (more coming soon)
-- Minimal dependencies, targets python 3.8 or higher
+- Minimal dependencies, supports Python 3.8 through 3.14
 - Memory concious - datasets are processed file-by-file instead of loading everything
   in memory (when possible)
 - Typed
@@ -486,7 +486,7 @@ We also welcome contributions, please submit a PR.
 
 ### Development
 
-The library targets python 3.8 and higher. We use uv to manage the development environment.
+The library supports Python 3.8 through 3.14. We use uv to manage the development environment.
 
 Here is an example development workflow:
 
