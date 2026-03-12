@@ -236,8 +236,6 @@ class PascalVOCSemanticSegmentationOutput(InstanceSegmentationOutput):
                     segmentation=obj.segmentation, image=image_label.image
                 )
                 positive_pixels = obj_mask > 0
-                if not positive_pixels.any():
-                    continue
                 mask[positive_pixels] = obj.category.id
 
             mask_path = (masks_dir / image_label.image.filename).with_suffix(".png")
@@ -259,11 +257,7 @@ def _get_category_id_to_name(
     """Build class-id mapping and validate duplicates."""
     category_id_to_name: dict[int, str] = {}
     for category in categories:
-        if category.id < 0:
-            raise ValueError(
-                f"Category id must be >= 0 for Pascal VOC export. Got: {category.id}"
-            )
-        if category.id > 255:
+        if not 0 <= category.id <= 255:
             raise ValueError(
                 "Pascal VOC semantic segmentation export only supports class IDs "
                 f"in the range [0, 255]. Got: {category.id}"
