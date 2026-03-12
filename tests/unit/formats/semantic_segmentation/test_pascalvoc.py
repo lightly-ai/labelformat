@@ -195,6 +195,41 @@ class _OutOfRangeCategoryInput(InstanceSegmentationInput):
         ]
 
 
+class _InvalidPolygonInput(InstanceSegmentationInput):
+    @staticmethod
+    def add_cli_arguments(parser: ArgumentParser) -> None:
+        raise NotImplementedError()
+
+    def __init__(self) -> None:
+        self._image = Image(id=0, filename="invalid_polygon.jpg", width=4, height=3)
+
+    def get_categories(self) -> Iterable[Category]:
+        return [Category(id=1, name="car")]
+
+    def get_images(self) -> Iterable[Image]:
+        return [self._image]
+
+    def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
+        return [
+            ImageInstanceSegmentation(
+                image=self._image,
+                objects=[
+                    SingleInstanceSegmentation(
+                        category=Category(id=1, name="car"),
+                        segmentation=MultiPolygon(
+                            polygons=[
+                                [
+                                    (1.0, 1.0),
+                                    (2.0, 2.0),
+                                ]
+                            ]
+                        ),
+                    )
+                ],
+            )
+        ]
+
+
 class TestPascalVOCSemanticSegmentationInput:
     def test_from_dirs__builds_categories_and_images(self) -> None:
         mapping = _load_class_mapping_int_keys()
@@ -421,14 +456,13 @@ class TestPascalVOCSemanticSegmentationOutput:
                 label_input=_OutOfRangeCategoryInput(category_id=256)
             )
 
-
-def test__multipolygon_to_binary_mask__polygon_with_less_than_3_points_raises() -> None:
-    multipolygon = MultiPolygon(polygons=[[(1.0, 1.0), (2.0, 2.0)]])
-
-    with pytest.raises(ValueError, match=r"Polygon must contain at least 3 points"):
-        pascalvoc_module._multipolygon_to_binary_mask(
-            multipolygon=multipolygon, width=4, height=3
-        )
+    def test_save__polygon_with_less_than_3_points_raises(self, tmp_path: Path) -> None:
+        with pytest.raises(
+            ValueError, match=r"Polygon must contain at least 3 points, got 2"
+        ):
+            PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
+                label_input=_InvalidPolygonInput()
+            )
 
 
 def test__validate_mask__unknown_class_value_raises() -> None:
