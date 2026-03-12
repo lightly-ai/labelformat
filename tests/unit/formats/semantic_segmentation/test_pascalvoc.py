@@ -410,17 +410,13 @@ class TestPascalVOCSemanticSegmentationOutput:
             )
 
     def test_save__category_id_below_0_raises(self, tmp_path: Path) -> None:
-        with pytest.raises(
-            ValueError, match=r"range \[0, 255\].*Got: -1"
-        ):
+        with pytest.raises(ValueError, match=r"range \[0, 255\].*Got: -1"):
             PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
                 label_input=_OutOfRangeCategoryInput(category_id=-1)
             )
 
     def test_save__category_id_above_255_raises(self, tmp_path: Path) -> None:
-        with pytest.raises(
-            ValueError, match=r"range \[0, 255\].*Got: 256"
-        ):
+        with pytest.raises(ValueError, match=r"range \[0, 255\].*Got: 256"):
             PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
                 label_input=_OutOfRangeCategoryInput(category_id=256)
             )
