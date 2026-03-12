@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import json
+from argparse import ArgumentParser
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Iterable
 
 import cv2
 import numpy as np
@@ -12,9 +13,17 @@ from PIL import Image as PILImage
 from labelformat.formats.semantic_segmentation import pascalvoc as pascalvoc_module
 from labelformat.formats.semantic_segmentation.pascalvoc import (
     PascalVOCSemanticSegmentationInput,
+    PascalVOCSemanticSegmentationOutput,
 )
 from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
+from labelformat.model.category import Category
 from labelformat.model.image import Image
+from labelformat.model.instance_segmentation import (
+    ImageInstanceSegmentation,
+    InstanceSegmentationInput,
+    SingleInstanceSegmentation,
+)
+from labelformat.model.multipolygon import MultiPolygon
 from tests.unit.test_utils import FIXTURES_DIR
 
 FIXTURES_ROOT_PASCALVOC = FIXTURES_DIR / "semantic_segmentation/pascalvoc"
@@ -27,6 +36,117 @@ def _load_class_mapping_int_keys() -> Dict[int, str]:
     with CLASS_MAP_PATH.open("r") as f:
         data = json.load(f)
     return {int(k): str(v) for k, v in data.items()}
+
+
+class _SimplePolygonInput(InstanceSegmentationInput):
+    @staticmethod
+    def add_cli_arguments(parser: ArgumentParser) -> None:
+        raise NotImplementedError()
+
+    def __init__(self) -> None:
+        self._image = Image(id=0, filename="nested/example.jpg", width=6, height=5)
+
+    def get_categories(self) -> Iterable[Category]:
+        return [
+            Category(id=1, name="car"),
+            Category(id=2, name="person"),
+        ]
+
+    def get_images(self) -> Iterable[Image]:
+        return [self._image]
+
+    def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
+        return [
+            ImageInstanceSegmentation(
+                image=self._image,
+                objects=[
+                    SingleInstanceSegmentation(
+                        category=Category(id=1, name="car"),
+                        segmentation=MultiPolygon(
+                            polygons=[
+                                [
+                                    (1.0, 1.0),
+                                    (1.0, 3.0),
+                                    (3.0, 3.0),
+                                    (3.0, 1.0),
+                                ]
+                            ]
+                        ),
+                    ),
+                    SingleInstanceSegmentation(
+                        category=Category(id=2, name="person"),
+                        segmentation=MultiPolygon(
+                            polygons=[
+                                [
+                                    (2.0, 2.0),
+                                    (2.0, 4.0),
+                                    (4.0, 4.0),
+                                    (4.0, 2.0),
+                                ]
+                            ]
+                        ),
+                    ),
+                ],
+            )
+        ]
+
+
+class _BadMaskShapeInput(InstanceSegmentationInput):
+    @staticmethod
+    def add_cli_arguments(parser: ArgumentParser) -> None:
+        raise NotImplementedError()
+
+    def get_categories(self) -> Iterable[Category]:
+        return [Category(id=0, name="background"), Category(id=1, name="foreground")]
+
+    def get_images(self) -> Iterable[Image]:
+        return [Image(id=0, filename="image.jpg", width=4, height=3)]
+
+    def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
+        return [
+            ImageInstanceSegmentation(
+                image=Image(id=0, filename="image.jpg", width=4, height=3),
+                objects=[
+                    SingleInstanceSegmentation(
+                        category=Category(id=1, name="foreground"),
+                        segmentation=BinaryMaskSegmentation.from_rle(
+                            rle_row_wise=[0, 4],
+                            width=2,
+                            height=2,
+                        ),
+                    )
+                ],
+            )
+        ]
+
+
+class _OutOfRangeCategoryInput(InstanceSegmentationInput):
+    @staticmethod
+    def add_cli_arguments(parser: ArgumentParser) -> None:
+        raise NotImplementedError()
+
+    def get_categories(self) -> Iterable[Category]:
+        return [Category(id=256, name="too_large")]
+
+    def get_images(self) -> Iterable[Image]:
+        return [Image(id=0, filename="image.jpg", width=2, height=2)]
+
+    def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
+        return [
+            ImageInstanceSegmentation(
+                image=Image(id=0, filename="image.jpg", width=2, height=2),
+                objects=[
+                    SingleInstanceSegmentation(
+                        category=Category(id=256, name="too_large"),
+                        segmentation=BinaryMaskSegmentation.from_rle(
+                            rle_row_wise=[0, 4],
+                            width=2,
+                            height=2,
+                        ),
+                    )
+                ],
+            )
+        ]
 
 
 class TestPascalVOCSemanticSegmentationInput:
@@ -156,6 +276,72 @@ class TestPascalVOCSemanticSegmentationInput:
             [1, 1],
             [1, 1],
         ]
+
+
+class TestPascalVOCSemanticSegmentationOutput:
+    def test_save__writes_fixture_masks_and_class_mapping(self, tmp_path: Path) -> None:
+        mapping = _load_class_mapping_int_keys()
+        label_input = PascalVOCSemanticSegmentationInput.from_dirs(
+            images_dir=IMAGES_DIR,
+            masks_dir=MASKS_DIR,
+            class_id_to_name=mapping,
+        )
+
+        PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
+            label_input=label_input
+        )
+
+        class_map_json = json.loads((tmp_path / "class_id_to_name.json").read_text())
+        class_map = {int(k): str(v) for k, v in class_map_json.items()}
+        assert class_map == mapping
+
+        for image in label_input.get_images():
+            rel_mask_path = Path(image.filename).with_suffix(".png")
+            class_mask_path = tmp_path / "SegmentationClass" / rel_mask_path
+            with PILImage.open(class_mask_path) as class_mask_img:
+                actual_mask = np.asarray(class_mask_img, dtype=np.int_)
+            with PILImage.open(MASKS_DIR / rel_mask_path) as expected_mask_img:
+                expected_mask = np.asarray(expected_mask_img, dtype=np.int_)
+            assert np.array_equal(actual_mask, expected_mask)
+
+    def test_save__rasterizes_polygon_masks_and_adds_background_class(
+        self, tmp_path: Path
+    ) -> None:
+        PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
+            label_input=_SimplePolygonInput()
+        )
+
+        mask = np.asarray(
+            PILImage.open(tmp_path / "SegmentationClass" / "nested/example.png"),
+            dtype=np.int_,
+        )
+        expected_mask = np.array(
+            [
+                [0, 0, 0, 0, 0, 0],
+                [0, 1, 1, 1, 0, 0],
+                [0, 1, 2, 2, 2, 0],
+                [0, 1, 2, 2, 2, 0],
+                [0, 0, 2, 2, 2, 0],
+            ],
+            dtype=np.int_,
+        )
+        assert np.array_equal(mask, expected_mask)
+
+        class_map_json = json.loads((tmp_path / "class_id_to_name.json").read_text())
+        class_map = {int(k): str(v) for k, v in class_map_json.items()}
+        assert class_map == {0: "background", 1: "car", 2: "person"}
+
+    def test_save__mask_shape_mismatch_raises(self, tmp_path: Path) -> None:
+        with pytest.raises(ValueError, match=r"Segmentation mask shape must match"):
+            PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
+                label_input=_BadMaskShapeInput()
+            )
+
+    def test_save__category_id_above_255_raises(self, tmp_path: Path) -> None:
+        with pytest.raises(ValueError, match=r"range \[0, 255\]"):
+            PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
+                label_input=_OutOfRangeCategoryInput()
+            )
 
 
 def test__validate_mask__unknown_class_value_raises() -> None:
