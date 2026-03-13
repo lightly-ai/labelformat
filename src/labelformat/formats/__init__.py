@@ -29,6 +29,7 @@ from labelformat.formats.rtdetrv2 import (
 )
 from labelformat.formats.semantic_segmentation.pascalvoc import (
     PascalVOCSemanticSegmentationInput,
+    PascalVOCSemanticSegmentationOutput,
 )
 from labelformat.formats.yolov5 import (
     YOLOv5ObjectDetectionInput,
@@ -89,6 +90,7 @@ __all__ = [
     "PascalVOCObjectDetectionInput",
     "PascalVOCObjectDetectionOutput",
     "PascalVOCSemanticSegmentationInput",
+    "PascalVOCSemanticSegmentationOutput",
     "RTDETRObjectDetectionInput",
     "RTDETRObjectDetectionOutput",
     "RTDETRv2ObjectDetectionInput",

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import json
+from argparse import ArgumentParser
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Iterable
 
 import cv2
 import numpy as np
@@ -12,9 +13,17 @@ from PIL import Image as PILImage
 from labelformat.formats.semantic_segmentation import pascalvoc as pascalvoc_module
 from labelformat.formats.semantic_segmentation.pascalvoc import (
     PascalVOCSemanticSegmentationInput,
+    PascalVOCSemanticSegmentationOutput,
 )
 from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
+from labelformat.model.category import Category
 from labelformat.model.image import Image
+from labelformat.model.instance_segmentation import (
+    ImageInstanceSegmentation,
+    InstanceSegmentationInput,
+    SingleInstanceSegmentation,
+)
+from labelformat.model.multipolygon import MultiPolygon
 from tests.unit.test_utils import FIXTURES_DIR
 
 FIXTURES_ROOT_PASCALVOC = FIXTURES_DIR / "semantic_segmentation/pascalvoc"
@@ -27,6 +36,102 @@ def _load_class_mapping_int_keys() -> Dict[int, str]:
     with CLASS_MAP_PATH.open("r") as f:
         data = json.load(f)
     return {int(k): str(v) for k, v in data.items()}
+
+
+class _SimplePolygonInput(InstanceSegmentationInput):
+    @staticmethod
+    def add_cli_arguments(parser: ArgumentParser) -> None:
+        raise NotImplementedError()
+
+    def __init__(self) -> None:
+        self._image = Image(id=0, filename="nested/example.jpg", width=6, height=5)
+
+    def get_categories(self) -> Iterable[Category]:
+        return [
+            Category(id=1, name="car"),
+            Category(id=2, name="person"),
+        ]
+
+    def get_images(self) -> Iterable[Image]:
+        return [self._image]
+
+    def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
+        return [
+            ImageInstanceSegmentation(
+                image=self._image,
+                objects=[
+                    SingleInstanceSegmentation(
+                        category=Category(id=1, name="car"),
+                        segmentation=MultiPolygon(
+                            polygons=[
+                                [
+                                    (1.0, 1.0),
+                                    (1.0, 3.0),
+                                    (3.0, 3.0),
+                                    (3.0, 1.0),
+                                ]
+                            ]
+                        ),
+                    ),
+                    SingleInstanceSegmentation(
+                        category=Category(id=2, name="person"),
+                        segmentation=MultiPolygon(
+                            polygons=[
+                                [
+                                    (2.0, 2.0),
+                                    (2.0, 4.0),
+                                    (4.0, 4.0),
+                                    (4.0, 2.0),
+                                ]
+                            ]
+                        ),
+                    ),
+                ],
+            )
+        ]
+
+
+class _SimpleRLEInput(InstanceSegmentationInput):
+    @staticmethod
+    def add_cli_arguments(parser: ArgumentParser) -> None:
+        raise NotImplementedError()
+
+    def __init__(self) -> None:
+        self._image = Image(id=0, filename="nested/rle_example.jpg", width=5, height=4)
+
+    def get_categories(self) -> Iterable[Category]:
+        return [
+            Category(id=1, name="car"),
+            Category(id=2, name="person"),
+        ]
+
+    def get_images(self) -> Iterable[Image]:
+        return [self._image]
+
+    def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
+        return [
+            ImageInstanceSegmentation(
+                image=self._image,
+                objects=[
+                    SingleInstanceSegmentation(
+                        category=Category(id=1, name="car"),
+                        segmentation=BinaryMaskSegmentation.from_rle(
+                            rle_row_wise=[1, 2, 3, 1, 13],
+                            width=5,
+                            height=4,
+                        ),
+                    ),
+                    SingleInstanceSegmentation(
+                        category=Category(id=2, name="person"),
+                        segmentation=BinaryMaskSegmentation.from_rle(
+                            rle_row_wise=[13, 2, 3, 1, 1],
+                            width=5,
+                            height=4,
+                        ),
+                    ),
+                ],
+            )
+        ]
 
 
 class TestPascalVOCSemanticSegmentationInput:
@@ -156,6 +261,135 @@ class TestPascalVOCSemanticSegmentationInput:
             [1, 1],
             [1, 1],
         ]
+
+
+class TestPascalVOCSemanticSegmentationOutput:
+    def test_save__writes_fixture_masks_and_class_mapping(self, tmp_path: Path) -> None:
+        mapping = _load_class_mapping_int_keys()
+        label_input = PascalVOCSemanticSegmentationInput.from_dirs(
+            images_dir=IMAGES_DIR,
+            masks_dir=MASKS_DIR,
+            class_id_to_name=mapping,
+        )
+
+        PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
+            label_input=label_input
+        )
+
+        class_map_json = json.loads((tmp_path / "class_id_to_name.json").read_text())
+        class_map = {int(k): str(v) for k, v in class_map_json.items()}
+        assert class_map == mapping
+
+        for image in label_input.get_images():
+            rel_mask_path = Path(image.filename).with_suffix(".png")
+            class_mask_path = tmp_path / "SegmentationClass" / rel_mask_path
+            with PILImage.open(class_mask_path) as class_mask_img:
+                actual_mask = np.asarray(class_mask_img, dtype=np.int_)
+            with PILImage.open(MASKS_DIR / rel_mask_path) as expected_mask_img:
+                expected_mask = np.asarray(expected_mask_img, dtype=np.int_)
+            assert np.array_equal(actual_mask, expected_mask)
+
+    def test_save__rasterizes_polygon_masks_and_adds_background_class(
+        self, tmp_path: Path
+    ) -> None:
+        PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
+            label_input=_SimplePolygonInput()
+        )
+
+        mask = np.asarray(
+            PILImage.open(tmp_path / "SegmentationClass" / "nested/example.png"),
+            dtype=np.int_,
+        )
+        expected_mask = np.array(
+            [
+                [0, 0, 0, 0, 0, 0],
+                [0, 1, 1, 1, 0, 0],
+                [0, 1, 2, 2, 2, 0],
+                [0, 1, 2, 2, 2, 0],
+                [0, 0, 2, 2, 2, 0],
+            ],
+            dtype=np.int_,
+        )
+        assert np.array_equal(mask, expected_mask)
+
+        class_map_json = json.loads((tmp_path / "class_id_to_name.json").read_text())
+        class_map = {int(k): str(v) for k, v in class_map_json.items()}
+        assert class_map == {0: "background", 1: "car", 2: "person"}
+
+    def test_save__writes_rle_masks_and_adds_background_class(
+        self, tmp_path: Path
+    ) -> None:
+        PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
+            label_input=_SimpleRLEInput()
+        )
+
+        mask = np.asarray(
+            PILImage.open(tmp_path / "SegmentationClass" / "nested/rle_example.png"),
+            dtype=np.int_,
+        )
+        expected_mask = np.array(
+            [
+                [0, 1, 1, 0, 0],
+                [0, 1, 0, 0, 0],
+                [0, 0, 0, 2, 2],
+                [0, 0, 0, 2, 0],
+            ],
+            dtype=np.int_,
+        )
+        assert np.array_equal(mask, expected_mask)
+
+        class_map_json = json.loads((tmp_path / "class_id_to_name.json").read_text())
+        class_map = {int(k): str(v) for k, v in class_map_json.items()}
+        assert class_map == {0: "background", 1: "car", 2: "person"}
+
+    @pytest.mark.parametrize("background_class_id", [-1, 256])
+    def test_init__background_class_id_out_of_range_raises(
+        self, tmp_path: Path, background_class_id: int
+    ) -> None:
+        with pytest.raises(
+            ValueError,
+            match=r"background_class_id must be in \[0,255\] for Pascal VOC export\.",
+        ):
+            PascalVOCSemanticSegmentationOutput(
+                output_folder=tmp_path,
+                background_class_id=background_class_id,
+            )
+
+    def test__segmentation_to_binary_mask__shape_mismatch_raises(self) -> None:
+        image = Image(id=0, filename="image.jpg", width=4, height=3)
+        bad_shape_segmentation = BinaryMaskSegmentation.from_rle(
+            rle_row_wise=[0, 4],
+            width=2,
+            height=2,
+        )
+        with pytest.raises(ValueError, match=r"Segmentation mask shape must match"):
+            pascalvoc_module._segmentation_to_binary_mask(
+                segmentation=bad_shape_segmentation,
+                image=image,
+            )
+
+    @pytest.mark.parametrize("category_id", [-1, 256])
+    def test__get_category_id_to_name__category_id_out_of_range_raises(
+        self, category_id: int
+    ) -> None:
+        with pytest.raises(ValueError, match=rf"range \[0, 255\].*Got: {category_id}"):
+            pascalvoc_module._get_category_id_to_name(
+                categories=[Category(id=category_id, name="out_of_range")],
+                background_class_id=0,
+            )
+
+    def test__segmentation_to_binary_mask__polygon_with_less_than_3_points_raises(
+        self,
+    ) -> None:
+        image = Image(id=0, filename="invalid_polygon.jpg", width=4, height=3)
+        invalid_polygon = MultiPolygon(polygons=[[(1.0, 1.0), (2.0, 2.0)]])
+        with pytest.raises(
+            ValueError, match=r"Polygon must contain at least 3 points, got 2"
+        ):
+            pascalvoc_module._segmentation_to_binary_mask(
+                segmentation=invalid_polygon,
+                image=image,
+            )
 
 
 def test__validate_mask__unknown_class_value_raises() -> None:
