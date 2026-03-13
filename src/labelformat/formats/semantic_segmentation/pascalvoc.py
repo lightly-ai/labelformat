@@ -199,12 +199,11 @@ class PascalVOCSemanticSegmentationOutput(InstanceSegmentationOutput):
         class_map_filename: str = "class_id_to_name.json",
         background_class_id: int = 0,
     ) -> None:
-        if background_class_id < 0:
-            raise ValueError("background_class_id must be >= 0 for Pascal VOC export.")
-        if background_class_id > 255:
+        if background_class_id < 0 or background_class_id > 255:
             raise ValueError(
-                "background_class_id must be <= 255 for Pascal VOC export."
+                "background_class_id must be in [0,255] for Pascal VOC export."
             )
+
         self._output_folder = output_folder
         self._masks_folder_name = masks_folder_name
         self._class_map_filename = class_map_filename
@@ -212,7 +211,7 @@ class PascalVOCSemanticSegmentationOutput(InstanceSegmentationOutput):
 
     def save(self, label_input: InstanceSegmentationInput) -> None:
         category_id_to_name = _get_category_id_to_name(
-            categories=list(label_input.get_categories()),
+            categories=label_input.get_categories(),
             background_class_id=self._background_class_id,
         )
 
@@ -235,8 +234,7 @@ class PascalVOCSemanticSegmentationOutput(InstanceSegmentationOutput):
                 obj_mask = _segmentation_to_binary_mask(
                     segmentation=obj.segmentation, image=image_label.image
                 )
-                positive_pixels = obj_mask > 0
-                mask[positive_pixels] = obj.category.id
+                mask[obj_mask] = obj.category.id
 
             mask_path = (masks_dir / image_label.image.filename).with_suffix(".png")
             mask_path.parent.mkdir(parents=True, exist_ok=True)
@@ -252,7 +250,7 @@ class PascalVOCSemanticSegmentationOutput(InstanceSegmentationOutput):
 
 
 def _get_category_id_to_name(
-    categories: list[Category], background_class_id: int
+    categories: Iterable[Category], background_class_id: int
 ) -> dict[int, str]:
     """Build class-id mapping and validate duplicates."""
     category_id_to_name: dict[int, str] = {}
@@ -277,7 +275,7 @@ def _get_category_id_to_name(
 
 def _segmentation_to_binary_mask(
     segmentation: BinaryMaskSegmentation | MultiPolygon, image: Image
-) -> NDArray[np.uint8]:
+) -> NDArray[np.bool_]:
     if isinstance(segmentation, BinaryMaskSegmentation):
         binary_mask = segmentation.get_binary_mask().astype(np.uint8, copy=False)
     elif isinstance(segmentation, MultiPolygon):
@@ -295,7 +293,7 @@ def _segmentation_to_binary_mask(
             f"Segmentation mask shape must match image dimensions for "
             f"'{image.filename}': got {binary_mask.shape}, expected {expected_shape}."
         )
-    return binary_mask
+    return binary_mask > 0
 
 
 def _multipolygon_to_binary_mask(

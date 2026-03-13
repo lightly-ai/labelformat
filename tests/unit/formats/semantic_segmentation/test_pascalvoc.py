@@ -134,102 +134,6 @@ class _SimpleRLEInput(InstanceSegmentationInput):
         ]
 
 
-class _BadMaskShapeInput(InstanceSegmentationInput):
-    @staticmethod
-    def add_cli_arguments(parser: ArgumentParser) -> None:
-        raise NotImplementedError()
-
-    def get_categories(self) -> Iterable[Category]:
-        return [Category(id=0, name="background"), Category(id=1, name="foreground")]
-
-    def get_images(self) -> Iterable[Image]:
-        return [Image(id=0, filename="image.jpg", width=4, height=3)]
-
-    def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
-        return [
-            ImageInstanceSegmentation(
-                image=Image(id=0, filename="image.jpg", width=4, height=3),
-                objects=[
-                    SingleInstanceSegmentation(
-                        category=Category(id=1, name="foreground"),
-                        segmentation=BinaryMaskSegmentation.from_rle(
-                            rle_row_wise=[0, 4],
-                            width=2,
-                            height=2,
-                        ),
-                    )
-                ],
-            )
-        ]
-
-
-class _OutOfRangeCategoryInput(InstanceSegmentationInput):
-    @staticmethod
-    def add_cli_arguments(parser: ArgumentParser) -> None:
-        raise NotImplementedError()
-
-    def __init__(self, category_id: int) -> None:
-        self._category_id = category_id
-
-    def get_categories(self) -> Iterable[Category]:
-        return [Category(id=self._category_id, name="out_of_range")]
-
-    def get_images(self) -> Iterable[Image]:
-        return [Image(id=0, filename="image.jpg", width=2, height=2)]
-
-    def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
-        return [
-            ImageInstanceSegmentation(
-                image=Image(id=0, filename="image.jpg", width=2, height=2),
-                objects=[
-                    SingleInstanceSegmentation(
-                        category=Category(id=self._category_id, name="out_of_range"),
-                        segmentation=BinaryMaskSegmentation.from_rle(
-                            rle_row_wise=[0, 4],
-                            width=2,
-                            height=2,
-                        ),
-                    )
-                ],
-            )
-        ]
-
-
-class _InvalidPolygonInput(InstanceSegmentationInput):
-    @staticmethod
-    def add_cli_arguments(parser: ArgumentParser) -> None:
-        raise NotImplementedError()
-
-    def __init__(self) -> None:
-        self._image = Image(id=0, filename="invalid_polygon.jpg", width=4, height=3)
-
-    def get_categories(self) -> Iterable[Category]:
-        return [Category(id=1, name="car")]
-
-    def get_images(self) -> Iterable[Image]:
-        return [self._image]
-
-    def get_labels(self) -> Iterable[ImageInstanceSegmentation]:
-        return [
-            ImageInstanceSegmentation(
-                image=self._image,
-                objects=[
-                    SingleInstanceSegmentation(
-                        category=Category(id=1, name="car"),
-                        segmentation=MultiPolygon(
-                            polygons=[
-                                [
-                                    (1.0, 1.0),
-                                    (2.0, 2.0),
-                                ]
-                            ]
-                        ),
-                    )
-                ],
-            )
-        ]
-
-
 class TestPascalVOCSemanticSegmentationInput:
     def test_from_dirs__builds_categories_and_images(self) -> None:
         mapping = _load_class_mapping_int_keys()
@@ -438,30 +342,53 @@ class TestPascalVOCSemanticSegmentationOutput:
         class_map = {int(k): str(v) for k, v in class_map_json.items()}
         assert class_map == {0: "background", 1: "car", 2: "person"}
 
-    def test_save__mask_shape_mismatch_raises(self, tmp_path: Path) -> None:
+    @pytest.mark.parametrize("background_class_id", [-1, 256])
+    def test_init__background_class_id_out_of_range_raises(
+        self, tmp_path: Path, background_class_id: int
+    ) -> None:
+        with pytest.raises(
+            ValueError,
+            match=r"background_class_id must be in \[0,255\] for Pascal VOC export\.",
+        ):
+            PascalVOCSemanticSegmentationOutput(
+                output_folder=tmp_path,
+                background_class_id=background_class_id,
+            )
+
+    def test__segmentation_to_binary_mask__shape_mismatch_raises(self) -> None:
+        image = Image(id=0, filename="image.jpg", width=4, height=3)
+        bad_shape_segmentation = BinaryMaskSegmentation.from_rle(
+            rle_row_wise=[0, 4],
+            width=2,
+            height=2,
+        )
         with pytest.raises(ValueError, match=r"Segmentation mask shape must match"):
-            PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
-                label_input=_BadMaskShapeInput()
+            pascalvoc_module._segmentation_to_binary_mask(
+                segmentation=bad_shape_segmentation,
+                image=image,
             )
 
-    def test_save__category_id_below_0_raises(self, tmp_path: Path) -> None:
-        with pytest.raises(ValueError, match=r"range \[0, 255\].*Got: -1"):
-            PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
-                label_input=_OutOfRangeCategoryInput(category_id=-1)
+    @pytest.mark.parametrize("category_id", [-1, 256])
+    def test__get_category_id_to_name__category_id_out_of_range_raises(
+        self, category_id: int
+    ) -> None:
+        with pytest.raises(ValueError, match=rf"range \[0, 255\].*Got: {category_id}"):
+            pascalvoc_module._get_category_id_to_name(
+                categories=[Category(id=category_id, name="out_of_range")],
+                background_class_id=0,
             )
 
-    def test_save__category_id_above_255_raises(self, tmp_path: Path) -> None:
-        with pytest.raises(ValueError, match=r"range \[0, 255\].*Got: 256"):
-            PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
-                label_input=_OutOfRangeCategoryInput(category_id=256)
-            )
-
-    def test_save__polygon_with_less_than_3_points_raises(self, tmp_path: Path) -> None:
+    def test__segmentation_to_binary_mask__polygon_with_less_than_3_points_raises(
+        self,
+    ) -> None:
+        image = Image(id=0, filename="invalid_polygon.jpg", width=4, height=3)
+        invalid_polygon = MultiPolygon(polygons=[[(1.0, 1.0), (2.0, 2.0)]])
         with pytest.raises(
             ValueError, match=r"Polygon must contain at least 3 points, got 2"
         ):
-            PascalVOCSemanticSegmentationOutput(output_folder=tmp_path).save(
-                label_input=_InvalidPolygonInput()
+            pascalvoc_module._segmentation_to_binary_mask(
+                segmentation=invalid_polygon,
+                image=image,
             )
 
 
