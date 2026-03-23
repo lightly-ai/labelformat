@@ -50,6 +50,9 @@ dev = [
   "types-PyYAML",
   "opencv-python",
   "types-tqdm>=4.67.0.20241221",
+  "mkdocs==1.6.1",
+  "mkdocs-material==9.7.6",
+  "mkdocs-git-revision-date-localized-plugin==1.4.7",
 ]
 
 [build-system]
@@ -71,6 +74,7 @@ pythonpath = [
 ]
 
 [tool.isort]
+
 profile = "black"
 
 [tool.mypy]
