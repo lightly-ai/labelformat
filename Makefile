@@ -24,6 +24,15 @@ test:
 all-checks: static-checks test
 	@echo "✅ Great success!"
 
+docs-serve:
+	uv run mkdocs serve
+
+docs-build:
+	uv run mkdocs build
+
+docs-deploy:
+	uv run mkdocs gh-deploy
+
 clean:
 	rm -rf dist
 
