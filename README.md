@@ -507,6 +507,19 @@ make format
 make all-checks
 ```
 
+#### Docs
+
+The documentation is hosted on [GitHub Pages](https://labelformat.com) and built with [MkDocs](https://www.mkdocs.org/).
+
+```bash
+# Serve docs locally with live reload
+make docs-serve
+
+# Deploy to GitHub Pages https://labelformat.com (builds and pushes in one step)
+# Requires push access to the repo — only run from main with a clean working tree
+make docs-deploy
+```
+
 ## Maintained By
 [Lightly](https://www.lightly.ai) is a spin-off from ETH Zurich that helps companies 
 build efficient active learning pipelines to select the most relevant data for their models.
