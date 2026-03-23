@@ -5,6 +5,8 @@
 
 **Labelformat** is an open-source Python framework for converting between popular computer vision annotation formats like YOLO, COCO, PascalVOC, and KITTI. Save hours on tedious format conversions and ensure consistency in your workflows.
 
+!!! tip
+    Check out our [LightlyStudio](https://github.com/lightly-ai/lightly-studio) open source project that builds on top of Labelformat to visualize and edit your annotation labels.
 
 ## Key Features
 - **Wide Format Support**: COCO, YOLO (v5-v12, v26), PascalVOC, KITTI, Labelbox, RT-DETR, RT-DETRv2, and more.
