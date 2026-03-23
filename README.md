@@ -10,6 +10,9 @@
 
 An open-source tool to seamlessly convert between popular computer vision label formats.
 
+> [!TIP]
+> Also check out [LightlyStudio](https://github.com/lightly-ai/lightly-studio) open source project to visualise your annotation labels.
+
 #### Why Labelformat
 
 Popular label formats are sparsely documented and store different
