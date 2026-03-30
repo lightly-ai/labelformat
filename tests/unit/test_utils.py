@@ -1,12 +1,15 @@
 from pathlib import Path
 from typing import Tuple
+from uuid import uuid4
 
+import fsspec
 import PIL.Image
 import pytest
 
 from labelformat.utils import (
     ImageDimensionError,
     get_image_dimensions,
+    get_images_from_folder,
     get_jpeg_dimensions,
     get_png_dimensions,
 )
@@ -117,6 +120,43 @@ def test_get_image_dimensions__unsupported_format() -> None:
     yaml_file = FIXTURES_DIR / "object_detection/YOLOv8/example.yaml"
     with pytest.raises(Exception):
         get_image_dimensions(yaml_file)
+
+
+def test_get_image_dimensions__memory_uri() -> None:
+    image_uri = f"memory://{uuid4().hex}/image.jpg"
+
+    image = PIL.Image.new("RGB", (123, 77), color="red")
+    with fsspec.open(image_uri, "wb") as file:
+        image.save(file, "JPEG")
+
+    width, height = get_image_dimensions(image_uri)
+    assert width == 123
+    assert height == 77
+
+
+def test_get_images_from_folder__memory_uri() -> None:
+    root_uri = f"memory://{uuid4().hex}/dataset"
+    image_a = f"{root_uri}/a.jpg"
+    image_b = f"{root_uri}/nested/b.png"
+    text_file = f"{root_uri}/nested/readme.txt"
+
+    with fsspec.open(image_a, "wb") as file:
+        PIL.Image.new("RGB", (100, 50), color="blue").save(file, "JPEG")
+    with fsspec.open(image_b, "wb") as file:
+        PIL.Image.new("RGB", (12, 34), color="green").save(file, "PNG")
+    with fsspec.open(text_file, "w") as file:
+        file.write("not an image")
+
+    images = list(get_images_from_folder(root_uri))
+    assert len(images) == 2
+
+    by_filename = {image.filename: image for image in images}
+    assert set(by_filename.keys()) == {"a.jpg", "nested/b.png"}
+    assert (by_filename["a.jpg"].width, by_filename["a.jpg"].height) == (100, 50)
+    assert (by_filename["nested/b.png"].width, by_filename["nested/b.png"].height) == (
+        12,
+        34,
+    )
 
 
 def _create_test_jpeg(
