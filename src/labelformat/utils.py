@@ -1,10 +1,15 @@
 import logging
-from pathlib import Path
+import posixpath
+from pathlib import Path, PurePosixPath
 from typing import Iterable, Tuple
+from urllib.parse import urlsplit
 
+import fsspec
 import PIL.Image
+from fsspec.core import url_to_fs
 
 from labelformat.model.image import Image
+from labelformat.types import PathLike
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +51,25 @@ class ImageDimensionError(Exception):
     pass
 
 
-def get_jpeg_dimensions(file_path: Path) -> Tuple[int, int]:
+def _path_suffix(path: PathLike) -> str:
+    path_str = str(path)
+    parsed = urlsplit(path_str)
+    # For URI-like inputs (s3://, memory://, file://), extract suffix from URL path.
+    if parsed.scheme:
+        return PurePosixPath(parsed.path).suffix.lower()
+    return Path(path_str).suffix.lower()
+
+
+def _relative_path(path: str, root: str) -> str:
+    root_path = PurePosixPath(root)
+    try:
+        return str(PurePosixPath(path).relative_to(root_path))
+    except ValueError:
+        # Fallback for filesystems that may return non-normalized paths.
+        return posixpath.relpath(path, start=root if root else ".")
+
+
+def get_jpeg_dimensions(file_path: PathLike) -> Tuple[int, int]:
     """Try to efficiently get JPEG dimensions from file headers without decoding the image.
 
     This method reads only the JPEG file headers looking for the Start Of Frame (SOFn)
@@ -61,7 +84,7 @@ def get_jpeg_dimensions(file_path: Path) -> Tuple[int, int]:
     is raised and a full image decode may be needed as fallback.
 
     Args:
-        file_path: Path to the JPEG file
+        file_path: Path or URI to the JPEG file
 
     Returns:
         Tuple of (width, height)
@@ -70,7 +93,7 @@ def get_jpeg_dimensions(file_path: Path) -> Tuple[int, int]:
         ImageDimensionError: If dimensions cannot be extracted from headers
     """
     try:
-        with open(file_path, "rb") as img_file:
+        with fsspec.open(str(file_path), "rb") as img_file:
             # Skip SOI marker
             img_file.seek(2)
             while True:
@@ -91,7 +114,7 @@ def get_jpeg_dimensions(file_path: Path) -> Tuple[int, int]:
         raise ImageDimensionError(f"Failed to read JPEG dimensions: {str(e)}")
 
 
-def get_png_dimensions(file_path: Path) -> Tuple[int, int]:
+def get_png_dimensions(file_path: PathLike) -> Tuple[int, int]:
     """Try to efficiently get PNG dimensions from file headers without decoding the image.
 
     This method reads only the PNG IHDR (Image Header) chunk which is always the first
@@ -106,7 +129,7 @@ def get_png_dimensions(file_path: Path) -> Tuple[int, int]:
     raised and a full image decode may be needed as fallback.
 
     Args:
-        file_path: Path to the PNG file
+        file_path: Path or URI to the PNG file
 
     Returns:
         Tuple of (width, height)
@@ -115,7 +138,7 @@ def get_png_dimensions(file_path: Path) -> Tuple[int, int]:
         ImageDimensionError: If dimensions cannot be extracted from headers
     """
     try:
-        with open(file_path, "rb") as img_file:
+        with fsspec.open(str(file_path), "rb") as img_file:
             # Skip PNG signature
             img_file.seek(8)
             # Read IHDR chunk
@@ -130,11 +153,11 @@ def get_png_dimensions(file_path: Path) -> Tuple[int, int]:
         raise ImageDimensionError(f"Failed to read PNG dimensions: {str(e)}")
 
 
-def get_image_dimensions(image_path: Path) -> Tuple[int, int]:
+def get_image_dimensions(image_path: PathLike) -> Tuple[int, int]:
     """Get image dimensions using the most efficient method available.
 
     Args:
-        image_path: Path to the image file
+        image_path: Path or URI to the image file
 
     Returns:
         Tuple of (width, height)
@@ -142,7 +165,7 @@ def get_image_dimensions(image_path: Path) -> Tuple[int, int]:
     Raises:
         Exception: If image dimensions cannot be extracted using any method
     """
-    suffix = image_path.suffix.lower()
+    suffix = _path_suffix(image_path)
     if suffix in {".jpg", ".jpeg"}:
         try:
             return get_jpeg_dimensions(image_path)
@@ -154,26 +177,35 @@ def get_image_dimensions(image_path: Path) -> Tuple[int, int]:
         except ImageDimensionError:
             pass
 
-    with PIL.Image.open(image_path) as img:
-        return img.size
+    with fsspec.open(str(image_path), "rb") as img_file:
+        with PIL.Image.open(img_file) as img:
+            return img.size
 
 
-def get_images_from_folder(folder: Path) -> Iterable[Image]:
+def get_images_from_folder(folder: PathLike) -> Iterable[Image]:
     """Yields an Image structure for all images in the given folder.
 
     The order of the images is arbitrary. Images in nested folders are included.
 
     Args:
-        folder: Path to the folder containing images.
+        folder: Path or URI to the folder containing images.
     """
     image_id = 0
     logger.debug(f"Listing images in '{folder}'...")
-    for image_path in folder.rglob("*"):
-        if image_path.suffix.lower() not in IMAGE_EXTENSIONS:
+    fs, fs_folder = url_to_fs(str(folder))
+    if not fs.exists(fs_folder):
+        logger.debug(f"Image folder '{folder}' does not exist.")
+        return
+
+    for image_path in fs.find(fs_folder):
+        if fs.isdir(image_path):
+            continue
+        if _path_suffix(image_path) not in IMAGE_EXTENSIONS:
             logger.debug(f"Skipping non-image file '{image_path}'")
             continue
-        image_filename = str(image_path.relative_to(folder))
-        image_width, image_height = get_image_dimensions(image_path)
+        image_filename = _relative_path(path=image_path, root=fs_folder)
+        image_uri = fs.unstrip_protocol(image_path)
+        image_width, image_height = get_image_dimensions(image_uri)
         yield Image(
             id=image_id,
             filename=image_filename,
