@@ -16,8 +16,8 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
 import numpy as np
-from numpy.typing import NDArray
 from fsspec.core import url_to_fs
+from numpy.typing import NDArray
 from PIL import Image as PILImage
 from PIL import ImageDraw
 
