@@ -9,13 +9,15 @@ Assumptions:
 from __future__ import annotations
 
 import json
+import posixpath
 from argparse import ArgumentParser
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import numpy as np
 from numpy.typing import NDArray
+from fsspec.core import url_to_fs
 from PIL import Image as PILImage
 from PIL import ImageDraw
 
@@ -32,6 +34,7 @@ from labelformat.model.instance_segmentation import (
 )
 from labelformat.model.multipolygon import MultiPolygon
 from labelformat.model.semantic_segmentation import SemanticSegmentationMask
+from labelformat.types import PathLike
 
 """TODO(Malte, 11/2025):
 Support what is already supported in LightlyTrain. https://docs.lightly.ai/train/stable/semantic_segmentation.html#data
@@ -46,8 +49,8 @@ Support merging multiple labels into one class during training. https://docs.lig
 class PascalVOCSemanticSegmentationInput(InstanceSegmentationInput):
     """Pascal VOC semantic segmentation input format."""
 
-    _images_dir: Path
-    _masks_dir: Path
+    _images_dir: PathLike
+    _masks_dir: PathLike
     _filename_to_image: dict[str, Image]
     _categories: list[Category]
 
@@ -59,24 +62,28 @@ class PascalVOCSemanticSegmentationInput(InstanceSegmentationInput):
     @classmethod
     def from_dirs(
         cls,
-        images_dir: Path,
-        masks_dir: Path,
+        images_dir: PathLike,
+        masks_dir: PathLike,
         class_id_to_name: Mapping[int, str],
     ) -> "PascalVOCSemanticSegmentationInput":
         """Create a PascalVOCSemanticSegmentationInput from directory pairs.
 
         Args:
-            images_dir: Root directory containing images (nested structure allowed).
-            masks_dir: Root directory containing PNG masks mirroring images structure.
+            images_dir: Root directory or URI containing images (nested structure allowed).
+            masks_dir: Root directory or URI containing PNG masks mirroring images
+                structure.
             class_id_to_name: Mapping of class_id -> class name, with integer keys.
 
         Raises:
             ValueError: If directories are invalid, a mask is missing or not PNG,
                         or if class_id keys cannot be parsed as integers.
         """
-        if not images_dir.is_dir():
+        images_fs, images_fs_dir = url_to_fs(str(images_dir))
+        if not images_fs.isdir(images_fs_dir):
             raise ValueError(f"Images directory is not a directory: {images_dir}")
-        if not masks_dir.is_dir():
+
+        masks_fs, masks_fs_dir = url_to_fs(str(masks_dir))
+        if not masks_fs.isdir(masks_fs_dir):
             raise ValueError(f"Masks directory is not a directory: {masks_dir}")
 
         # Build categories from mapping
@@ -87,10 +94,12 @@ class PascalVOCSemanticSegmentationInput(InstanceSegmentationInput):
         # Collect images using helper and ensure a PNG mask exists for each.
         images_by_filename: dict[str, Image] = {}
         for img in utils.get_images_from_folder(images_dir):
-            mask_path = masks_dir / Path(img.filename).with_suffix(".png")
-            if not mask_path.is_file():
+            mask_rel_path = str(PurePosixPath(img.filename).with_suffix(".png"))
+            mask_path = _join_fs_path(root=masks_fs_dir, relative=mask_rel_path)
+            if not masks_fs.isfile(mask_path):
                 raise ValueError(
-                    f"Missing mask PNG for image '{img.filename}' at path: {mask_path}"
+                    f"Missing mask PNG for image '{img.filename}' at path: "
+                    f"{masks_fs.unstrip_protocol(mask_path)}"
                 )
             images_by_filename[img.filename] = img
 
@@ -138,15 +147,19 @@ class PascalVOCSemanticSegmentationInput(InstanceSegmentationInput):
                 f"Unknown image filepath {image_filepath}. Use one returned by get_images()."
             )
 
-        mask_path = self._masks_dir / Path(image_filepath).with_suffix(".png")
-        if not mask_path.is_file():
+        masks_fs, masks_fs_dir = url_to_fs(str(self._masks_dir))
+        mask_rel_path = str(PurePosixPath(image_filepath).with_suffix(".png"))
+        mask_path = _join_fs_path(root=masks_fs_dir, relative=mask_rel_path)
+        if not masks_fs.isfile(mask_path):
             raise ValueError(
-                f"Mask PNG not found for image '{image_filepath}': {mask_path}"
+                f"Mask PNG not found for image '{image_filepath}': "
+                f"{masks_fs.unstrip_protocol(mask_path)}"
             )
 
         # Load and validate mask by shape and value set.
-        with PILImage.open(mask_path) as mimg:
-            mask_np: NDArray[np.int_] = np.asarray(mimg, dtype=np.int_)
+        with masks_fs.open(mask_path, mode="rb") as mask_file:
+            with PILImage.open(mask_file) as mimg:
+                mask_np: NDArray[np.int_] = np.asarray(mimg, dtype=np.int_)
         _validate_mask(
             image_obj=image_obj,
             mask_np=mask_np,
@@ -336,6 +349,12 @@ def _save_mask(mask_path: Path, mask: NDArray[np.int_]) -> None:
     mask_img = PILImage.fromarray(mask.astype(np.uint8), mode="P")
     mask_img.putpalette(_PASCAL_VOC_PALETTE)
     mask_img.save(mask_path)
+
+
+def _join_fs_path(root: str, relative: str) -> str:
+    if not root:
+        return relative
+    return posixpath.join(root, relative)
 
 
 def _validate_mask(
