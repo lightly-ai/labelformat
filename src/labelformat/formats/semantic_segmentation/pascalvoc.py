@@ -95,7 +95,7 @@ class PascalVOCSemanticSegmentationInput(InstanceSegmentationInput):
         images_by_filename: dict[str, Image] = {}
         for img in utils.get_images_from_folder(images_dir):
             mask_rel_path = str(PurePosixPath(img.filename).with_suffix(".png"))
-            mask_path = _join_fs_path(root=masks_fs_dir, relative=mask_rel_path)
+            mask_path = posixpath.join(masks_fs_dir, mask_rel_path)
             if not masks_fs.isfile(mask_path):
                 raise ValueError(
                     f"Missing mask PNG for image '{img.filename}' at path: "
@@ -149,7 +149,7 @@ class PascalVOCSemanticSegmentationInput(InstanceSegmentationInput):
 
         masks_fs, masks_fs_dir = url_to_fs(str(self._masks_dir))
         mask_rel_path = str(PurePosixPath(image_filepath).with_suffix(".png"))
-        mask_path = _join_fs_path(root=masks_fs_dir, relative=mask_rel_path)
+        mask_path = posixpath.join(masks_fs_dir, mask_rel_path)
         if not masks_fs.isfile(mask_path):
             raise ValueError(
                 f"Mask PNG not found for image '{image_filepath}': "
@@ -349,12 +349,6 @@ def _save_mask(mask_path: Path, mask: NDArray[np.int_]) -> None:
     mask_img = PILImage.fromarray(mask.astype(np.uint8), mode="P")
     mask_img.putpalette(_PASCAL_VOC_PALETTE)
     mask_img.save(mask_path)
-
-
-def _join_fs_path(root: str, relative: str) -> str:
-    if not root:
-        return relative
-    return posixpath.join(root, relative)
 
 
 def _validate_mask(
