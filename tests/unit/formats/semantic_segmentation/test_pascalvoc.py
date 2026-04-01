@@ -4,8 +4,10 @@ import json
 from argparse import ArgumentParser
 from pathlib import Path
 from typing import Dict, Iterable
+from uuid import uuid4
 
 import cv2
+import fsspec
 import numpy as np
 import pytest
 from PIL import Image as PILImage
@@ -261,6 +263,33 @@ class TestPascalVOCSemanticSegmentationInput:
             [1, 1],
             [1, 1],
         ]
+
+    def test_from_dirs__supports_memory_uri(self) -> None:
+        mapping = _load_class_mapping_int_keys()
+        root_uri = f"memory://{uuid4().hex}/pascalvoc"
+        images_uri = f"{root_uri}/JPEGImages"
+        masks_uri = f"{root_uri}/SegmentationClass"
+
+        for image_filename in ["2007_000032.jpg", "subdir/2007_000033.jpg"]:
+            with fsspec.open(f"{images_uri}/{image_filename}", "wb") as file:
+                file.write((IMAGES_DIR / image_filename).read_bytes())
+            mask_filename = str(Path(image_filename).with_suffix(".png"))
+            with fsspec.open(f"{masks_uri}/{mask_filename}", "wb") as file:
+                file.write((MASKS_DIR / mask_filename).read_bytes())
+
+        ds = PascalVOCSemanticSegmentationInput.from_dirs(
+            images_dir=images_uri,
+            masks_dir=masks_uri,
+            class_id_to_name=mapping,
+        )
+
+        images = list(ds.get_images())
+        assert len(images) == 2
+        for image in images:
+            mask = ds._get_mask(image.filename)
+            assert sum(run_length for _, run_length in mask.category_id_rle) == (
+                image.width * image.height
+            )
 
 
 class TestPascalVOCSemanticSegmentationOutput:
