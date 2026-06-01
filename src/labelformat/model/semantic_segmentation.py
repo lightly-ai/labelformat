@@ -33,43 +33,48 @@ class SemanticSegmentationMask:
         if array.ndim != 2:
             raise ValueError("SemSegMask.array must be 2D with shape (H, W).")
 
-        category_id_rle: list[tuple[int, int]] = []
+        if array.size == 0:
+            return cls(
+                category_id_rle=[],
+                width=array.shape[1],
+                height=array.shape[0],
+            )
 
-        cur_cat_id: int | None = None
-        cur_run_length = 0
-        for cat_id in array.flatten():
-            if cat_id == cur_cat_id:
-                cur_run_length += 1
-            else:
-                if cur_cat_id is not None:
-                    category_id_rle.append((cur_cat_id, cur_run_length))
-                cur_cat_id = int(cat_id)
-                cur_run_length = 1
-        if cur_cat_id is not None:
-            category_id_rle.append((cur_cat_id, cur_run_length))
+        flat = array.ravel()
+        change_indices = np.nonzero(flat[:-1] != flat[1:])[0]
+        run_starts = np.concatenate(([0], change_indices + 1))
+        run_lengths = np.diff(np.concatenate(([0], change_indices + 1, [flat.size])))
+
+        category_ids = flat[run_starts]
+        category_id_rle = list(zip(category_ids.tolist(), run_lengths.tolist()))
 
         return cls(
-            category_id_rle=category_id_rle, width=array.shape[1], height=array.shape[0]
+            category_id_rle=category_id_rle,
+            width=array.shape[1],
+            height=array.shape[0],
         )
 
     def to_binary_mask(self, category_id: int) -> BinaryMaskSegmentation:
         """Get a binary mask for a given category ID."""
-        binary_rle = []
+        if not self.category_id_rle:
+            return BinaryMaskSegmentation.from_rle(
+                rle_row_wise=[],
+                width=self.width,
+                height=self.height,
+            )
 
-        symbol = 0
-        run_length = 0
-        for cat_id, cur_run_length in self.category_id_rle:
-            cur_symbol = 1 if cat_id == category_id else 0
-            if symbol == cur_symbol:
-                run_length += cur_run_length
-            else:
-                binary_rle.append(run_length)
-                symbol = cur_symbol
-                run_length = cur_run_length
+        rle_array = np.asarray(self.category_id_rle, dtype=np.int_)
+        cat_ids = rle_array[:, 0]
+        run_lengths = rle_array[:, 1]
+        symbols = cat_ids == category_id
+        change_indices = np.nonzero(symbols[:-1] != symbols[1:])[0] + 1
+        run_starts = np.concatenate(([0], change_indices))
+        binary_run_lengths = np.add.reduceat(run_lengths, run_starts)
+        if symbols[0]:
+            binary_run_lengths = np.concatenate(([0], binary_run_lengths))
 
-        binary_rle.append(run_length)
         return BinaryMaskSegmentation.from_rle(
-            rle_row_wise=binary_rle,
+            rle_row_wise=binary_run_lengths.tolist(),
             width=self.width,
             height=self.height,
         )
