@@ -65,7 +65,7 @@ class TestSemanticSegmentationMask:
             [0, 0, 0, 0],
         ]
 
-    def test_empty_mask(self) -> None:
+    def test__empty_mask(self) -> None:
         mask = SemanticSegmentationMask.from_array(
             array=np.empty((0, 3), dtype=np.int_)
         )
