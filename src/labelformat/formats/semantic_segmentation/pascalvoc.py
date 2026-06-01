@@ -377,8 +377,16 @@ def _validate_mask(
             f"mask (W,H)=({mw},{mh}) vs image (W,H)=({image_obj.width},{image_obj.height})"
         )
 
-    uniques = np.unique(mask_np.astype(int))
-    unique_values = set(uniques)
+    # np.bincount is much faster than np.unique for finding unique non-negative integer classes.
+    # We fall back to np.unique if there are negative values or extremely large values
+    # (to prevent huge memory allocations in np.bincount).
+    if np.any(mask_np < 0) or mask_np.max() > 65535:
+        uniques = np.unique(mask_np)
+        unique_values = set(uniques)
+    else:
+        uniques = np.flatnonzero(np.bincount(mask_np.ravel()))
+        unique_values = set(uniques)
+
     unknown_values = unique_values.difference(valid_class_ids)
     if unknown_values:
         raise ValueError(
