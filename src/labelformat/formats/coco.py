@@ -134,7 +134,6 @@ class COCOInstanceSegmentationInput(_COCOBaseInput, InstanceSegmentationInput):
                     SingleInstanceSegmentation(
                         category=category_id_to_category[ann["category_id"]],
                         segmentation=segmentation,
-                        confidence=(float(ann["score"]) if "score" in ann else None),
                     )
                 )
             yield ImageInstanceSegmentation(
@@ -205,8 +204,6 @@ class COCOInstanceSegmentationOutput(_COCOBaseOutput, InstanceSegmentationOutput
                     "iscrowd": is_crowd,
                     "segmentation": segmentation,
                 }
-                if obj.confidence is not None:
-                    annotation["score"] = obj.confidence
                 data["annotations"].append(annotation)
 
         self.output_file.parent.mkdir(parents=True, exist_ok=True)

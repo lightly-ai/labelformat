@@ -15,13 +15,6 @@ from labelformat.model.multipolygon import MultiPolygon
 class SingleInstanceSegmentation:
     category: Category
     segmentation: MultiPolygon | BinaryMaskSegmentation
-    confidence: float | None = None
-
-    def __post_init__(self) -> None:
-        if self.confidence is not None and not (0 <= self.confidence <= 1):
-            raise ValueError(
-                f"Confidence must be between 0 and 1, but got: {self.confidence}"
-            )
 
 
 @dataclass(frozen=True)
