@@ -90,9 +90,7 @@ class COCOObjectDetectionInput(_COCOBaseInput, ObjectDetectionInput):
                             bbox=[float(x) for x in ann["bbox"]],
                             format=BoundingBoxFormat.XYWH,
                         ),
-                        confidence=(
-                            float(ann["score"]) if "score" in ann else None
-                        ),
+                        confidence=(float(ann["score"]) if "score" in ann else None),
                     )
                 )
             yield ImageObjectDetection(
@@ -136,9 +134,7 @@ class COCOInstanceSegmentationInput(_COCOBaseInput, InstanceSegmentationInput):
                     SingleInstanceSegmentation(
                         category=category_id_to_category[ann["category_id"]],
                         segmentation=segmentation,
-                        confidence=(
-                            float(ann["score"]) if "score" in ann else None
-                        ),
+                        confidence=(float(ann["score"]) if "score" in ann else None),
                     )
                 )
             yield ImageInstanceSegmentation(

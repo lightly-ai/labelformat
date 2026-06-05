@@ -1,10 +1,9 @@
 import json
+from argparse import ArgumentParser
 from pathlib import Path
+from typing import Iterable
 
 import pytest
-
-from argparse import ArgumentParser
-from typing import Iterable
 
 from labelformat.formats.coco import (
     COCOInstanceSegmentationInput,
@@ -115,9 +114,7 @@ class TestCOCOObjectDetectionOutput:
         assert output_json["annotations"] == expected_annotations
 
 
-def _create_coco_instance_segmentation_file(
-    tmp_path: Path, with_score: bool
-) -> Path:
+def _create_coco_instance_segmentation_file(tmp_path: Path, with_score: bool) -> Path:
     annotations = [
         {
             "image_id": 0,
