@@ -90,6 +90,9 @@ class COCOObjectDetectionInput(_COCOBaseInput, ObjectDetectionInput):
                             bbox=[float(x) for x in ann["bbox"]],
                             format=BoundingBoxFormat.XYWH,
                         ),
+                        confidence=(
+                            float(ann["score"]) if "score" in ann else None
+                        ),
                     )
                 )
             yield ImageObjectDetection(
@@ -133,6 +136,9 @@ class COCOInstanceSegmentationInput(_COCOBaseInput, InstanceSegmentationInput):
                     SingleInstanceSegmentation(
                         category=category_id_to_category[ann["category_id"]],
                         segmentation=segmentation,
+                        confidence=(
+                            float(ann["score"]) if "score" in ann else None
+                        ),
                     )
                 )
             yield ImageInstanceSegmentation(
@@ -173,6 +179,8 @@ class COCOObjectDetectionOutput(_COCOBaseOutput, ObjectDetectionOutput):
                         float(v) for v in obj.box.to_format(BoundingBoxFormat.XYWH)
                     ],
                 }
+                if obj.confidence is not None:
+                    annotation["score"] = obj.confidence
                 data["annotations"].append(annotation)
 
         self.output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -201,6 +209,8 @@ class COCOInstanceSegmentationOutput(_COCOBaseOutput, InstanceSegmentationOutput
                     "iscrowd": is_crowd,
                     "segmentation": segmentation,
                 }
+                if obj.confidence is not None:
+                    annotation["score"] = obj.confidence
                 data["annotations"].append(annotation)
 
         self.output_file.parent.mkdir(parents=True, exist_ok=True)
