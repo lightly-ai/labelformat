@@ -96,3 +96,17 @@ class TestKittiObjectDetectionOutput:
             "cat -1 -1 -10 50.0 60.0 70.0 80.0 -1 -1 -1 -1000 -1000 -1000 -10\n"
         )
         assert contents == expected
+
+    def test_save_replaces_spaces_in_category_name(self, tmp_path: Path) -> None:
+        output_folder = tmp_path / "labels"
+        label_input = simple_object_detection_label_input.get_input()
+        label_input._labels[0].objects[0].category = Category(
+            id=1, name="traffic light"
+        )
+
+        KittiObjectDetectionOutput(output_folder=output_folder).save(
+            label_input=label_input
+        )
+
+        contents = (output_folder / "image.txt").read_text()
+        assert contents.startswith("traffic_light ")

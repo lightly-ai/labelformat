@@ -126,9 +126,10 @@ class KittiObjectDetectionOutput(ObjectDetectionOutput):
                     left, top, right, bottom = obj.box.to_format(
                         format=BoundingBoxFormat.XYXY
                     )
+                    category_name = obj.category.name.replace(" ", "_")
                     # Unknown values match Kitti dataset "DontCare" label values.
                     file.write(
-                        f"{obj.category.name} "
+                        f"{category_name} "
                         "-1 "  # truncated
                         "-1 "  # occluded
                         "-10 "  # alpha
