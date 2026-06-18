@@ -1,6 +1,5 @@
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Iterable
 
 import pytest
 from pytest_mock import MockerFixture
@@ -9,12 +8,12 @@ from labelformat.formats.kitti import (
     KittiObjectDetectionInput,
     KittiObjectDetectionOutput,
 )
+from labelformat.formats.labelformat import LabelformatObjectDetectionInput
 from labelformat.model.bounding_box import BoundingBox
 from labelformat.model.category import Category
 from labelformat.model.image import Image
 from labelformat.model.object_detection import (
     ImageObjectDetection,
-    ObjectDetectionInput,
     SingleObjectDetection,
 )
 
@@ -99,9 +98,24 @@ class TestKittiObjectDetectionOutput:
 
     def test_save_replaces_spaces_in_category_name(self, tmp_path: Path) -> None:
         output_folder = tmp_path / "labels"
-        label_input = simple_object_detection_label_input.get_input()
-        label_input._labels[0].objects[0].category = Category(
-            id=1, name="traffic light"
+        categories = [
+            Category(id=0, name="traffic light"),
+        ]
+        image = Image(id=0, filename="image.jpg", width=100, height=200)
+        label_input = LabelformatObjectDetectionInput(
+            categories=categories,
+            images=[image],
+            labels=[
+                ImageObjectDetection(
+                    image=image,
+                    objects=[
+                        SingleObjectDetection(
+                            category=categories[0],
+                            box=BoundingBox(xmin=10.0, ymin=20.0, xmax=30.0, ymax=40.0),
+                        ),
+                    ],
+                )
+            ],
         )
 
         KittiObjectDetectionOutput(output_folder=output_folder).save(
