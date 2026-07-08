@@ -3,9 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from labelformat.formats.activitynet import (
-    ActivityNetTemporalClassificationInput,
-)
+from labelformat.formats.activitynet import ActivityNetTemporalClassificationInput
 from labelformat.model.category import Category
 from labelformat.model.temporal_classification import (
     TemporalEvent,

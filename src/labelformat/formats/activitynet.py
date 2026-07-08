@@ -53,9 +53,7 @@ def _parse_activitynet_data(
         entries = data["results"]
         is_database = False
     else:
-        raise ParseError(
-            "ActivityNet JSON must contain a 'database' or 'results' key."
-        )
+        raise ParseError("ActivityNet JSON must contain a 'database' or 'results' key.")
 
     label_names: dict[str, None] = {}
     parsed_by_video: list[tuple[str, list[_ParsedEvent]]] = []

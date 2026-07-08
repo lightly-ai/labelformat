@@ -1,6 +1,4 @@
-from labelformat.formats.activitynet import (
-    ActivityNetTemporalClassificationInput,
-)
+from labelformat.formats.activitynet import ActivityNetTemporalClassificationInput
 from labelformat.formats.coco import (
     COCOInstanceSegmentationInput,
     COCOInstanceSegmentationOutput,
