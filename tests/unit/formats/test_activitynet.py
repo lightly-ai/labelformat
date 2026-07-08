@@ -4,9 +4,7 @@ from pathlib import Path
 import pytest
 
 from labelformat.formats.activitynet import (
-    ActivityNetTemporalClassificationDatabaseOutput,
     ActivityNetTemporalClassificationInput,
-    ActivityNetTemporalClassificationResultsOutput,
 )
 from labelformat.model.category import Category
 from labelformat.model.temporal_classification import (
@@ -33,7 +31,6 @@ class TestActivityNetTemporalClassificationDatabaseInput:
         assert list(label_input.get_labels()) == [
             VideoTemporalClassification(
                 video_id="v_test_video",
-                duration_s=82.75,
                 events=[
                     TemporalEvent(
                         category=Category(id=1, name="Person walking"),
@@ -59,7 +56,6 @@ class TestActivityNetTemporalClassificationResultsInput:
         assert list(label_input.get_labels()) == [
             VideoTemporalClassification(
                 video_id="v_test_video",
-                duration_s=None,
                 events=[
                     TemporalEvent(
                         category=Category(id=1, name="Person walking"),
@@ -94,34 +90,6 @@ class TestActivityNetTemporalClassificationResultsInput:
 
         with pytest.raises(ParseError, match="segment"):
             ActivityNetTemporalClassificationInput(input_file=input_file)
-
-
-class TestActivityNetTemporalClassificationExportImport:
-    def test_database_import_export(self, tmp_path: Path) -> None:
-        input_file = _write_activitynet_database_json(tmp_path / "activity_net.json")
-        label_input = ActivityNetTemporalClassificationInput(input_file=input_file)
-
-        output_path = tmp_path / "activity_net_out.json"
-        ActivityNetTemporalClassificationDatabaseOutput(output_file=output_path).save(
-            label_input=label_input
-        )
-
-        output_json = json.loads(output_path.read_text())
-        expected_json = json.loads(input_file.read_text())
-        assert output_json == expected_json
-
-    def test_results_import_export(self, tmp_path: Path) -> None:
-        input_file = _write_activitynet_results_json(tmp_path / "results.json")
-        label_input = ActivityNetTemporalClassificationInput(input_file=input_file)
-
-        output_path = tmp_path / "results_out.json"
-        ActivityNetTemporalClassificationResultsOutput(output_file=output_path).save(
-            label_input=label_input
-        )
-
-        output_json = json.loads(output_path.read_text())
-        expected_json = json.loads(input_file.read_text())
-        assert output_json == expected_json
 
 
 def _write_activitynet_database_json(input_file: Path) -> Path:

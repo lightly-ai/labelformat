@@ -1,7 +1,5 @@
 from labelformat.formats.activitynet import (
-    ActivityNetTemporalClassificationDatabaseOutput,
     ActivityNetTemporalClassificationInput,
-    ActivityNetTemporalClassificationResultsOutput,
 )
 from labelformat.formats.coco import (
     COCOInstanceSegmentationInput,
@@ -81,9 +79,7 @@ from labelformat.formats.youtubevis import (
 )
 
 __all__ = [
-    "ActivityNetTemporalClassificationDatabaseOutput",
     "ActivityNetTemporalClassificationInput",
-    "ActivityNetTemporalClassificationResultsOutput",
     "COCOInstanceSegmentationInput",
     "COCOInstanceSegmentationOutput",
     "COCOObjectDetectionInput",

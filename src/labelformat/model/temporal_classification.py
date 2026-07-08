@@ -31,7 +31,6 @@ class VideoTemporalClassification:
 
     video_id: str
     events: list[TemporalEvent]
-    duration_s: float | None = None
 
 
 class TemporalClassificationInput(ABC):
@@ -46,15 +45,4 @@ class TemporalClassificationInput(ABC):
 
     @abstractmethod
     def get_labels(self) -> Iterable[VideoTemporalClassification]:
-        raise NotImplementedError()
-
-
-class TemporalClassificationOutput(ABC):
-    @staticmethod
-    @abstractmethod
-    def add_cli_arguments(parser: ArgumentParser) -> None:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def save(self, label_input: TemporalClassificationInput) -> None:
         raise NotImplementedError()

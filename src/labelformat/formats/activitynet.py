@@ -9,7 +9,6 @@ from typing import Iterable
 from labelformat.model.category import Category
 from labelformat.model.temporal_classification import (
     TemporalClassificationInput,
-    TemporalClassificationOutput,
     TemporalEvent,
     VideoTemporalClassification,
 )
@@ -44,101 +43,26 @@ class ActivityNetTemporalClassificationInput(
     """Import ActivityNet-style temporal classification annotations."""
 
 
-class _ActivityNetBaseOutput:
-    @staticmethod
-    def add_cli_arguments(parser: ArgumentParser) -> None:
-        parser.add_argument(
-            "--output-file",
-            type=Path,
-            required=True,
-            help="Path to output ActivityNet JSON file",
-        )
-
-    def __init__(self, output_file: Path) -> None:
-        self.output_file = output_file
-
-
-class ActivityNetTemporalClassificationResultsOutput(
-    _ActivityNetBaseOutput, TemporalClassificationOutput
-):
-    """Export ActivityNet submission-style JSON with a top-level ``results`` key."""
-
-    def save(self, label_input: TemporalClassificationInput) -> None:
-        data: JsonDict = {
-            "results": _get_output_results_dict(label_input.get_labels()),
-        }
-        self.output_file.parent.mkdir(parents=True, exist_ok=True)
-        with self.output_file.open("w", encoding="utf-8") as file:
-            json.dump(data, file, indent=2)
-
-
-class ActivityNetTemporalClassificationDatabaseOutput(
-    _ActivityNetBaseOutput, TemporalClassificationOutput
-):
-    """Export ActivityNet ground-truth-style JSON with a top-level ``database`` key."""
-
-    def save(self, label_input: TemporalClassificationInput) -> None:
-        data: JsonDict = {
-            "database": _get_output_database_dict(label_input.get_labels()),
-        }
-        self.output_file.parent.mkdir(parents=True, exist_ok=True)
-        with self.output_file.open("w", encoding="utf-8") as file:
-            json.dump(data, file, indent=2)
-
-
 def _parse_activitynet_data(
     data: JsonDict,
 ) -> tuple[list[VideoTemporalClassification], list[Category]]:
     if "database" in data:
-        return _parse_database(database=data["database"])
-    if "results" in data:
-        return _parse_results(results=data["results"])
-
-    raise ParseError("ActivityNet JSON must contain a 'database' or 'results' key.")
-
-
-def _parse_database(
-    database: JsonDict,
-) -> tuple[list[VideoTemporalClassification], list[Category]]:
-    label_names: dict[str, None] = {}
-    parsed_by_video: list[tuple[str, list[_ParsedEvent], float | None]] = []
-
-    for video_id, video_entry in database.items():
-        if not isinstance(video_entry, dict):
-            raise ParseError(f"Invalid database entry for video '{video_id}'.")
-        raw_annotations = video_entry.get("annotations", [])
-        if not isinstance(raw_annotations, list):
-            raise ParseError(f"Invalid annotations for video '{video_id}'.")
-        duration = video_entry.get("duration")
-        duration_s = float(duration) if duration is not None else None
-        events = [_parse_event(annotation=annotation) for annotation in raw_annotations]
-        label_names.update((event.label, None) for event in events)
-        parsed_by_video.append((str(video_id), events, duration_s))
-
-    categories = _categories_from_label_names(label_names=label_names)
-    category_name_to_id = {category.name: category.id for category in categories}
-    labels = [
-        VideoTemporalClassification(
-            video_id=video_id,
-            events=_events_from_parsed(
-                events=events, category_name_to_id=category_name_to_id
-            ),
-            duration_s=duration_s,
+        entries = data["database"]
+        is_database = True
+    elif "results" in data:
+        entries = data["results"]
+        is_database = False
+    else:
+        raise ParseError(
+            "ActivityNet JSON must contain a 'database' or 'results' key."
         )
-        for video_id, events, duration_s in parsed_by_video
-    ]
-    return labels, categories
 
-
-def _parse_results(
-    results: JsonDict,
-) -> tuple[list[VideoTemporalClassification], list[Category]]:
     label_names: dict[str, None] = {}
     parsed_by_video: list[tuple[str, list[_ParsedEvent]]] = []
-
-    for video_id, raw_annotations in results.items():
-        if not isinstance(raw_annotations, list):
-            raise ParseError(f"Invalid results entry for video '{video_id}'.")
+    for video_id, video_entry in entries.items():
+        raw_annotations = _extract_annotations(
+            video_id=video_id, video_entry=video_entry, is_database=is_database
+        )
         events = [_parse_event(annotation=annotation) for annotation in raw_annotations]
         label_names.update((event.label, None) for event in events)
         parsed_by_video.append((str(video_id), events))
@@ -151,11 +75,31 @@ def _parse_results(
             events=_events_from_parsed(
                 events=events, category_name_to_id=category_name_to_id
             ),
-            duration_s=None,
         )
         for video_id, events in parsed_by_video
     ]
     return labels, categories
+
+
+def _extract_annotations(
+    video_id: str,
+    video_entry: object,
+    is_database: bool,
+) -> list[JsonDict]:
+    """Extract the raw annotation list for one video.
+
+    In the ``database`` format each entry is a dict with an ``annotations`` list;
+    in the ``results`` format the entry is the list itself.
+    """
+    if is_database:
+        if not isinstance(video_entry, dict):
+            raise ParseError(f"Invalid database entry for video '{video_id}'.")
+        raw_annotations = video_entry.get("annotations", [])
+    else:
+        raw_annotations = video_entry
+    if not isinstance(raw_annotations, list):
+        raise ParseError(f"Invalid annotations for video '{video_id}'.")
+    return raw_annotations
 
 
 @dataclass(frozen=True)
@@ -219,42 +163,3 @@ def _events_from_parsed(
         )
         for event in events
     ]
-
-
-def _get_output_results_dict(
-    labels: Iterable[VideoTemporalClassification],
-) -> JsonDict:
-    results: JsonDict = {}
-    for label in labels:
-        annotations: list[JsonDict] = []
-        for event in label.events:
-            annotation: JsonDict = {
-                "label": event.category.name,
-                "segment": [event.start_time_s, event.end_time_s],
-            }
-            if event.confidence is not None:
-                annotation["score"] = event.confidence
-            annotations.append(annotation)
-        results[label.video_id] = annotations
-    return results
-
-
-def _get_output_database_dict(
-    labels: Iterable[VideoTemporalClassification],
-) -> JsonDict:
-    database: JsonDict = {}
-    for label in labels:
-        annotations: list[JsonDict] = []
-        for event in label.events:
-            annotation: JsonDict = {
-                "label": event.category.name,
-                "segment": [event.start_time_s, event.end_time_s],
-            }
-            if event.confidence is not None:
-                annotation["score"] = event.confidence
-            annotations.append(annotation)
-        video_entry: JsonDict = {"annotations": annotations}
-        if label.duration_s is not None:
-            video_entry["duration"] = label.duration_s
-        database[label.video_id] = video_entry
-    return database
