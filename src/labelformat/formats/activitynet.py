@@ -154,9 +154,7 @@ def _filter_by_split(
 ) -> list[tuple[str, list[_ParsedEvent], _VideoMetadata]]:
     if split is None:
         return parsed_by_video
-    filtered = [
-        video for video in parsed_by_video if video[2].subset == split
-    ]
+    filtered = [video for video in parsed_by_video if video[2].subset == split]
     if not filtered:
         available = sorted(
             {meta.subset for _, _, meta in parsed_by_video if meta.subset is not None}
