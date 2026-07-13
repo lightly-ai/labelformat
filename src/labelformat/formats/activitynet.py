@@ -78,9 +78,7 @@ def _parse_activitynet_data(
 
     labels = []
     for video_id, video_entry in entries.items():
-        raw_annotations, meta = _extract_video(
-            str(video_id), video_entry, is_database
-        )
+        raw_annotations, meta = _extract_video(str(video_id), video_entry, is_database)
         labels.append(
             VideoTemporalClassification(
                 video_id=str(video_id),
