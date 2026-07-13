@@ -110,6 +110,33 @@ class TestActivityNetTemporalClassificationDatabaseInput:
         with pytest.raises(ParseError, match="missing required field 'subset'"):
             ActivityNetTemporalClassificationInput(input_file=input_file)
 
+    def test_optional_metadata_defaults_to_none(self, tmp_path: Path) -> None:
+        input_file = tmp_path / "no_optional.json"
+        input_file.write_text(
+            json.dumps(
+                {
+                    "database": {
+                        "v_test_video": {
+                            "duration": 82.75,
+                            "subset": "validation",
+                            "annotations": [
+                                {"label": "Person walking", "segment": [0.58, 6.16]},
+                            ],
+                        }
+                    }
+                }
+            )
+        )
+
+        label_input = ActivityNetTemporalClassificationInput(input_file=input_file)
+        labels = list(label_input.get_labels())
+
+        assert len(labels) == 1
+        assert labels[0].duration_s == 82.75
+        assert labels[0].subset == "validation"
+        assert labels[0].resolution is None
+        assert labels[0].url is None
+
 
 class TestActivityNetTemporalClassificationResultsInput:
     def test_get_labels(self, tmp_path: Path) -> None:

@@ -116,8 +116,10 @@ def _extract_video(
     """Extract the raw annotation list and video metadata for one video.
 
     In the ``database`` format each entry is a dict with an ``annotations`` list and
-    video metadata (``duration``, ``subset``, ``resolution``, ``url``); in the
-    ``results`` format the entry is the annotation list itself, without metadata.
+    video metadata. ``duration`` and ``subset`` are required (``subset`` is needed
+    for split filtering); ``resolution`` and ``url`` are optional and default to
+    ``None``. In the ``results`` format the entry is the annotation list itself,
+    without metadata.
     """
     if not is_database:
         if not isinstance(video_entry, list):
@@ -134,8 +136,8 @@ def _extract_video(
     meta = _VideoMetadata(
         duration_s=float(_require_field(video_entry, "duration", video_id)),
         subset=_require_field(video_entry, "subset", video_id),
-        resolution=_require_field(video_entry, "resolution", video_id),
-        url=_require_field(video_entry, "url", video_id),
+        resolution=video_entry.get("resolution"),
+        url=video_entry.get("url"),
     )
     return raw_annotations, meta
 
