@@ -4,7 +4,7 @@ import json
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 
 from labelformat.model.category import Category
 from labelformat.model.temporal_classification import (
@@ -67,37 +67,35 @@ def _parse_activitynet_data(
     else:
         raise ParseError("ActivityNet JSON must contain a 'database' or 'results' key.")
 
-    label_names: dict[str, None] = {}
-    parsed_by_video: list[tuple[str, list[_ParsedEvent], _VideoMetadata]] = []
+    # Assign category ids by first appearance across all videos, so that ids stay
+    # stable regardless of any split filter applied afterwards.
+    categories: dict[str, Category] = {}
+
+    def category_for(label: str) -> Category:
+        if label not in categories:
+            categories[label] = Category(id=len(categories) + 1, name=label)
+        return categories[label]
+
+    labels = []
     for video_id, video_entry in entries.items():
         raw_annotations, meta = _extract_video(
-            video_id=str(video_id), video_entry=video_entry, is_database=is_database
+            str(video_id), video_entry, is_database
         )
-        events = [
-            _parse_event(annotation=annotation, duration_s=meta.duration_s)
-            for annotation in raw_annotations
-        ]
-        label_names.update((event.label, None) for event in events)
-        parsed_by_video.append((str(video_id), events, meta))
-
-    categories = _categories_from_label_names(label_names=label_names)
-    category_name_to_id = {category.name: category.id for category in categories}
-
-    parsed_by_video = _filter_by_split(parsed_by_video=parsed_by_video, split=split)
-    labels = [
-        VideoTemporalClassification(
-            video_id=video_id,
-            events=_events_from_parsed(
-                events=events, category_name_to_id=category_name_to_id
-            ),
-            duration_s=meta.duration_s,
-            subset=meta.subset,
-            resolution=meta.resolution,
-            url=meta.url,
+        labels.append(
+            VideoTemporalClassification(
+                video_id=str(video_id),
+                events=[
+                    _parse_event(annotation, category_for, meta.duration_s)
+                    for annotation in raw_annotations
+                ],
+                duration_s=meta.duration_s,
+                subset=meta.subset,
+                resolution=meta.resolution,
+                url=meta.url,
+            )
         )
-        for video_id, events, meta in parsed_by_video
-    ]
-    return labels, categories
+
+    return _filter_by_split(labels, split), list(categories.values())
 
 
 @dataclass(frozen=True)
@@ -151,15 +149,15 @@ def _require_field(video_entry: JsonDict, key: str, video_id: str) -> Any:
 
 
 def _filter_by_split(
-    parsed_by_video: list[tuple[str, list[_ParsedEvent], _VideoMetadata]],
+    labels: list[VideoTemporalClassification],
     split: str | None,
-) -> list[tuple[str, list[_ParsedEvent], _VideoMetadata]]:
+) -> list[VideoTemporalClassification]:
     if split is None:
-        return parsed_by_video
-    filtered = [video for video in parsed_by_video if video[2].subset == split]
+        return labels
+    filtered = [label for label in labels if label.subset == split]
     if not filtered:
         available = sorted(
-            {meta.subset for _, _, meta in parsed_by_video if meta.subset is not None}
+            {label.subset for label in labels if label.subset is not None}
         )
         raise ParseError(
             f"Split '{split}' not found in ActivityNet data. "
@@ -168,15 +166,11 @@ def _filter_by_split(
     return filtered
 
 
-@dataclass(frozen=True)
-class _ParsedEvent:
-    label: str
-    start_time_s: float
-    end_time_s: float
-    confidence: float | None
-
-
-def _parse_event(annotation: JsonDict, duration_s: float | None = None) -> _ParsedEvent:
+def _parse_event(
+    annotation: JsonDict,
+    category_for: Callable[[str], Category],
+    duration_s: float | None,
+) -> TemporalEvent:
     label = annotation.get("label")
     segment = annotation.get("segment")
     if not isinstance(label, str) or not label:
@@ -199,38 +193,10 @@ def _parse_event(annotation: JsonDict, duration_s: float | None = None) -> _Pars
             f"end must not exceed the video duration ({duration_s})."
         )
 
-    confidence = annotation.get("score")
-    if confidence is not None:
-        confidence = float(confidence)
-
-    return _ParsedEvent(
-        label=label,
+    score = annotation.get("score")
+    return TemporalEvent(
+        category=category_for(label),
         start_time_s=start_time_s,
         end_time_s=end_time_s,
-        confidence=confidence,
+        confidence=float(score) if score is not None else None,
     )
-
-
-def _categories_from_label_names(label_names: Iterable[str]) -> list[Category]:
-    return [
-        Category(id=index, name=label_name)
-        for index, label_name in enumerate(label_names, start=1)
-    ]
-
-
-def _events_from_parsed(
-    events: list[_ParsedEvent],
-    category_name_to_id: dict[str, int],
-) -> list[TemporalEvent]:
-    return [
-        TemporalEvent(
-            category=Category(
-                id=category_name_to_id[event.label],
-                name=event.label,
-            ),
-            start_time_s=event.start_time_s,
-            end_time_s=event.end_time_s,
-            confidence=event.confidence,
-        )
-        for event in events
-    ]
