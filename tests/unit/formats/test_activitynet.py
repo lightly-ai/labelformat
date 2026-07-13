@@ -88,6 +88,37 @@ class TestActivityNetTemporalClassificationDatabaseInput:
         with pytest.raises(ParseError, match="exceed the video duration"):
             ActivityNetTemporalClassificationInput(input_file=input_file)
 
+    def test_clips_rounding_overflow_from_official_ground_truth(
+        self, tmp_path: Path
+    ) -> None:
+        # The stored duration is rounded while the segment end is not. This must not be rejected.
+        input_file = tmp_path / "official.json"
+        input_file.write_text(
+            json.dumps(
+                {
+                    "database": {
+                        "amCD-2TIKw0": {
+                            "duration": 124.18,
+                            "subset": "validation",
+                            "annotations": [
+                                {
+                                    "label": "Rock climbing",
+                                    "segment": [10.0, 124.18031746031745],
+                                },
+                            ],
+                        }
+                    }
+                }
+            )
+        )
+
+        label_input = ActivityNetTemporalClassificationInput(input_file=input_file)
+        events = list(label_input.get_labels())[0].events
+
+        assert len(events) == 1
+        # The tiny overflow is clipped back to the video duration.
+        assert events[0].end_time_s == 124.18
+
     def test_rejects_missing_required_field(self, tmp_path: Path) -> None:
         input_file = tmp_path / "invalid.json"
         input_file.write_text(

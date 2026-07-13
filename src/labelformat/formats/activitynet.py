@@ -14,6 +14,8 @@ from labelformat.model.temporal_classification import (
 )
 from labelformat.types import JsonDict, ParseError
 
+_DURATION_OVERFLOW_TOLERANCE_S = 0.1
+
 
 class _ActivityNetBaseInput:
     @staticmethod
@@ -186,10 +188,13 @@ def _parse_event(
             "start must be non-negative and less than end."
         )
     if duration_s is not None and end_time_s > duration_s:
-        raise ParseError(
-            f"Invalid segment [{start_time_s}, {end_time_s}] for label '{label}': "
-            f"end must not exceed the video duration ({duration_s})."
-        )
+        if end_time_s - duration_s > _DURATION_OVERFLOW_TOLERANCE_S:
+            raise ParseError(
+                f"Invalid segment [{start_time_s}, {end_time_s}] for label "
+                f"'{label}': end must not exceed the video duration ({duration_s})."
+            )
+        # Rounding overflow within tolerance: clip the end to the duration.
+        end_time_s = duration_s
 
     score = annotation.get("score")
     return TemporalEvent(
