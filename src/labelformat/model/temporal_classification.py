@@ -31,6 +31,10 @@ class VideoTemporalClassification:
 
     video_id: str
     events: list[TemporalEvent]
+    duration_s: float | None = None
+    subset: str | None = None
+    resolution: str | None = None
+    url: str | None = None
 
 
 class TemporalClassificationInput(ABC):

@@ -29,6 +29,10 @@ class TestActivityNetTemporalClassificationDatabaseInput:
         assert list(label_input.get_labels()) == [
             VideoTemporalClassification(
                 video_id="v_test_video",
+                duration_s=82.75,
+                subset="validation",
+                resolution="270x480",
+                url="https://www.youtube.com/watch?v=v_test_video",
                 events=[
                     TemporalEvent(
                         category=Category(id=1, name="Person walking"),
@@ -44,6 +48,67 @@ class TestActivityNetTemporalClassificationDatabaseInput:
                 ],
             )
         ]
+
+    def test_filters_by_split(self, tmp_path: Path) -> None:
+        input_file = _write_activitynet_database_json(tmp_path / "activity_net.json")
+
+        validation = ActivityNetTemporalClassificationInput(
+            input_file=input_file, input_split="validation"
+        )
+        assert [label.video_id for label in validation.get_labels()] == ["v_test_video"]
+
+    def test_rejects_unknown_split(self, tmp_path: Path) -> None:
+        input_file = _write_activitynet_database_json(tmp_path / "activity_net.json")
+
+        with pytest.raises(ParseError, match="Split 'training' not found"):
+            ActivityNetTemporalClassificationInput(
+                input_file=input_file, input_split="training"
+            )
+
+    def test_rejects_segment_exceeding_duration(self, tmp_path: Path) -> None:
+        input_file = tmp_path / "invalid.json"
+        input_file.write_text(
+            json.dumps(
+                {
+                    "database": {
+                        "v_test_video": {
+                            "duration": 5.0,
+                            "subset": "validation",
+                            "resolution": "270x480",
+                            "url": "https://www.youtube.com/watch?v=v_test_video",
+                            "annotations": [
+                                {"label": "Person walking", "segment": [1.0, 6.0]},
+                            ],
+                        }
+                    }
+                }
+            )
+        )
+
+        with pytest.raises(ParseError, match="exceed the video duration"):
+            ActivityNetTemporalClassificationInput(input_file=input_file)
+
+    def test_rejects_missing_required_field(self, tmp_path: Path) -> None:
+        input_file = tmp_path / "invalid.json"
+        input_file.write_text(
+            json.dumps(
+                {
+                    "database": {
+                        "v_test_video": {
+                            "duration": 82.75,
+                            "resolution": "270x480",
+                            "url": "https://www.youtube.com/watch?v=v_test_video",
+                            "annotations": [
+                                {"label": "Person walking", "segment": [0.58, 6.16]},
+                            ],
+                        }
+                    }
+                }
+            )
+        )
+
+        with pytest.raises(ParseError, match="missing required field 'subset'"):
+            ActivityNetTemporalClassificationInput(input_file=input_file)
 
 
 class TestActivityNetTemporalClassificationResultsInput:
@@ -95,6 +160,9 @@ def _write_activitynet_database_json(input_file: Path) -> Path:
         "database": {
             "v_test_video": {
                 "duration": 82.75,
+                "subset": "validation",
+                "resolution": "270x480",
+                "url": "https://www.youtube.com/watch?v=v_test_video",
                 "annotations": [
                     {
                         "label": "Person walking",
