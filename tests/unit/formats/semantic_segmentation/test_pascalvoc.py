@@ -26,6 +26,7 @@ from labelformat.model.instance_segmentation import (
     SingleInstanceSegmentation,
 )
 from labelformat.model.multipolygon import MultiPolygon
+from labelformat.utils import ImageDimensionError
 from tests.unit.test_utils import FIXTURES_DIR
 
 FIXTURES_ROOT_PASCALVOC = FIXTURES_DIR / "semantic_segmentation/pascalvoc"
@@ -182,28 +183,8 @@ class TestPascalVOCSemanticSegmentationInput:
                 class_id_to_name=_load_class_mapping_int_keys(),
             )
 
-    def _make_dataset_with_broken_image(
-        self, tmp_path: Path
-    ) -> "tuple[Path, Path, Dict[int, str]]":
-        images_dir = tmp_path / "JPEGImages"
-        masks_dir = tmp_path / "SegmentationClass"
-        images_dir.mkdir(parents=True)
-        masks_dir.mkdir(parents=True)
-
-        PILImage.new("RGB", (10, 20), color="blue").save(images_dir / "good.jpg")
-        PILImage.new("L", (10, 20), color=0).save(masks_dir / "good.png")
-
-        (images_dir / "broken.jpg").write_bytes(b"not a valid jpeg")
-        PILImage.new("L", (10, 20), color=0).save(masks_dir / "broken.png")
-
-        return images_dir, masks_dir, {0: "background"}
-
     def test_from_dirs__reraises_by_default(self, tmp_path: Path) -> None:
-        from labelformat.utils import ImageDimensionError
-
-        images_dir, masks_dir, class_map = self._make_dataset_with_broken_image(
-            tmp_path
-        )
+        images_dir, masks_dir, class_map = _make_dataset_with_broken_image(tmp_path)
         with pytest.raises(ImageDimensionError):
             PascalVOCSemanticSegmentationInput.from_dirs(
                 images_dir=images_dir,
@@ -212,11 +193,7 @@ class TestPascalVOCSemanticSegmentationInput:
             )
 
     def test_from_dirs__on_error_hook_skips_broken_image(self, tmp_path: Path) -> None:
-        from labelformat.utils import ImageDimensionError
-
-        images_dir, masks_dir, class_map = self._make_dataset_with_broken_image(
-            tmp_path
-        )
+        images_dir, masks_dir, class_map = _make_dataset_with_broken_image(tmp_path)
         errors: List[Tuple[Path, ImageDimensionError]] = []
         ds = PascalVOCSemanticSegmentationInput.from_dirs(
             images_dir=images_dir,
@@ -506,3 +483,21 @@ def test__validate_mask__non_2d_mask_raises() -> None:
         pascalvoc_module._validate_mask(
             image_obj=img, mask_np=mask, valid_class_ids=valid_ids
         )
+
+
+def _make_dataset_with_broken_image(
+    tmp_path: Path,
+) -> Tuple[Path, Path, Dict[int, str]]:
+    """Create a Pascal VOC dataset with one valid and one corrupt image."""
+    images_dir = tmp_path / "JPEGImages"
+    masks_dir = tmp_path / "SegmentationClass"
+    images_dir.mkdir(parents=True)
+    masks_dir.mkdir(parents=True)
+
+    PILImage.new("RGB", (10, 20), color="blue").save(images_dir / "good.jpg")
+    PILImage.new("L", (10, 20), color=0).save(masks_dir / "good.png")
+
+    (images_dir / "broken.jpg").write_bytes(b"not a valid jpeg")
+    PILImage.new("L", (10, 20), color=0).save(masks_dir / "broken.png")
+
+    return images_dir, masks_dir, {0: "background"}

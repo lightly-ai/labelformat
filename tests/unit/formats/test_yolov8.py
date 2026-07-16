@@ -3,11 +3,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable, Dict, List, Tuple, TypedDict, Union
 
+import PIL.Image
 import pytest
 import yaml
 
 from labelformat.formats.yolov8 import _YOLOv8BaseInput
 from labelformat.model.category import Category
+from labelformat.utils import ImageDimensionError
 
 
 class YOLOv8Config(TypedDict, total=False):
@@ -276,34 +278,14 @@ class Test_YOLOv8BaseInput:
             )
 
     class Test_OnError:
-        def _make_dataset(self, tmp_path: Path) -> Path:
-            import PIL.Image
-
-            images_dir = tmp_path / "images"
-            images_dir.mkdir()
-            PIL.Image.new("RGB", (10, 20), color="blue").save(
-                images_dir / "good.jpg", "JPEG"
-            )
-            (images_dir / "broken.jpg").write_bytes(b"not a valid jpeg")
-
-            config: YOLOv8Config = {"train": "images", "names": ["person"]}
-            config_file = tmp_path / "data.yaml"
-            with config_file.open("w") as f:
-                yaml.safe_dump(config, f)
-            return config_file
-
         def test_reraises_by_default(self, tmp_path: Path) -> None:
-            from labelformat.utils import ImageDimensionError
-
-            config_file = self._make_dataset(tmp_path)
+            config_file = _make_on_error_dataset(tmp_path)
             input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
             with pytest.raises(ImageDimensionError):
                 list(input_obj.get_images())
 
         def test_hook_skips_unreadable_image(self, tmp_path: Path) -> None:
-            from labelformat.utils import ImageDimensionError
-
-            config_file = self._make_dataset(tmp_path)
+            config_file = _make_on_error_dataset(tmp_path)
             input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
 
             errors: List[Tuple[Path, ImageDimensionError]] = []
@@ -314,3 +296,17 @@ class Test_YOLOv8BaseInput:
             assert len(errors) == 1
             assert Path(errors[0][0]).name == "broken.jpg"
             assert isinstance(errors[0][1], ImageDimensionError)
+
+
+def _make_on_error_dataset(tmp_path: Path) -> Path:
+    """Create a YOLOv8 dataset with one valid and one corrupt image."""
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+    PIL.Image.new("RGB", (10, 20), color="blue").save(images_dir / "good.jpg", "JPEG")
+    (images_dir / "broken.jpg").write_bytes(b"not a valid jpeg")
+
+    config: YOLOv8Config = {"train": "images", "names": ["person"]}
+    config_file = tmp_path / "data.yaml"
+    with config_file.open("w") as f:
+        yaml.safe_dump(config, f)
+    return config_file
