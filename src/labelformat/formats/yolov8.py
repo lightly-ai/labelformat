@@ -1,7 +1,7 @@
 import logging
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 import yaml
 
@@ -41,6 +41,9 @@ class _YOLOv8BaseInput:
     def __init__(self, input_file: Path, input_split: str) -> None:
         self._config_file = input_file
         self._split = input_split
+        # Optional hook to tolerate unreadable images during folder scan.
+        # Default None re-raises; see utils.get_images_from_folder.
+        self.on_error: Optional[utils.OnImageErrorHook] = None
         with self._config_file.open() as file:
             self._config_data = yaml.safe_load(file)
 
@@ -56,7 +59,9 @@ class _YOLOv8BaseInput:
             yield Category(id=category_id, name=names[category_id])
 
     def get_images(self) -> Iterable[Image]:
-        yield from utils.get_images_from_folder(folder=self._images_dir())
+        yield from utils.get_images_from_folder(
+            folder=self._images_dir(), on_error=self.on_error
+        )
 
     def _root_dir(self) -> Path:
         """Return the root directory of the dataset.

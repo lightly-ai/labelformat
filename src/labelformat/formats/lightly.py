@@ -2,7 +2,7 @@ import copy
 import json
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Sequence
+from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 from labelformat import utils
 from labelformat.cli.registry import Task, cli_register
@@ -49,6 +49,9 @@ class LightlyObjectDetectionInput(ObjectDetectionInput):
         self._input_folder = input_folder
         self._images_rel_path = images_rel_path
         self._skip_labels_without_image = skip_labels_without_image
+        # Optional hook to tolerate unreadable images during folder scan.
+        # Default None re-raises; see utils.get_images_from_folder.
+        self.on_error: Optional[utils.OnImageErrorHook] = None
         self._categories = self._get_categories()
 
     def get_categories(self) -> Iterable[Category]:
@@ -56,7 +59,8 @@ class LightlyObjectDetectionInput(ObjectDetectionInput):
 
     def get_images(self) -> Iterable[Image]:
         yield from utils.get_images_from_folder(
-            folder=self._input_folder / self._images_rel_path
+            folder=self._input_folder / self._images_rel_path,
+            on_error=self.on_error,
         )
 
     def get_labels(self) -> Iterable[ImageObjectDetection]:

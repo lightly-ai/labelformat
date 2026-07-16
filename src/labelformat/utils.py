@@ -1,7 +1,7 @@
 import logging
 import posixpath
 from pathlib import Path, PurePosixPath
-from typing import Iterable, Tuple
+from typing import Callable, Iterable, Optional, Tuple
 from urllib.parse import urlsplit
 
 import fsspec
@@ -46,9 +46,21 @@ JPEG_SOF_MARKERS = {
 
 
 class ImageDimensionError(Exception):
-    """Raised when unable to extract image dimensions using fast methods."""
+    """Raised when unable to extract image dimensions.
 
-    pass
+    Carries the offending image path (when available) so callers and error
+    hooks can identify which file failed.
+    """
+
+    def __init__(self, message: str, path: Optional[PathLike] = None) -> None:
+        super().__init__(message)
+        self.path = path
+
+
+# Hook invoked when an image cannot be read during a folder scan. Receives the
+# offending path and the raised ImageDimensionError. Returning normally skips
+# the file; raising propagates.
+OnImageErrorHook = Callable[[Path, ImageDimensionError], None]
 
 
 def _path_suffix(path: PathLike) -> str:
@@ -177,18 +189,32 @@ def get_image_dimensions(image_path: PathLike) -> Tuple[int, int]:
         except ImageDimensionError:
             pass
 
-    with fsspec.open(str(image_path), "rb") as img_file:
-        with PIL.Image.open(img_file) as img:
-            return img.size
+    try:
+        with fsspec.open(str(image_path), "rb") as img_file:
+            with PIL.Image.open(img_file) as img:
+                return img.size
+    except (PIL.UnidentifiedImageError, OSError) as error:
+        raise ImageDimensionError(
+            f"Failed to read image dimensions for '{image_path}': {error}",
+            path=image_path,
+        ) from error
 
 
-def get_images_from_folder(folder: PathLike) -> Iterable[Image]:
+def get_images_from_folder(
+    folder: PathLike,
+    on_error: Optional[OnImageErrorHook] = None,
+) -> Iterable[Image]:
     """Yields an Image structure for all images in the given folder.
 
     The order of the images is arbitrary. Images in nested folders are included.
 
     Args:
         folder: Path or URI to the folder containing images.
+        on_error: Optional hook invoked when an image cannot be read. When
+            ``None`` (the default), a failure raises ``ImageDimensionError`` and
+            aborts iteration. When provided, the hook is called with the
+            offending path and the error, and the file is skipped so iteration
+            continues.
     """
     image_id = 0
     logger.debug(f"Listing images in '{folder}'...")
@@ -205,7 +231,13 @@ def get_images_from_folder(folder: PathLike) -> Iterable[Image]:
             continue
         image_filename = _relative_path(path=image_path, root=fs_folder)
         image_uri = fs.unstrip_protocol(image_path)
-        image_width, image_height = get_image_dimensions(image_uri)
+        try:
+            image_width, image_height = get_image_dimensions(image_uri)
+        except ImageDimensionError as error:
+            if on_error is None:
+                raise
+            on_error(Path(image_uri), error)
+            continue
         yield Image(
             id=image_id,
             filename=image_filename,

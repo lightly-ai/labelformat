@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Tuple
+from typing import List, Tuple
 from uuid import uuid4
 
 import fsspec
@@ -157,6 +157,49 @@ def test_get_images_from_folder__memory_uri() -> None:
         12,
         34,
     )
+
+
+def test_get_image_dimensions__corrupt_image_raises_image_dimension_error() -> None:
+    image_uri = f"memory://{uuid4().hex}/broken.jpg"
+    with fsspec.open(image_uri, "wb") as file:
+        file.write(b"this is not a valid jpeg")
+
+    with pytest.raises(ImageDimensionError) as exc_info:
+        get_image_dimensions(image_uri)
+    assert exc_info.value.path == image_uri
+
+
+def test_get_images_from_folder__corrupt_image_reraises_by_default() -> None:
+    root_uri = f"memory://{uuid4().hex}/dataset"
+    with fsspec.open(f"{root_uri}/good.jpg", "wb") as file:
+        PIL.Image.new("RGB", (10, 20), color="blue").save(file, "JPEG")
+    with fsspec.open(f"{root_uri}/broken.jpg", "wb") as file:
+        file.write(b"not a valid jpeg")
+
+    with pytest.raises(ImageDimensionError):
+        list(get_images_from_folder(root_uri))
+
+
+def test_get_images_from_folder__on_error_hook_skips_corrupt_images() -> None:
+    root_uri = f"memory://{uuid4().hex}/dataset"
+    with fsspec.open(f"{root_uri}/good.jpg", "wb") as file:
+        PIL.Image.new("RGB", (10, 20), color="blue").save(file, "JPEG")
+    with fsspec.open(f"{root_uri}/broken.jpg", "wb") as file:
+        file.write(b"not a valid jpeg")
+
+    errors: List[Tuple[Path, ImageDimensionError]] = []
+    images = list(
+        get_images_from_folder(
+            root_uri, on_error=lambda path, error: errors.append((path, error))
+        )
+    )
+
+    assert len(images) == 1
+    assert images[0].filename == "good.jpg"
+    assert len(errors) == 1
+    error_path, error = errors[0]
+    assert Path(error_path).name == "broken.jpg"
+    assert isinstance(error, ImageDimensionError)
 
 
 def _create_test_jpeg(

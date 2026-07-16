@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Dict, Iterable
+from typing import Dict, Iterable, List, Tuple
 from uuid import uuid4
 
 import cv2
@@ -181,6 +181,55 @@ class TestPascalVOCSemanticSegmentationInput:
                 masks_dir=masks_tmp,
                 class_id_to_name=_load_class_mapping_int_keys(),
             )
+
+    def _make_dataset_with_broken_image(
+        self, tmp_path: Path
+    ) -> "tuple[Path, Path, Dict[int, str]]":
+        images_dir = tmp_path / "JPEGImages"
+        masks_dir = tmp_path / "SegmentationClass"
+        images_dir.mkdir(parents=True)
+        masks_dir.mkdir(parents=True)
+
+        PILImage.new("RGB", (10, 20), color="blue").save(images_dir / "good.jpg")
+        PILImage.new("L", (10, 20), color=0).save(masks_dir / "good.png")
+
+        (images_dir / "broken.jpg").write_bytes(b"not a valid jpeg")
+        PILImage.new("L", (10, 20), color=0).save(masks_dir / "broken.png")
+
+        return images_dir, masks_dir, {0: "background"}
+
+    def test_from_dirs__reraises_by_default(self, tmp_path: Path) -> None:
+        from labelformat.utils import ImageDimensionError
+
+        images_dir, masks_dir, class_map = self._make_dataset_with_broken_image(
+            tmp_path
+        )
+        with pytest.raises(ImageDimensionError):
+            PascalVOCSemanticSegmentationInput.from_dirs(
+                images_dir=images_dir,
+                masks_dir=masks_dir,
+                class_id_to_name=class_map,
+            )
+
+    def test_from_dirs__on_error_hook_skips_broken_image(self, tmp_path: Path) -> None:
+        from labelformat.utils import ImageDimensionError
+
+        images_dir, masks_dir, class_map = self._make_dataset_with_broken_image(
+            tmp_path
+        )
+        errors: List[Tuple[Path, ImageDimensionError]] = []
+        ds = PascalVOCSemanticSegmentationInput.from_dirs(
+            images_dir=images_dir,
+            masks_dir=masks_dir,
+            class_id_to_name=class_map,
+            on_error=lambda path, error: errors.append((path, error)),
+        )
+
+        images = list(ds.get_images())
+        assert [img.filename for img in images] == ["good.jpg"]
+        assert len(errors) == 1
+        assert Path(errors[0][0]).name == "broken.jpg"
+        assert isinstance(errors[0][1], ImageDimensionError)
 
     def test_get_mask__unknown_image_raises(self) -> None:
         ds = PascalVOCSemanticSegmentationInput.from_dirs(
