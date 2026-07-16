@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Iterable, List, Literal, Union
+from typing import Iterable, List, Literal, Optional, Union
 
 from labelformat.cli.registry import Task, cli_register
 from labelformat.mask_utils import (
@@ -23,7 +23,11 @@ from labelformat.model.instance_segmentation import (
     SingleInstanceSegmentation,
 )
 from labelformat.model.multipolygon import MultiPolygon
-from labelformat.utils import get_image_dimensions
+from labelformat.utils import (
+    ImageDimensionError,
+    OnImageErrorHook,
+    get_image_dimensions,
+)
 
 
 @cli_register(format="maskpair", task=Task.INSTANCE_SEGMENTATION)
@@ -128,6 +132,9 @@ class MaskPairInstanceSegmentationInput(InstanceSegmentationInput):
         self._morph_close = morph_close
         self._segmentation_type = segmentation_type
         self._approx_epsilon = approx_epsilon
+        # Optional hook to tolerate unreadable images during folder scan.
+        # Default None re-raises; see utils.get_images_from_folder.
+        self.on_error: Optional[OnImageErrorHook] = None
 
         # Parse category names
         self._categories = []
@@ -147,9 +154,20 @@ class MaskPairInstanceSegmentationInput(InstanceSegmentationInput):
         yield from self._categories
 
     def get_images(self) -> Iterable[Image]:
-        """Get images from the image/mask pairs."""
+        """Get images from the image/mask pairs.
+
+        Image ids are the positional index into the image/mask pairs so that
+        they stay aligned with ``get_labels()``. Images skipped via ``on_error``
+        leave a gap in the id sequence.
+        """
         for image_id, (image_path, _) in enumerate(self._image_mask_pairs):
-            width, height = get_image_dimensions(image_path)
+            try:
+                width, height = get_image_dimensions(image_path)
+            except ImageDimensionError as error:
+                if self.on_error is None:
+                    raise
+                self.on_error(Path(image_path), error)
+                continue
             yield Image(
                 id=image_id,
                 filename=image_path.name,
@@ -162,6 +180,11 @@ class MaskPairInstanceSegmentationInput(InstanceSegmentationInput):
         images = {img.id: img for img in self.get_images()}
 
         for image_id, (image_path, mask_path) in enumerate(self._image_mask_pairs):
+            # Skip pairs whose image was dropped by the on_error hook in
+            # get_images() so labels stay aligned with readable images.
+            if image_id not in images:
+                continue
+
             # Load and binarize the mask
             binary_mask = binarize_mask(
                 mask_path=mask_path,

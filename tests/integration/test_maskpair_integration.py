@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List, Tuple
 
 import cv2
 import numpy as np
@@ -11,6 +11,7 @@ from numpy.typing import NDArray
 
 from labelformat.formats.coco import COCOInstanceSegmentationOutput
 from labelformat.formats.maskpair import MaskPairInstanceSegmentationInput
+from labelformat.utils import ImageDimensionError
 
 
 def create_test_data(base_path: Path) -> None:
@@ -265,3 +266,59 @@ class TestMaskPairIntegration:
         # Should create a default category
         assert len(categories) > 0
         # Default category should be created in the get_labels method
+
+    def test_get_images__reraises_by_default(self, tmp_path: Path) -> None:
+        maskpair_input = _make_on_error_input(tmp_path)
+        with pytest.raises(ImageDimensionError):
+            list(maskpair_input.get_images())
+
+    def test_get_images__on_error_hook_skips_broken_image(self, tmp_path: Path) -> None:
+        maskpair_input = _make_on_error_input(tmp_path)
+        errors: List[Tuple[Path, ImageDimensionError]] = []
+        maskpair_input.on_error = lambda path, error: errors.append((path, error))
+
+        images = list(maskpair_input.get_images())
+        assert [img.filename for img in images] == ["good.jpg"]
+        assert len(errors) == 1
+        assert Path(errors[0][0]).name == "broken.jpg"
+        assert isinstance(errors[0][1], ImageDimensionError)
+
+    def test_get_labels__on_error_hook_skips_broken_image(self, tmp_path: Path) -> None:
+        maskpair_input = _make_on_error_input(tmp_path)
+        maskpair_input.on_error = lambda path, error: None
+
+        labels = list(maskpair_input.get_labels())
+        assert [label.image.filename for label in labels] == ["good.jpg"]
+
+
+def _make_data_with_broken_image(base_path: Path) -> None:
+    """Create one valid image/mask pair and one broken image with a valid mask."""
+    images_dir = base_path / "images"
+    masks_dir = base_path / "masks"
+    images_dir.mkdir(parents=True)
+    masks_dir.mkdir(parents=True)
+
+    # One valid image/mask pair.
+    image = np.random.randint(100, 200, (100, 100, 3), dtype=np.uint8)
+    cv2.imwrite(str(images_dir / "good.jpg"), image)
+    good_mask: NDArray[np.uint8] = np.zeros((100, 100), dtype=np.uint8)
+    good_mask[20:40, 20:40] = 255
+    cv2.imwrite(str(masks_dir / "good.png"), good_mask)
+
+    # One broken image with a valid mask (so the pair is matched).
+    (images_dir / "broken.jpg").write_bytes(b"not a valid jpeg")
+    broken_mask: NDArray[np.uint8] = np.zeros((100, 100), dtype=np.uint8)
+    broken_mask[10:30, 10:30] = 255
+    cv2.imwrite(str(masks_dir / "broken.png"), broken_mask)
+
+
+def _make_on_error_input(tmp_path: Path) -> MaskPairInstanceSegmentationInput:
+    _make_data_with_broken_image(tmp_path)
+    return MaskPairInstanceSegmentationInput(
+        image_glob="images/*.jpg",
+        mask_glob="masks/*.png",
+        base_path=tmp_path,
+        pairing_mode="stem",
+        category_names="object",
+        min_area=10.0,
+    )

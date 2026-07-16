@@ -14,6 +14,7 @@ from argparse import ArgumentParser
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
+from typing import Optional
 
 import numpy as np
 from fsspec.core import url_to_fs
@@ -65,6 +66,7 @@ class PascalVOCSemanticSegmentationInput(InstanceSegmentationInput):
         images_dir: PathLike,
         masks_dir: PathLike,
         class_id_to_name: Mapping[int, str],
+        on_error: Optional[utils.OnImageErrorHook] = None,
     ) -> "PascalVOCSemanticSegmentationInput":
         """Create a PascalVOCSemanticSegmentationInput from directory pairs.
 
@@ -73,6 +75,10 @@ class PascalVOCSemanticSegmentationInput(InstanceSegmentationInput):
             masks_dir: Root directory or URI containing PNG masks mirroring images
                 structure.
             class_id_to_name: Mapping of class_id -> class name, with integer keys.
+            on_error: Optional hook invoked when an image cannot be read during the
+                folder scan. When ``None`` (the default), a failure raises
+                ``ImageDimensionError``. When provided, the hook is called with the
+                offending path and the error, and the image is skipped.
 
         Raises:
             ValueError: If directories are invalid, a mask is missing or not PNG,
@@ -93,7 +99,7 @@ class PascalVOCSemanticSegmentationInput(InstanceSegmentationInput):
 
         # Collect images using helper and ensure a PNG mask exists for each.
         images_by_filename: dict[str, Image] = {}
-        for img in utils.get_images_from_folder(images_dir):
+        for img in utils.get_images_from_folder(images_dir, on_error=on_error):
             mask_rel_path = str(PurePosixPath(img.filename).with_suffix(".png"))
             mask_path = posixpath.join(masks_fs_dir, mask_rel_path)
             if not masks_fs.isfile(mask_path):

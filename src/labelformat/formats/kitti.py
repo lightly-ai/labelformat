@@ -1,7 +1,7 @@
 import logging
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Optional
 
 from labelformat import utils
 from labelformat.cli.registry import Task, cli_register
@@ -49,6 +49,9 @@ class KittiObjectDetectionInput(ObjectDetectionInput):
     ) -> None:
         self._input_folder = input_folder
         self._images_rel_path = images_rel_path
+        # Optional hook to tolerate unreadable images during folder scan.
+        # Default None re-raises; see utils.get_images_from_folder.
+        self.on_error: Optional[utils.OnImageErrorHook] = None
         self._categories = [
             Category(id=idx, name=name)
             for idx, name in enumerate(category_names.split(","))
@@ -59,7 +62,8 @@ class KittiObjectDetectionInput(ObjectDetectionInput):
 
     def get_images(self) -> Iterable[Image]:
         yield from utils.get_images_from_folder(
-            folder=self._input_folder / self._images_rel_path
+            folder=self._input_folder / self._images_rel_path,
+            on_error=self.on_error,
         )
 
     def get_labels(self) -> Iterable[ImageObjectDetection]:
