@@ -1,0 +1,205 @@
+from __future__ import annotations
+
+import json
+from argparse import ArgumentParser
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Callable, Iterable
+
+from labelformat.model.category import Category
+from labelformat.model.temporal_classification import (
+    TemporalClassificationInput,
+    TemporalEvent,
+    VideoTemporalClassification,
+)
+from labelformat.types import JsonDict, ParseError
+
+_DURATION_OVERFLOW_TOLERANCE_S = 0.1
+
+
+class _ActivityNetBaseInput:
+    @staticmethod
+    def add_cli_arguments(parser: ArgumentParser) -> None:
+        parser.add_argument(
+            "--input-file",
+            type=Path,
+            required=True,
+            help="Path to input ActivityNet JSON file",
+        )
+        parser.add_argument(
+            "--input-split",
+            type=str,
+            default=None,
+            help=(
+                "Only import videos whose 'subset' matches this split "
+                "(e.g. 'training', 'validation'). Imports all videos if not set."
+            ),
+        )
+
+    def __init__(self, input_file: Path, input_split: str | None = None) -> None:
+        with input_file.open(encoding="utf-8") as file:
+            data = json.load(file)
+        self._labels, self._categories = _parse_activitynet_data(
+            data=data, split=input_split
+        )
+
+    def get_categories(self) -> Iterable[Category]:
+        yield from self._categories
+
+    def get_labels(self) -> Iterable[VideoTemporalClassification]:
+        yield from self._labels
+
+
+class ActivityNetTemporalClassificationInput(
+    _ActivityNetBaseInput, TemporalClassificationInput
+):
+    """Import ActivityNet-style temporal classification annotations."""
+
+
+def _parse_activitynet_data(
+    data: JsonDict,
+    split: str | None = None,
+) -> tuple[list[VideoTemporalClassification], list[Category]]:
+    if "database" in data:
+        entries = data["database"]
+        is_database = True
+    elif "results" in data:
+        entries = data["results"]
+        is_database = False
+    else:
+        raise ParseError("ActivityNet JSON must contain a 'database' or 'results' key.")
+
+    # Assign category ids by first appearance across all videos, so that ids stay
+    # stable regardless of any split filter applied afterwards.
+    categories: dict[str, Category] = {}
+
+    def category_for(label: str) -> Category:
+        if label not in categories:
+            categories[label] = Category(id=len(categories) + 1, name=label)
+        return categories[label]
+
+    labels = []
+    for video_id, video_entry in entries.items():
+        raw_annotations, meta = _extract_video(str(video_id), video_entry, is_database)
+        labels.append(
+            VideoTemporalClassification(
+                video_id=str(video_id),
+                events=[
+                    _parse_event(annotation, category_for, meta.duration_s)
+                    for annotation in raw_annotations
+                ],
+                duration_s=meta.duration_s,
+                subset=meta.subset,
+                resolution=meta.resolution,
+                url=meta.url,
+            )
+        )
+
+    return _filter_by_split(labels, split), list(categories.values())
+
+
+@dataclass(frozen=True)
+class _VideoMetadata:
+    duration_s: float | None
+    subset: str | None
+    resolution: str | None
+    url: str | None
+
+
+def _extract_video(
+    video_id: str,
+    video_entry: object,
+    is_database: bool,
+) -> tuple[list[JsonDict], _VideoMetadata]:
+    """Extract the raw annotation list and video metadata for one video.
+
+    In the ``database`` format each entry is a dict with an ``annotations`` list and
+    video metadata. ``duration`` and ``subset`` are required (``subset`` is needed
+    for split filtering); ``resolution`` and ``url`` are optional and default to
+    ``None``. In the ``results`` format the entry is the annotation list itself,
+    without metadata.
+    """
+    if not is_database:
+        if not isinstance(video_entry, list):
+            raise ParseError(f"Invalid annotations for video '{video_id}'.")
+        return video_entry, _VideoMetadata(
+            duration_s=None, subset=None, resolution=None, url=None
+        )
+
+    if not isinstance(video_entry, dict):
+        raise ParseError(f"Invalid database entry for video '{video_id}'.")
+    raw_annotations = video_entry.get("annotations", [])
+    if not isinstance(raw_annotations, list):
+        raise ParseError(f"Invalid annotations for video '{video_id}'.")
+    meta = _VideoMetadata(
+        duration_s=float(_require_field(video_entry, "duration", video_id)),
+        subset=_require_field(video_entry, "subset", video_id),
+        resolution=video_entry.get("resolution"),
+        url=video_entry.get("url"),
+    )
+    return raw_annotations, meta
+
+
+def _require_field(video_entry: JsonDict, key: str, video_id: str) -> Any:
+    if key not in video_entry:
+        raise ParseError(
+            f"Database entry for video '{video_id}' is missing required field '{key}'."
+        )
+    return video_entry[key]
+
+
+def _filter_by_split(
+    labels: list[VideoTemporalClassification],
+    split: str | None,
+) -> list[VideoTemporalClassification]:
+    if split is None:
+        return labels
+    filtered = [label for label in labels if label.subset == split]
+    if not filtered:
+        available = sorted(
+            {label.subset for label in labels if label.subset is not None}
+        )
+        raise ParseError(
+            f"Split '{split}' not found in ActivityNet data. "
+            f"Available subsets: {available}."
+        )
+    return filtered
+
+
+def _parse_event(
+    annotation: JsonDict,
+    category_for: Callable[[str], Category],
+    duration_s: float | None,
+) -> TemporalEvent:
+    label = annotation.get("label")
+    segment = annotation.get("segment")
+    if not isinstance(label, str) or not label:
+        raise ParseError("ActivityNet event must contain a non-empty 'label'.")
+    if not isinstance(segment, list) or len(segment) != 2:
+        raise ParseError(
+            "ActivityNet event must contain 'segment' as [start_s, end_s]."
+        )
+
+    start_time_s = float(segment[0])
+    end_time_s = float(segment[1])
+    if start_time_s < 0 or start_time_s >= end_time_s:
+        raise ParseError(
+            f"Invalid segment [{start_time_s}, {end_time_s}] for label '{label}': "
+            "start must be non-negative and less than end."
+        )
+    if duration_s is not None and end_time_s > duration_s:
+        if end_time_s - duration_s > _DURATION_OVERFLOW_TOLERANCE_S:
+            raise ParseError(
+                f"Invalid segment [{start_time_s}, {end_time_s}] for label "
+                f"'{label}': end must not exceed the video duration ({duration_s})."
+            )
+        # Rounding overflow within tolerance: clip the end to the duration.
+        end_time_s = duration_s
+
+    score = annotation.get("score")
+    return TemporalEvent(
+        category=category_for(label),
+        start_time_s=start_time_s,
+        end_time_s=end_time_s,
+        confidence=float(score) if score is not None else None,
+    )
