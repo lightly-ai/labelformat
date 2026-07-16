@@ -269,12 +269,12 @@ class TestMaskPairIntegration:
 
 
 class TestMaskPairOnError:
-    def test_reraises_by_default(self, tmp_path: Path) -> None:
+    def test_get_images__reraises_by_default(self, tmp_path: Path) -> None:
         maskpair_input = _make_on_error_input(tmp_path)
         with pytest.raises(ImageDimensionError):
             list(maskpair_input.get_images())
 
-    def test_hook_skips_broken_image_in_get_images(self, tmp_path: Path) -> None:
+    def test_get_images__on_error_hook_skips_broken_image(self, tmp_path: Path) -> None:
         maskpair_input = _make_on_error_input(tmp_path)
         errors: List[Tuple[Path, ImageDimensionError]] = []
         maskpair_input.on_error = lambda path, error: errors.append((path, error))
@@ -285,7 +285,7 @@ class TestMaskPairOnError:
         assert Path(errors[0][0]).name == "broken.jpg"
         assert isinstance(errors[0][1], ImageDimensionError)
 
-    def test_hook_skips_broken_image_in_get_labels(self, tmp_path: Path) -> None:
+    def test_get_labels__on_error_hook_skips_broken_image(self, tmp_path: Path) -> None:
         maskpair_input = _make_on_error_input(tmp_path)
         maskpair_input.on_error = lambda path, error: None
 

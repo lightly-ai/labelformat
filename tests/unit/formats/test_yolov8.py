@@ -278,13 +278,15 @@ class Test_YOLOv8BaseInput:
             )
 
     class Test_OnError:
-        def test_reraises_by_default(self, tmp_path: Path) -> None:
+        def test_get_images__reraises_by_default(self, tmp_path: Path) -> None:
             config_file = _make_on_error_dataset(tmp_path)
             input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
             with pytest.raises(ImageDimensionError):
                 list(input_obj.get_images())
 
-        def test_hook_skips_unreadable_image(self, tmp_path: Path) -> None:
+        def test_get_images__on_error_hook_skips_unreadable_image(
+            self, tmp_path: Path
+        ) -> None:
             config_file = _make_on_error_dataset(tmp_path)
             input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
 
