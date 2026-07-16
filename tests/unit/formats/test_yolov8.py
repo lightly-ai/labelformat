@@ -116,6 +116,27 @@ class Test_YOLOv8BaseInput:
             with pytest.raises(TypeError):  # Will fail when trying to use len() on int
                 list(input_obj.get_categories())
 
+    def test_get_images__reraises_by_default(self, tmp_path: Path) -> None:
+        config_file = _make_on_error_dataset(tmp_path)
+        input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+        with pytest.raises(ImageDimensionError):
+            list(input_obj.get_images())
+
+    def test_get_images__on_error_hook_skips_unreadable_image(
+        self, tmp_path: Path
+    ) -> None:
+        config_file = _make_on_error_dataset(tmp_path)
+        input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
+
+        errors: List[Tuple[Path, ImageDimensionError]] = []
+        input_obj.on_error = lambda path, error: errors.append((path, error))
+
+        images = list(input_obj.get_images())
+        assert [img.filename for img in images] == ["good.jpg"]
+        assert len(errors) == 1
+        assert Path(errors[0][0]).name == "broken.jpg"
+        assert isinstance(errors[0][1], ImageDimensionError)
+
     class Test_RootDir:
         def test_resolves_root_dir_with_explicit_path(self, tmp_path: Path) -> None:
             dataset_dir = tmp_path / "dataset"
@@ -276,28 +297,6 @@ class Test_YOLOv8BaseInput:
             assert (
                 input_obj._labels_dir().resolve() == (parent_dir / "labels").resolve()
             )
-
-    class Test_OnError:
-        def test_get_images__reraises_by_default(self, tmp_path: Path) -> None:
-            config_file = _make_on_error_dataset(tmp_path)
-            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
-            with pytest.raises(ImageDimensionError):
-                list(input_obj.get_images())
-
-        def test_get_images__on_error_hook_skips_unreadable_image(
-            self, tmp_path: Path
-        ) -> None:
-            config_file = _make_on_error_dataset(tmp_path)
-            input_obj = _YOLOv8BaseInput(input_file=config_file, input_split="train")
-
-            errors: List[Tuple[Path, ImageDimensionError]] = []
-            input_obj.on_error = lambda path, error: errors.append((path, error))
-
-            images = list(input_obj.get_images())
-            assert [img.filename for img in images] == ["good.jpg"]
-            assert len(errors) == 1
-            assert Path(errors[0][0]).name == "broken.jpg"
-            assert isinstance(errors[0][1], ImageDimensionError)
 
 
 def _make_on_error_dataset(tmp_path: Path) -> Path:

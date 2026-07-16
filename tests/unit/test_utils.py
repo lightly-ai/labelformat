@@ -134,6 +134,16 @@ def test_get_image_dimensions__memory_uri() -> None:
     assert height == 77
 
 
+def test_get_image_dimensions__corrupt_image_raises_image_dimension_error() -> None:
+    image_uri = f"memory://{uuid4().hex}/broken.jpg"
+    with fsspec.open(image_uri, "wb") as file:
+        file.write(b"this is not a valid jpeg")
+
+    with pytest.raises(ImageDimensionError) as exc_info:
+        get_image_dimensions(image_uri)
+    assert exc_info.value.path == image_uri
+
+
 def test_get_images_from_folder__memory_uri() -> None:
     root_uri = f"memory://{uuid4().hex}/dataset"
     image_a = f"{root_uri}/a.jpg"
@@ -157,16 +167,6 @@ def test_get_images_from_folder__memory_uri() -> None:
         12,
         34,
     )
-
-
-def test_get_image_dimensions__corrupt_image_raises_image_dimension_error() -> None:
-    image_uri = f"memory://{uuid4().hex}/broken.jpg"
-    with fsspec.open(image_uri, "wb") as file:
-        file.write(b"this is not a valid jpeg")
-
-    with pytest.raises(ImageDimensionError) as exc_info:
-        get_image_dimensions(image_uri)
-    assert exc_info.value.path == image_uri
 
 
 def test_get_images_from_folder__corrupt_image_reraises_by_default() -> None:

@@ -267,8 +267,6 @@ class TestMaskPairIntegration:
         assert len(categories) > 0
         # Default category should be created in the get_labels method
 
-
-class TestMaskPairOnError:
     def test_get_images__reraises_by_default(self, tmp_path: Path) -> None:
         maskpair_input = _make_on_error_input(tmp_path)
         with pytest.raises(ImageDimensionError):
