@@ -135,9 +135,8 @@ class YOLOv8ObjectDetectionInput(_YOLOv8BaseInput, ObjectDetectionInput):
         for image in self.get_images():
             label_path = (labels_dir / image.filename).with_suffix(".txt")
             if not label_path.exists():
-                logger.warning(
-                    f"Label file '{label_path}' for image '{image.filename}' does not exist. Skipping this image."
-                )
+                # YOLO allows no label file for an image without objects.
+                yield ImageObjectDetection(image=image, objects=[])
                 continue
 
             try:
@@ -199,9 +198,9 @@ class YOLOv8InstanceSegmentationInput(_YOLOv8BaseInput, InstanceSegmentationInpu
         for image in self.get_images():
             label_path = (labels_dir / image.filename).with_suffix(".txt")
             if not label_path.exists():
-                logger.warning(
-                    f"Label file '{label_path}' for image '{image.filename}' does not exist."
-                )
+                # YOLO allows no label file for an image without objects.
+                yield ImageInstanceSegmentation(image=image, objects=[])
+                continue
             with label_path.open() as file:
                 label_data = [line.split() for line in file.readlines()]
 
