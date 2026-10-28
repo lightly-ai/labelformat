@@ -118,6 +118,7 @@ class TestYouTubeVISInstanceSegmentationTrackInput:
                         category=Category(id=1, name="cat"),
                         segmentations=[expected_rle_segmentation, None],
                         object_track_id=20,
+                        is_crowd=True,
                     ),
                     SingleInstanceSegmentationTrack(
                         category=Category(id=1, name="cat"),
@@ -160,6 +161,25 @@ class TestYouTubeVISInstanceSegmentationTrackInputExportImport:
         assert (
             annotation_output == annotation_expected
         ), f"Annotations do not match. Output: {annotation_output}, Expected: {annotation_expected}"
+
+    def test_import_export__keeps_iscrowd(self, tmp_path: Path) -> None:
+        # The RLE track is not a crowd and the polygon track is a crowd.
+        input_file = _write_youtube_vis_instance_segmentation_json(
+            tmp_path / "instances.json"
+        )
+        data = json.loads(input_file.read_text())
+        data["annotations"][0]["iscrowd"] = 0
+        data["annotations"][1]["iscrowd"] = 1
+        input_file.write_text(json.dumps(data))
+        label_input = YouTubeVISInstanceSegmentationTrackInput(input_file=input_file)
+
+        output_path = tmp_path / "instances_out.json"
+        YouTubeVISInstanceSegmentationTrackOutput(output_file=output_path).save(
+            label_input=label_input
+        )
+
+        annotations = json.loads(output_path.read_text())["annotations"]
+        assert [annotation["iscrowd"] for annotation in annotations] == [0, 1]
 
 
 def _write_youtube_vis_json(input_file: Path) -> Path:

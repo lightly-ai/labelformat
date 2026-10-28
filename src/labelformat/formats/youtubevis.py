@@ -121,6 +121,7 @@ class YouTubeVISInstanceSegmentationTrackInput(
                         category=category_id_to_category[track["category_id"]],
                         segmentations=segmentations,
                         object_track_id=track.get("id"),
+                        is_crowd=track.get("iscrowd", 0) == 1,
                     )
                 )
             yield VideoInstanceSegmentationTrack(
@@ -201,16 +202,13 @@ def _get_output_annotations_dict(
                 | None
             ] = []
             areas_list: List[int | None] = []
-            iscrowd = 0
             for seg in obj.segmentations:
                 if seg is None:
                     bboxes_list.append(None)
                     segmentations_list.append(None)
                     areas_list.append(None)
                     continue
-                segmentation, bbox, iscrowd = (
-                    segmentation_helpers.get_coco_segmentation(seg)
-                )
+                segmentation, bbox = segmentation_helpers.get_coco_segmentation(seg)
                 if isinstance(segmentation, dict):  # RLE segmentation
                     area = sum(
                         segmentation["counts"][1::2]
@@ -234,7 +232,7 @@ def _get_output_annotations_dict(
                     "bboxes": bboxes_list,
                     "segmentations": segmentations_list,
                     "areas": areas_list,
-                    "iscrowd": iscrowd,
+                    "iscrowd": int(obj.is_crowd),
                     "height": height,
                     "width": width,
                     "length": length,
