@@ -15,6 +15,9 @@ jobs:
     strategy:
       matrix:
         python: ["3.8", "3.14"]
+    env:
+      # Without this, uv run uses .python-version (3.8) in every matrix job.
+      UV_PYTHON: ${{ matrix.python }}
 
     steps:
       - name: Checkout code
