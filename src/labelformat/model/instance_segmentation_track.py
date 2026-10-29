@@ -16,6 +16,7 @@ class SingleInstanceSegmentationTrack:
     category: Category
     segmentations: list[MultiPolygon | BinaryMaskSegmentation | None]
     object_track_id: int | None = None
+    is_crowd: bool = False
 
 
 @dataclass(frozen=True)

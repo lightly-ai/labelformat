@@ -15,6 +15,7 @@ from labelformat.model.multipolygon import MultiPolygon
 class SingleInstanceSegmentation:
     category: Category
     segmentation: MultiPolygon | BinaryMaskSegmentation
+    is_crowd: bool = False
 
 
 @dataclass(frozen=True)
