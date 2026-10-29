@@ -37,10 +37,21 @@ class _YOLOv8BaseInput:
         parser.add_argument(
             "--input-split", type=str, default="train", help="Split to use"
         )
+        parser.add_argument(
+            "--include-images-without-label-file",
+            action="store_true",
+            help="Include images without a label file as images without objects",
+        )
 
-    def __init__(self, input_file: Path, input_split: str) -> None:
+    def __init__(
+        self,
+        input_file: Path,
+        input_split: str,
+        include_images_without_label_file: bool = False,
+    ) -> None:
         self._config_file = input_file
         self._split = input_split
+        self._include_images_without_label_file = include_images_without_label_file
         # Optional hook to tolerate unreadable images during folder scan.
         # Default None re-raises; see utils.get_images_from_folder.
         self.on_error: Optional[utils.OnImageErrorHook] = None
@@ -135,9 +146,12 @@ class YOLOv8ObjectDetectionInput(_YOLOv8BaseInput, ObjectDetectionInput):
         for image in self.get_images():
             label_path = (labels_dir / image.filename).with_suffix(".txt")
             if not label_path.exists():
-                logger.warning(
-                    f"Label file '{label_path}' for image '{image.filename}' does not exist. Skipping this image."
-                )
+                if self._include_images_without_label_file:
+                    yield ImageObjectDetection(image=image, objects=[])
+                else:
+                    logger.warning(
+                        f"Label file '{label_path}' for image '{image.filename}' does not exist. Skipping this image."
+                    )
                 continue
 
             try:
@@ -199,9 +213,13 @@ class YOLOv8InstanceSegmentationInput(_YOLOv8BaseInput, InstanceSegmentationInpu
         for image in self.get_images():
             label_path = (labels_dir / image.filename).with_suffix(".txt")
             if not label_path.exists():
-                logger.warning(
-                    f"Label file '{label_path}' for image '{image.filename}' does not exist."
-                )
+                if self._include_images_without_label_file:
+                    yield ImageInstanceSegmentation(image=image, objects=[])
+                else:
+                    logger.warning(
+                        f"Label file '{label_path}' for image '{image.filename}' does not exist. Skipping this image."
+                    )
+                continue
             with label_path.open() as file:
                 label_data = [line.split() for line in file.readlines()]
 
