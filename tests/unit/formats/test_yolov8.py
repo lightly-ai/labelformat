@@ -318,25 +318,47 @@ def _make_on_error_dataset(tmp_path: Path) -> Path:
 
 
 class TestYOLOv8MissingLabelFile:
-    # Ultralytics needs no label file for an image without objects.
-    def test_object_detection__image_without_label_file(self, tmp_path: Path) -> None:
+    @pytest.mark.parametrize(
+        "include_images_without_label_file, expected",
+        [
+            (True, [("background.jpg", 0), ("labeled.jpg", 1)]),
+            (False, [("labeled.jpg", 1)]),
+        ],
+    )
+    def test_object_detection__image_without_label_file(
+        self,
+        tmp_path: Path,
+        include_images_without_label_file: bool,
+        expected: List[Tuple[str, int]],
+    ) -> None:
         config_file = _make_dataset_with_background_image(
             tmp_path=tmp_path, label_line="0 0.5 0.5 0.2 0.2\n"
         )
 
         labels = list(
             YOLOv8ObjectDetectionInput(
-                input_file=config_file, input_split="train"
+                input_file=config_file,
+                input_split="train",
+                include_images_without_label_file=include_images_without_label_file,
             ).get_labels()
         )
 
-        assert [(label.image.filename, len(label.objects)) for label in labels] == [
-            ("background.jpg", 0),
-            ("labeled.jpg", 1),
-        ]
+        assert [
+            (label.image.filename, len(label.objects)) for label in labels
+        ] == expected
 
+    @pytest.mark.parametrize(
+        "include_images_without_label_file, expected",
+        [
+            (True, [("background.jpg", 0), ("labeled.jpg", 1)]),
+            (False, [("labeled.jpg", 1)]),
+        ],
+    )
     def test_instance_segmentation__image_without_label_file(
-        self, tmp_path: Path
+        self,
+        tmp_path: Path,
+        include_images_without_label_file: bool,
+        expected: List[Tuple[str, int]],
     ) -> None:
         config_file = _make_dataset_with_background_image(
             tmp_path=tmp_path, label_line="0 0.1 0.1 0.5 0.1 0.5 0.5\n"
@@ -344,14 +366,15 @@ class TestYOLOv8MissingLabelFile:
 
         labels = list(
             YOLOv8InstanceSegmentationInput(
-                input_file=config_file, input_split="train"
+                input_file=config_file,
+                input_split="train",
+                include_images_without_label_file=include_images_without_label_file,
             ).get_labels()
         )
 
-        assert [(label.image.filename, len(label.objects)) for label in labels] == [
-            ("background.jpg", 0),
-            ("labeled.jpg", 1),
-        ]
+        assert [
+            (label.image.filename, len(label.objects)) for label in labels
+        ] == expected
 
 
 def _make_dataset_with_background_image(tmp_path: Path, label_line: str) -> Path:
