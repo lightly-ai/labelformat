@@ -7,7 +7,11 @@ import PIL.Image
 import pytest
 import yaml
 
-from labelformat.formats.yolov8 import _YOLOv8BaseInput
+from labelformat.formats.yolov8 import (
+    YOLOv8InstanceSegmentationInput,
+    YOLOv8ObjectDetectionInput,
+    _YOLOv8BaseInput,
+)
 from labelformat.model.category import Category
 from labelformat.utils import ImageDimensionError
 
@@ -305,6 +309,83 @@ def _make_on_error_dataset(tmp_path: Path) -> Path:
     images_dir.mkdir()
     PIL.Image.new("RGB", (10, 20), color="blue").save(images_dir / "good.jpg", "JPEG")
     (images_dir / "broken.jpg").write_bytes(b"not a valid jpeg")
+
+    config: YOLOv8Config = {"train": "images", "names": ["person"]}
+    config_file = tmp_path / "data.yaml"
+    with config_file.open("w") as f:
+        yaml.safe_dump(config, f)
+    return config_file
+
+
+class TestYOLOv8MissingLabelFile:
+    @pytest.mark.parametrize(
+        "include_images_without_label_file, expected",
+        [
+            (True, [("background.jpg", 0), ("labeled.jpg", 1)]),
+            (False, [("labeled.jpg", 1)]),
+        ],
+    )
+    def test_object_detection__image_without_label_file(
+        self,
+        tmp_path: Path,
+        include_images_without_label_file: bool,
+        expected: List[Tuple[str, int]],
+    ) -> None:
+        config_file = _make_dataset_with_background_image(
+            tmp_path=tmp_path, label_line="0 0.5 0.5 0.2 0.2\n"
+        )
+
+        labels = list(
+            YOLOv8ObjectDetectionInput(
+                input_file=config_file,
+                input_split="train",
+                include_images_without_label_file=include_images_without_label_file,
+            ).get_labels()
+        )
+
+        assert [
+            (label.image.filename, len(label.objects)) for label in labels
+        ] == expected
+
+    @pytest.mark.parametrize(
+        "include_images_without_label_file, expected",
+        [
+            (True, [("background.jpg", 0), ("labeled.jpg", 1)]),
+            (False, [("labeled.jpg", 1)]),
+        ],
+    )
+    def test_instance_segmentation__image_without_label_file(
+        self,
+        tmp_path: Path,
+        include_images_without_label_file: bool,
+        expected: List[Tuple[str, int]],
+    ) -> None:
+        config_file = _make_dataset_with_background_image(
+            tmp_path=tmp_path, label_line="0 0.1 0.1 0.5 0.1 0.5 0.5\n"
+        )
+
+        labels = list(
+            YOLOv8InstanceSegmentationInput(
+                input_file=config_file,
+                input_split="train",
+                include_images_without_label_file=include_images_without_label_file,
+            ).get_labels()
+        )
+
+        assert [
+            (label.image.filename, len(label.objects)) for label in labels
+        ] == expected
+
+
+def _make_dataset_with_background_image(tmp_path: Path, label_line: str) -> Path:
+    """Create a YOLOv8 dataset where only labeled.jpg has a label file."""
+    images_dir = tmp_path / "images"
+    labels_dir = tmp_path / "labels"
+    images_dir.mkdir()
+    labels_dir.mkdir()
+    PIL.Image.new("RGB", (10, 20)).save(images_dir / "labeled.jpg", "JPEG")
+    PIL.Image.new("RGB", (10, 20)).save(images_dir / "background.jpg", "JPEG")
+    (labels_dir / "labeled.txt").write_text(label_line)
 
     config: YOLOv8Config = {"train": "images", "names": ["person"]}
     config_file = tmp_path / "data.yaml"
