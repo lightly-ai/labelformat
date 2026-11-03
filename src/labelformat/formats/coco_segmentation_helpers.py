@@ -75,20 +75,17 @@ def get_coco_segmentation(
 ) -> tuple[
     COCOInstanceSegmentationRLE | COCOInstanceSegmentationMultiPolygon,
     List[float],
-    bool,
 ]:
-    """Returns coco segmentation, bbox in xywh format and iscrowd flag for the given segmentation."""
+    """Returns coco segmentation and bbox in xywh format for the given segmentation."""
     if isinstance(segmentation, BinaryMaskSegmentation):
         return (
             _binary_mask_rle_to_coco_segmentation(segmentation),
             segmentation.bounding_box.to_format(BoundingBoxFormat.XYWH),
-            True,
         )
     elif isinstance(segmentation, MultiPolygon):
         return (
             _multipolygon_to_coco_segmentation(segmentation),
             segmentation.bounding_box().to_format(BoundingBoxFormat.XYWH),
-            False,
         )
     else:
         raise ValueError(f"Unsupported segmentation type: {type(segmentation)}")

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, cast
 
 import fsspec
 
@@ -118,10 +118,13 @@ class COCOInstanceSegmentationInput(_COCOBaseInput, InstanceSegmentationInput):
                 if "segmentation" not in ann:
                     raise ParseError(f"Segmentation missing for image id {image_id}")
                 segmentation: MultiPolygon | BinaryMaskSegmentation
-                if ann["iscrowd"] == 1:
+                if isinstance(ann["segmentation"], dict):
+                    segmentation_rle = cast(
+                        COCOInstanceSegmentationRLE, ann["segmentation"]
+                    )
                     segmentation = (
                         segmentation_helpers.coco_segmentation_to_binary_mask_rle(
-                            segmentation=ann["segmentation"], bbox=ann["bbox"]
+                            segmentation=segmentation_rle, bbox=ann["bbox"]
                         )
                     )
                 else:
@@ -134,6 +137,7 @@ class COCOInstanceSegmentationInput(_COCOBaseInput, InstanceSegmentationInput):
                     SingleInstanceSegmentation(
                         category=category_id_to_category[ann["category_id"]],
                         segmentation=segmentation,
+                        is_crowd=ann["iscrowd"] == 1,
                     )
                 )
             yield ImageInstanceSegmentation(
@@ -194,14 +198,14 @@ class COCOInstanceSegmentationOutput(_COCOBaseOutput, InstanceSegmentationOutput
         data["annotations"] = []
         for label in label_input.get_labels():
             for obj in label.objects:
-                segmentation, bbox, is_crowd = (
-                    segmentation_helpers.get_coco_segmentation(obj.segmentation)
+                segmentation, bbox = segmentation_helpers.get_coco_segmentation(
+                    obj.segmentation
                 )
                 annotation = {
                     "image_id": label.image.id,
                     "category_id": obj.category.id,
                     "bbox": bbox,
-                    "iscrowd": is_crowd,
+                    "iscrowd": int(obj.is_crowd),
                     "segmentation": segmentation,
                 }
                 data["annotations"].append(annotation)
