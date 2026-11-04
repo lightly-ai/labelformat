@@ -3,7 +3,12 @@ from pathlib import Path
 
 import pytest
 
-from labelformat.formats.coco import COCOObjectDetectionInput, COCOObjectDetectionOutput
+from labelformat.formats.coco import (
+    COCOInstanceSegmentationInput,
+    COCOInstanceSegmentationOutput,
+    COCOObjectDetectionInput,
+    COCOObjectDetectionOutput,
+)
 from labelformat.model.bounding_box import BoundingBox
 from labelformat.model.category import Category
 from labelformat.model.image import Image
@@ -99,3 +104,40 @@ class TestCOCOObjectDetectionOutput:
             expected_annotations[0]["score"] = 0.4
             expected_annotations[1]["score"] = 0.8
         assert output_json["annotations"] == expected_annotations
+
+
+class TestCOCOInstanceSegmentationConfidence:
+    @pytest.mark.parametrize("with_score", [True, False])
+    def test_round_trip(self, tmp_path: Path, with_score: bool) -> None:
+        annotation = {
+            "image_id": 0,
+            "category_id": 1,
+            "bbox": [10.0, 10.0, 10.0, 10.0],
+            "iscrowd": 0,
+            "segmentation": [[10.0, 10.0, 10.0, 20.0, 20.0, 20.0, 20.0, 10.0]],
+        }
+        if with_score:
+            annotation["score"] = 0.4
+        input_file = tmp_path / "input.json"
+        input_file.write_text(
+            json.dumps(
+                {
+                    "images": [
+                        {"id": 0, "file_name": "image.jpg", "width": 100, "height": 200}
+                    ],
+                    "categories": [{"id": 1, "name": "dog"}],
+                    "annotations": [annotation],
+                }
+            )
+        )
+
+        label_input = COCOInstanceSegmentationInput(input_file=input_file)
+        [label] = label_input.get_labels()
+        assert label.objects[0].confidence == (0.4 if with_score else None)
+
+        output_file = tmp_path / "output.json"
+        COCOInstanceSegmentationOutput(output_file=output_file).save(
+            label_input=label_input
+        )
+        [saved] = json.loads(output_file.read_text())["annotations"]
+        assert saved.get("score") == annotation.get("score")
