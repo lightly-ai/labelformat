@@ -4,6 +4,7 @@ from labelformat.formats.coco import (
     COCOInstanceSegmentationOutput,
     COCOObjectDetectionInput,
     COCOObjectDetectionOutput,
+    COCOSingleInstanceSegmentation,
 )
 from labelformat.formats.cvat import CVATObjectDetectionInput, CVATObjectDetectionOutput
 from labelformat.formats.kitti import (
@@ -74,6 +75,7 @@ from labelformat.formats.youtubevis import (
     YouTubeVISInstanceSegmentationTrackInput,
     YouTubeVISInstanceSegmentationTrackOutput,
     YouTubeVISObjectDetectionTrackInput,
+    YouTubeVISSingleInstanceSegmentationTrack,
 )
 
 __all__ = [
@@ -82,6 +84,7 @@ __all__ = [
     "COCOInstanceSegmentationOutput",
     "COCOObjectDetectionInput",
     "COCOObjectDetectionOutput",
+    "COCOSingleInstanceSegmentation",
     "CVATObjectDetectionInput",
     "CVATObjectDetectionOutput",
     "KittiObjectDetectionInput",
@@ -121,4 +124,5 @@ __all__ = [
     "YouTubeVISInstanceSegmentationTrackInput",
     "YouTubeVISInstanceSegmentationTrackOutput",
     "YouTubeVISObjectDetectionTrackInput",
+    "YouTubeVISSingleInstanceSegmentationTrack",
 ]

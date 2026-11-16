@@ -5,11 +5,13 @@ from pytest_mock import MockerFixture
 from labelformat.formats.coco import (
     COCOInstanceSegmentationInput,
     COCOInstanceSegmentationOutput,
+    COCOSingleInstanceSegmentation,
 )
 from labelformat.formats.yolov8 import (
     YOLOv8InstanceSegmentationInput,
     YOLOv8InstanceSegmentationOutput,
 )
+from labelformat.model.instance_segmentation import ImageInstanceSegmentation
 from labelformat.model.multipolygon import MultiPolygon
 
 from ...simple_instance_segmentation_label_input import (
@@ -25,7 +27,22 @@ def test_coco_inverse(tmp_path: Path) -> None:
         label_input=start_label_input
     )
     end_label_input = COCOInstanceSegmentationInput(input_file=tmp_path / "train.json")
-    assert list(start_label_input.get_labels()) == list(end_label_input.get_labels())
+    # COCO input returns its own class with the crowd flag. No object is a crowd.
+    expected_labels = [
+        ImageInstanceSegmentation(
+            image=label.image,
+            objects=[
+                COCOSingleInstanceSegmentation(
+                    category=obj.category,
+                    segmentation=obj.segmentation,
+                    is_crowd=False,
+                )
+                for obj in label.objects
+            ],
+        )
+        for label in start_label_input.get_labels()
+    ]
+    assert list(end_label_input.get_labels()) == expected_labels
 
 
 def test_yolov8_inverse(tmp_path: Path, mocker: MockerFixture) -> None:

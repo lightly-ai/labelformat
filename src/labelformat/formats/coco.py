@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import json
 from argparse import ArgumentParser
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, cast
 
 import fsspec
 
@@ -34,6 +35,17 @@ from labelformat.model.object_detection import (
     SingleObjectDetection,
 )
 from labelformat.types import JsonDict, ParseError, PathLike
+
+
+@dataclass(frozen=True)
+class COCOSingleInstanceSegmentation(SingleInstanceSegmentation):
+    """Instance segmentation with the COCO crowd flag.
+
+    COCO input returns this class, so that COCO output can write the crowd flag back.
+    COCO output writes `iscrowd` 0 for objects of other classes.
+    """
+
+    is_crowd: bool = False
 
 
 class _COCOBaseInput:
@@ -113,15 +125,20 @@ class COCOInstanceSegmentationInput(_COCOBaseInput, InstanceSegmentationInput):
             image_id_to_annotations[ann["image_id"]].append(ann)
 
         for image_id, annotations in image_id_to_annotations.items():
-            objects = []
+            objects: list[SingleInstanceSegmentation] = []
             for ann in annotations:
                 if "segmentation" not in ann:
                     raise ParseError(f"Segmentation missing for image id {image_id}")
                 segmentation: MultiPolygon | BinaryMaskSegmentation
-                if ann["iscrowd"] == 1:
+                # The encoding of the segmentation sets the decoder. The crowd flag
+                # does not, because COCO also stores single objects as RLE.
+                if isinstance(ann["segmentation"], dict):
                     segmentation = (
                         segmentation_helpers.coco_segmentation_to_binary_mask_rle(
-                            segmentation=ann["segmentation"], bbox=ann["bbox"]
+                            segmentation=cast(
+                                COCOInstanceSegmentationRLE, ann["segmentation"]
+                            ),
+                            bbox=ann["bbox"],
                         )
                     )
                 else:
@@ -131,9 +148,10 @@ class COCOInstanceSegmentationInput(_COCOBaseInput, InstanceSegmentationInput):
                         )
                     )
                 objects.append(
-                    SingleInstanceSegmentation(
+                    COCOSingleInstanceSegmentation(
                         category=category_id_to_category[ann["category_id"]],
                         segmentation=segmentation,
+                        is_crowd=bool(ann["iscrowd"]),
                     )
                 )
             yield ImageInstanceSegmentation(
@@ -194,14 +212,17 @@ class COCOInstanceSegmentationOutput(_COCOBaseOutput, InstanceSegmentationOutput
         data["annotations"] = []
         for label in label_input.get_labels():
             for obj in label.objects:
-                segmentation, bbox, is_crowd = (
-                    segmentation_helpers.get_coco_segmentation(obj.segmentation)
+                segmentation, bbox = segmentation_helpers.get_coco_segmentation(
+                    obj.segmentation
+                )
+                is_crowd = (
+                    isinstance(obj, COCOSingleInstanceSegmentation) and obj.is_crowd
                 )
                 annotation = {
                     "image_id": label.image.id,
                     "category_id": obj.category.id,
                     "bbox": bbox,
-                    "iscrowd": is_crowd,
+                    "iscrowd": int(is_crowd),
                     "segmentation": segmentation,
                 }
                 data["annotations"].append(annotation)
