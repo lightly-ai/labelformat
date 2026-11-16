@@ -165,7 +165,7 @@ class TestMaskPairIntegration:
 
         # Verify that annotations use RLE format
         for ann in coco_data["annotations"]:
-            assert ann["iscrowd"] == 1  # RLE format
+            assert ann["iscrowd"] == 0  # Each mask is one object.
             assert "counts" in ann["segmentation"]
             assert "size" in ann["segmentation"]
 

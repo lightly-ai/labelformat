@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from argparse import ArgumentParser
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, cast
 
@@ -30,6 +31,17 @@ from labelformat.model.object_detection_track import (
 )
 from labelformat.model.video import Video
 from labelformat.types import JsonDict
+
+
+@dataclass(frozen=True)
+class YouTubeVISSingleInstanceSegmentationTrack(SingleInstanceSegmentationTrack):
+    """Instance segmentation track with the YouTube-VIS crowd flag.
+
+    YouTube-VIS input returns this class, so that YouTube-VIS output can write the crowd
+    flag back. YouTube-VIS output writes `iscrowd` 0 for objects of other classes.
+    """
+
+    is_crowd: bool = False
 
 
 class _YouTubeVISBaseInput:
@@ -113,14 +125,15 @@ class YouTubeVISInstanceSegmentationTrackInput(
 
         for video_id, tracks in video_id_to_tracks.items():
             video = video_id_to_video[video_id]
-            objects = []
+            objects: list[SingleInstanceSegmentationTrack] = []
             for track in tracks:
                 segmentations = _get_object_track_segmentations(ann=track)
                 objects.append(
-                    SingleInstanceSegmentationTrack(
+                    YouTubeVISSingleInstanceSegmentationTrack(
                         category=category_id_to_category[track["category_id"]],
                         segmentations=segmentations,
                         object_track_id=track.get("id"),
+                        is_crowd=bool(track.get("iscrowd", 0)),
                     )
                 )
             yield VideoInstanceSegmentationTrack(
@@ -201,16 +214,13 @@ def _get_output_annotations_dict(
                 | None
             ] = []
             areas_list: List[int | None] = []
-            iscrowd = 0
             for seg in obj.segmentations:
                 if seg is None:
                     bboxes_list.append(None)
                     segmentations_list.append(None)
                     areas_list.append(None)
                     continue
-                segmentation, bbox, iscrowd = (
-                    segmentation_helpers.get_coco_segmentation(seg)
-                )
+                segmentation, bbox = segmentation_helpers.get_coco_segmentation(seg)
                 if isinstance(segmentation, dict):  # RLE segmentation
                     area = sum(
                         segmentation["counts"][1::2]
@@ -234,7 +244,10 @@ def _get_output_annotations_dict(
                     "bboxes": bboxes_list,
                     "segmentations": segmentations_list,
                     "areas": areas_list,
-                    "iscrowd": iscrowd,
+                    "iscrowd": int(
+                        isinstance(obj, YouTubeVISSingleInstanceSegmentationTrack)
+                        and obj.is_crowd
+                    ),
                     "height": height,
                     "width": width,
                     "length": length,
