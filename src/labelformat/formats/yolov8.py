@@ -221,7 +221,7 @@ class YOLOv8InstanceSegmentationInput(_YOLOv8BaseInput, InstanceSegmentationInpu
                     )
                 continue
             with label_path.open() as file:
-                label_data = [line.split() for line in file.readlines()]
+                label_data = [line.split() for line in file if line.strip()]
 
             objects = []
             for row in label_data:
