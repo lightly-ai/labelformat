@@ -520,6 +520,10 @@ make docs-serve
 make docs-deploy
 ```
 
+#### Release
+
+See [RELEASE.md](.github/RELEASE.md).
+
 ## Maintained By
 [Lightly](https://www.lightly.ai) is a spin-off from ETH Zurich that helps companies 
 build efficient active learning pipelines to select the most relevant data for their models.
