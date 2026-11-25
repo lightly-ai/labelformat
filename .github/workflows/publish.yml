@@ -1,7 +1,7 @@
 name: Publish to PyPI
 
 on:
-  # Publishing a GitHub release publishes the package.
+  # Publishing a GitHub release publishes the package, also a pre-release.
   release:
     types: [published]
   # Retry hatch for a failed run, and a TestPyPI rehearsal of the whole path.
@@ -19,10 +19,10 @@ on:
 
 permissions: {}
 
-# Queued rather than cancelled: cancelling a run mid-upload is worse than
-# making a second run for the same tag wait.
+# One run per tag and index. Not cancel-in-progress, because cancelling a run
+# mid-upload is worse than waiting. GitHub keeps only the newest pending run.
 concurrency:
-  group: ${{ github.workflow }}-${{ inputs.tag || github.event.release.tag_name }}
+  group: ${{ github.workflow }}-${{ inputs.tag || github.event.release.tag_name }}-${{ inputs.target || 'pypi' }}
   cancel-in-progress: false
 
 env:
@@ -41,13 +41,15 @@ jobs:
       # `refs/tags/` because actions/checkout resolves an unqualified ref as a
       # branch first, and a branch with the tag's name would be built instead.
       - name: Checkout the release commit
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           ref: refs/tags/${{ env.TAG }}
+          # Full history, for the check that the tag is on main.
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.12"
 
@@ -60,37 +62,49 @@ jobs:
             exit 1
           fi
 
+      - name: Assert the tag is on main
+        run: |
+          set -euo pipefail
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "::error::${TAG} points at a commit that is not on main."
+            exit 1
+          fi
+
       # No enable-cache, unlike the test workflow: a cache written by another
       # workflow would be an input to what gets published.
       - name: Set up Uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
           version: "0.10.4"
 
+      # Without UV_PYTHON, uv build uses .python-version (3.8).
       - name: Build the distributions
         run: make build
+        env:
+          UV_PYTHON: "3.12"
 
-      # A week, to outlast the pypi environment's approval gate.
+      # 30 days, the longest that a deployment waits for approval.
       - name: Upload the distributions
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: dist
           path: dist
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 30
 
   publish:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 15
     # PyPI's trusted publisher checks the OIDC claim against this workflow file
-    # and environment, so only this job can publish.
+    # and environment, not the branch. The environment's required reviewers and
+    # deployment rules stop a workflow edited on a branch, see RELEASE.md.
     environment: ${{ inputs.target || 'pypi' }}
     permissions:
       id-token: write
     steps:
       - name: Download the distributions
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: dist
           path: dist
@@ -99,7 +113,7 @@ jobs:
       # them. Given no password, so a misconfigured publisher fails here rather
       # than falling back to a token. `skip-existing` lets a failed run be retried.
       - name: Publish to the index
-        uses: pypa/gh-action-pypi-publish@v1.14.3
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
           repository-url: >-
             ${{ env.TARGET == 'pypi' && 'https://upload.pypi.org/legacy/'
