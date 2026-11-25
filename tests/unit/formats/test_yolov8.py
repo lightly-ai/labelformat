@@ -377,6 +377,22 @@ class TestYOLOv8MissingLabelFile:
         ] == expected
 
 
+def test_yolov8_instance_segmentation_input__blank_lines(tmp_path: Path) -> None:
+    config_file = _make_dataset_with_background_image(
+        tmp_path=tmp_path, label_line="0 0.1 0.1 0.5 0.1 0.5 0.5\n\n  \n"
+    )
+
+    labels = list(
+        YOLOv8InstanceSegmentationInput(
+            input_file=config_file, input_split="train"
+        ).get_labels()
+    )
+
+    assert [(label.image.filename, len(label.objects)) for label in labels] == [
+        ("labeled.jpg", 1)
+    ]
+
+
 def _make_dataset_with_background_image(tmp_path: Path, label_line: str) -> Path:
     """Create a YOLOv8 dataset where only labeled.jpg has a label file."""
     images_dir = tmp_path / "images"
