@@ -14,7 +14,7 @@ Labelformat offers a robust set of features tailored to meet the diverse needs o
 
 - **Performance Optimizations:**
     - **Memory Conscious:** Processes datasets file-by-file to minimize memory usage.
-    - **Minimal Dependencies:** Supports Python 3.8 through 3.14, ensuring broad compatibility.
+    - **Minimal Dependencies:** Supports Python 3.8 through 3.15, ensuring broad compatibility.
 
 - **Cross-Platform Support:**
     - **Windows, Linux, and macOS:** Works seamlessly across all major operating systems.
