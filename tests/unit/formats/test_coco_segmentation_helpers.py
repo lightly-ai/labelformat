@@ -51,3 +51,19 @@ def test_coco_segmentation_to_multipolygon_rejects_odd_length() -> None:
         coco_segmentation_helpers.coco_segmentation_to_multipolygon(
             coco_segmentation=coco_segmentation
         )
+
+
+def test_get_coco_area__rle() -> None:
+    segmentation: COCOInstanceSegmentationRLE = {"counts": [1, 2, 3, 4], "size": [2, 5]}
+
+    assert coco_segmentation_helpers.get_coco_area(segmentation) == 6.0
+
+
+def test_get_coco_area__polygons() -> None:
+    # A 2x3 rectangle and a triangle with area 0.5, in opposite vertex orders.
+    segmentation: COCOInstanceSegmentationMultiPolygon = [
+        [0.0, 0.0, 2.0, 0.0, 2.0, 3.0, 0.0, 3.0],
+        [5.0, 5.0, 5.0, 6.0, 6.0, 5.0],
+    ]
+
+    assert coco_segmentation_helpers.get_coco_area(segmentation) == 6.5

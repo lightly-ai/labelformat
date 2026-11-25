@@ -34,6 +34,7 @@ def test_coco_to_coco(tmp_path: Path) -> None:
     # - <image>.license
     # - <image>.flickr_url
     # - <image>.coco_url
+    # The output writes new annotation ids and computes the area itself:
     # - <annotation>.id
     # - <annotation>.area
     del expected_json["info"]
@@ -46,6 +47,9 @@ def test_coco_to_coco(tmp_path: Path) -> None:
         del image["flickr_url"]
         del image["coco_url"]
     for annotation in expected_json["annotations"]:
+        del annotation["id"]
+        del annotation["area"]
+    for annotation in output_json["annotations"]:
         del annotation["id"]
         del annotation["area"]
     assert_almost_equal_recursive(output_json, expected_json)
