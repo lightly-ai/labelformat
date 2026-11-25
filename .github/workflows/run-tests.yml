@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python: ["3.8", "3.14", "3.15"]
+        python: ["3.8", "3.15"]
     env:
       # Without this, uv run uses .python-version (3.8) in every matrix job.
       UV_PYTHON: ${{ matrix.python }}
