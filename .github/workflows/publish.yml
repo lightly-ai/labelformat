@@ -1,0 +1,107 @@
+name: Publish to PyPI
+
+on:
+  # Publishing a GitHub release publishes the package.
+  release:
+    types: [published]
+  # Retry hatch for a failed run, and a TestPyPI rehearsal of the whole path.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to publish, e.g. v1.2.3.
+        type: string
+        required: true
+      target:
+        description: Index to publish to. "testpypi" rehearses the whole path.
+        type: choice
+        options: [pypi, testpypi]
+        default: pypi
+
+permissions: {}
+
+# Queued rather than cancelled: cancelling a run mid-upload is worse than
+# making a second run for the same tag wait.
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.tag || github.event.release.tag_name }}
+  cancel-in-progress: false
+
+env:
+  TAG: ${{ inputs.tag || github.event.release.tag_name }}
+  TARGET: ${{ inputs.target || 'pypi' }}
+
+jobs:
+  # Runs the tagged commit's own code, so it must not be able to mint a PyPI
+  # credential: no `id-token: write`, and all it hands onwards is the artifact.
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      # `refs/tags/` because actions/checkout resolves an unqualified ref as a
+      # branch first, and a branch with the tag's name would be built instead.
+      - name: Checkout the release commit
+        uses: actions/checkout@v6
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Assert the tag matches the version it points at
+        run: |
+          set -euo pipefail
+          version="$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          if [ "v${version}" != "${TAG}" ]; then
+            echo "::error::${TAG} points at a commit whose version is ${version}."
+            exit 1
+          fi
+
+      # No enable-cache, unlike the test workflow: a cache written by another
+      # workflow would be an input to what gets published.
+      - name: Set up Uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.10.4"
+
+      - name: Build the distributions
+        run: make build
+
+      # A week, to outlast the pypi environment's approval gate.
+      - name: Upload the distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # PyPI's trusted publisher checks the OIDC claim against this workflow file
+    # and environment, so only this job can publish.
+    environment: ${{ inputs.target || 'pypi' }}
+    permissions:
+      id-token: write
+    steps:
+      - name: Download the distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      # Not `uv publish`, which uploads PEP 740 attestations but does not create
+      # them. Given no password, so a misconfigured publisher fails here rather
+      # than falling back to a token. `skip-existing` lets a failed run be retried.
+      - name: Publish to the index
+        uses: pypa/gh-action-pypi-publish@v1.14.3
+        with:
+          repository-url: >-
+            ${{ env.TARGET == 'pypi' && 'https://upload.pypi.org/legacy/'
+            || 'https://test.pypi.org/legacy/' }}
+          skip-existing: true
