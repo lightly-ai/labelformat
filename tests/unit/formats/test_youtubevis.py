@@ -1,5 +1,7 @@
 import json
+from argparse import ArgumentParser
 from pathlib import Path
+from typing import Iterable
 
 import numpy as np
 
@@ -7,6 +9,7 @@ from labelformat.formats.youtubevis import (
     YouTubeVISInstanceSegmentationTrackInput,
     YouTubeVISInstanceSegmentationTrackOutput,
     YouTubeVISObjectDetectionTrackInput,
+    YouTubeVISSingleInstanceSegmentationTrack,
 )
 from labelformat.model.binary_mask_segmentation import (
     BinaryMaskSegmentation,
@@ -15,6 +18,7 @@ from labelformat.model.binary_mask_segmentation import (
 from labelformat.model.bounding_box import BoundingBox
 from labelformat.model.category import Category
 from labelformat.model.instance_segmentation_track import (
+    InstanceSegmentationTrackInput,
     SingleInstanceSegmentationTrack,
     VideoInstanceSegmentationTrack,
 )
@@ -114,18 +118,20 @@ class TestYouTubeVISInstanceSegmentationTrackInput:
                     number_of_frames=2,
                 ),
                 objects=[
-                    SingleInstanceSegmentationTrack(
+                    YouTubeVISSingleInstanceSegmentationTrack(
                         category=Category(id=1, name="cat"),
                         segmentations=[expected_rle_segmentation, None],
                         object_track_id=20,
+                        is_crowd=True,
                     ),
-                    SingleInstanceSegmentationTrack(
+                    YouTubeVISSingleInstanceSegmentationTrack(
                         category=Category(id=1, name="cat"),
                         segmentations=[
                             expected_polygon_segmentation,
                             None,
                         ],
                         object_track_id=21,
+                        is_crowd=False,
                     ),
                 ],
             )
@@ -160,6 +166,77 @@ class TestYouTubeVISInstanceSegmentationTrackInputExportImport:
         assert (
             annotation_output == annotation_expected
         ), f"Annotations do not match. Output: {annotation_output}, Expected: {annotation_expected}"
+
+    def test_import_export__keeps_iscrowd(self, tmp_path: Path) -> None:
+        # The fixture has a crowd RLE track and a polygon track. Here the RLE track is
+        # not a crowd and the polygon track is a crowd.
+        input_file = _write_youtube_vis_instance_segmentation_json(
+            tmp_path / "instances.json"
+        )
+        data = json.loads(input_file.read_text())
+        data["annotations"][0]["iscrowd"] = 0
+        data["annotations"][1]["iscrowd"] = 1
+        input_file.write_text(json.dumps(data))
+
+        output_path = tmp_path / "instances_out.json"
+        YouTubeVISInstanceSegmentationTrackOutput(output_file=output_path).save(
+            label_input=YouTubeVISInstanceSegmentationTrackInput(input_file=input_file)
+        )
+
+        annotations = json.loads(output_path.read_text())["annotations"]
+        assert [type(annotation["segmentations"][0]) for annotation in annotations] == [
+            dict,
+            list,
+        ]
+        assert [annotation["iscrowd"] for annotation in annotations] == [0, 1]
+
+
+class TestYouTubeVISInstanceSegmentationTrackOutput:
+    def test_save__other_input_is_not_crowd(self, tmp_path: Path) -> None:
+        output_path = tmp_path / "instances_out.json"
+
+        YouTubeVISInstanceSegmentationTrackOutput(output_file=output_path).save(
+            label_input=_RLETrackInput()
+        )
+
+        [annotation] = json.loads(output_path.read_text())["annotations"]
+        assert isinstance(annotation["segmentations"][0], dict)
+        assert annotation["iscrowd"] == 0
+
+
+class _RLETrackInput(InstanceSegmentationTrackInput):
+    """Input with one binary mask track and no crowd flag."""
+
+    _video = Video(id=5, filename="video1", width=3, height=2, number_of_frames=1)
+    _category = Category(id=1, name="cat")
+
+    @staticmethod
+    def add_cli_arguments(parser: ArgumentParser) -> None:
+        pass
+
+    def get_categories(self) -> Iterable[Category]:
+        return [self._category]
+
+    def get_videos(self) -> Iterable[Video]:
+        return [self._video]
+
+    def get_labels(self) -> Iterable[VideoInstanceSegmentationTrack]:
+        mask = BinaryMaskSegmentation.from_binary_mask(
+            binary_mask=np.array([[0, 1, 1], [0, 1, 1]], dtype=int),
+            bounding_box=BoundingBox(xmin=1.0, ymin=0.0, xmax=3.0, ymax=2.0),
+        )
+        return [
+            VideoInstanceSegmentationTrack(
+                video=self._video,
+                objects=[
+                    SingleInstanceSegmentationTrack(
+                        category=self._category,
+                        segmentations=[mask],
+                        object_track_id=20,
+                    )
+                ],
+            )
+        ]
 
 
 def _write_youtube_vis_json(input_file: Path) -> Path:
