@@ -51,7 +51,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
-          python-version: "3.12"
+          python-version: "3.15"
 
       - name: Assert the tag matches the version it points at
         run: |
@@ -81,16 +81,16 @@ jobs:
       - name: Build the distributions
         run: make build
         env:
-          UV_PYTHON: "3.12"
+          UV_PYTHON: "3.15"
 
-      # 30 days, the longest that a deployment waits for approval.
+      # A day, as releasers approve at once. A later approval fails, see RELEASE.md.
       - name: Upload the distributions
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: dist
           path: dist
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 1
 
   publish:
     needs: build
@@ -115,6 +115,7 @@ jobs:
       - name: Publish to the index
         uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
+          # `/legacy/` is the name of PyPI's only upload API.
           repository-url: >-
             ${{ env.TARGET == 'pypi' && 'https://upload.pypi.org/legacy/'
             || 'https://test.pypi.org/legacy/' }}

@@ -50,8 +50,8 @@ A pre-release also publishes to PyPI. For a pre-release, use a pre-release versi
 
 Publishing the release starts
 [Publish to PyPI](https://github.com/lightly-ai/labelformat/actions/workflows/publish.yml). It
-builds the package from the tag and waits for approval of the `pypi` environment. Approve it
-within 30 days, after which the run expires.
+builds the package and waits for approval. Within a day, open the run and click **Review
+deployments** > **Approve and deploy**. After a day, the package expires: run the workflow again.
 
 ### 4. Check the release
 
@@ -70,6 +70,5 @@ with the tag and `target` set to `pypi`. Files that are already on PyPI are skip
 ## Rehearse on TestPyPI
 
 Run [Publish to PyPI](https://github.com/lightly-ai/labelformat/actions/workflows/publish.yml)
-manually from `main` with an existing tag and `target` set to `testpypi`. This does not need a
-GitHub release. If the version is already on TestPyPI, the upload is skipped and the run still
-passes, so only a version that is new on TestPyPI tests the upload.
+manually from `main` with an existing tag and `target` set to `testpypi`. If the version is
+already on TestPyPI, the upload is skipped, so only a new version tests the upload.
