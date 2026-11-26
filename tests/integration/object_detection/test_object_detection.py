@@ -33,9 +33,9 @@ def test_coco_to_coco(tmp_path: Path) -> None:
     # - licenses
     # - <category>.supercategory
     # - <image>.date_captured
+    # The output writes new annotation ids and computes the area itself:
     # - <annotation>.id
     # - <annotation>.area
-    # - <annotation>.iscrowd
     del expected_json["info"]
     del expected_json["licenses"]
     for category in expected_json["categories"]:
@@ -45,7 +45,9 @@ def test_coco_to_coco(tmp_path: Path) -> None:
     for annotation in expected_json["annotations"]:
         del annotation["id"]
         del annotation["area"]
-        del annotation["iscrowd"]
+    for annotation in output_json["annotations"]:
+        del annotation["id"]
+        del annotation["area"]
     assert output_json == expected_json
 
 

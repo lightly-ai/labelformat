@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import List, TypedDict
 
 from labelformat.model.binary_mask_segmentation import (
@@ -89,3 +90,36 @@ def get_coco_segmentation(
         )
     else:
         raise ValueError(f"Unsupported segmentation type: {type(segmentation)}")
+
+
+def get_coco_area(
+    segmentation: COCOInstanceSegmentationRLE | COCOInstanceSegmentationMultiPolygon,
+) -> float:
+    """Returns the area in pixels of a COCO segmentation.
+
+    Args:
+        segmentation: An RLE mask or a list of polygons in COCO format.
+
+    Returns:
+        The number of foreground pixels for an RLE mask, or the sum of the
+        polygon areas for a list of polygons.
+    """
+    if isinstance(segmentation, dict):
+        # Foreground runs are at odd indices.
+        return float(sum(segmentation["counts"][1::2]))
+    return float(sum(_polygon_area(polygon) for polygon in segmentation))
+
+
+def _polygon_area(polygon: Sequence[float]) -> float:
+    """Returns the area of a polygon with the shoelace formula.
+
+    Args:
+        polygon: The polygon as a flat list of x and y coordinates.
+
+    Returns:
+        The area of the polygon.
+    """
+    xs = polygon[0::2]
+    ys = polygon[1::2]
+    twice_area = sum(xs[i - 1] * ys[i] - xs[i] * ys[i - 1] for i in range(len(xs)))
+    return abs(twice_area) / 2

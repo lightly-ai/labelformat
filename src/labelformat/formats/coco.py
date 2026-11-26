@@ -185,12 +185,15 @@ class COCOObjectDetectionOutput(_COCOBaseOutput, ObjectDetectionOutput):
         data["annotations"] = []
         for label in label_input.get_labels():
             for obj in label.objects:
+                bbox = [float(v) for v in obj.box.to_format(BoundingBoxFormat.XYWH)]
                 annotation = {
+                    # COCO annotation IDs start at 1.
+                    "id": len(data["annotations"]) + 1,
                     "image_id": label.image.id,
                     "category_id": obj.category.id,
-                    "bbox": [
-                        float(v) for v in obj.box.to_format(BoundingBoxFormat.XYWH)
-                    ],
+                    "bbox": bbox,
+                    "area": bbox[2] * bbox[3],
+                    "iscrowd": 0,
                 }
                 if obj.confidence is not None:
                     annotation["score"] = obj.confidence
@@ -219,9 +222,12 @@ class COCOInstanceSegmentationOutput(_COCOBaseOutput, InstanceSegmentationOutput
                     isinstance(obj, COCOSingleInstanceSegmentation) and obj.is_crowd
                 )
                 annotation = {
+                    # COCO annotation IDs start at 1.
+                    "id": len(data["annotations"]) + 1,
                     "image_id": label.image.id,
                     "category_id": obj.category.id,
                     "bbox": bbox,
+                    "area": segmentation_helpers.get_coco_area(segmentation),
                     "iscrowd": int(is_crowd),
                     "segmentation": segmentation,
                 }

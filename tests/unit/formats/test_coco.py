@@ -10,6 +10,7 @@ from labelformat.formats.coco import (
     COCOObjectDetectionOutput,
     COCOSingleInstanceSegmentation,
 )
+from labelformat.formats.labelformat import LabelformatObjectDetectionInput
 from labelformat.model.binary_mask_segmentation import BinaryMaskSegmentation
 from labelformat.model.bounding_box import BoundingBox
 from labelformat.model.category import Category
@@ -24,6 +25,8 @@ from ... import simple_object_detection_label_input
 from ...simple_instance_segmentation_label_input import (
     SimpleInstanceSegmentationInputWithBinaryMask,
 )
+
+_FIXTURES_DIR = Path(__file__).parent.parent.parent / "fixtures"
 
 
 def _create_coco_file(tmp_path: Path, with_score: bool) -> Path:
@@ -96,20 +99,51 @@ class TestCOCOObjectDetectionOutput:
         output_json = json.loads(output_file.read_text())
         expected_annotations = [
             {
+                "id": 1,
                 "image_id": 0,
                 "category_id": 1,
                 "bbox": [10.0, 20.0, 20.0, 20.0],
+                "area": 400.0,
+                "iscrowd": 0,
             },
             {
+                "id": 2,
                 "image_id": 0,
                 "category_id": 0,
                 "bbox": [50.0, 60.0, 20.0, 20.0],
+                "area": 400.0,
+                "iscrowd": 0,
             },
         ]
         if with_confidence:
             expected_annotations[0]["score"] = 0.4
             expected_annotations[1]["score"] = 0.8
         assert output_json["annotations"] == expected_annotations
+
+    def test_save__area(self, tmp_path: Path) -> None:
+        output_file = tmp_path / "train.json"
+        image = Image(id=0, filename="image.jpg", width=100, height=200)
+        category = Category(id=0, name="cat")
+        label_input = LabelformatObjectDetectionInput(
+            categories=[category],
+            images=[image],
+            labels=[
+                ImageObjectDetection(
+                    image=image,
+                    objects=[
+                        SingleObjectDetection(
+                            category=category,
+                            box=BoundingBox(xmin=10.0, ymin=20.0, xmax=20.0, ymax=50.0),
+                        )
+                    ],
+                )
+            ],
+        )
+
+        COCOObjectDetectionOutput(output_file=output_file).save(label_input=label_input)
+
+        [annotation] = json.loads(output_file.read_text())["annotations"]
+        assert annotation["area"] == 300.0
 
 
 class TestCOCOInstanceSegmentationInput:
@@ -202,6 +236,33 @@ class TestCOCOInstanceSegmentationOutput:
             dict,
         ]
         assert [annotation["iscrowd"] for annotation in annotations] == [0, 0]
+
+    def test_save__id_and_area(self, tmp_path: Path) -> None:
+        # The input has a 10x10 polygon and a binary mask with 2 foreground pixels.
+        output_file = tmp_path / "output.json"
+
+        COCOInstanceSegmentationOutput(output_file=output_file).save(
+            label_input=SimpleInstanceSegmentationInputWithBinaryMask()
+        )
+
+        annotations = json.loads(output_file.read_text())["annotations"]
+        assert [annotation["id"] for annotation in annotations] == [1, 2]
+        assert [annotation["area"] for annotation in annotations] == [100.0, 2.0]
+
+    def test_save__area_matches_coco_dataset(self, tmp_path: Path) -> None:
+        # The fixture holds polygon annotations from the COCO dataset with their areas.
+        input_file = _FIXTURES_DIR / "instance_segmentation/COCO/instances.json"
+        output_file = tmp_path / "output.json"
+
+        COCOInstanceSegmentationOutput(output_file=output_file).save(
+            label_input=COCOInstanceSegmentationInput(input_file=input_file)
+        )
+
+        input_annotations = json.loads(input_file.read_text())["annotations"]
+        output_annotations = json.loads(output_file.read_text())["annotations"]
+        assert [annotation["area"] for annotation in output_annotations] == [
+            pytest.approx(annotation["area"]) for annotation in input_annotations
+        ]
 
 
 def _create_coco_instance_segmentation_file(
