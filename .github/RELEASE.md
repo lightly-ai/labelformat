@@ -7,18 +7,11 @@ workflow uploads the package with
 [trusted publishing](https://docs.pypi.org/trusted-publishers/). Nobody needs a PyPI token or
 password.
 
-## One-time setup
+## Repository settings
 
-Without this setup, anyone with write access can publish.
-
-1. In **Settings** > **Environments**, create the `pypi` and `testpypi` environments. A job
-   that names a missing environment creates it without protection.
-2. For each environment, add the release maintainers as **Required reviewers**. Under
-   **Deployment branches and tags**, allow only the branch `main` and the tag pattern `v*`.
-3. On [PyPI](https://pypi.org/manage/project/labelformat/settings/publishing/) and
-   [TestPyPI](https://test.pypi.org/manage/project/labelformat/settings/publishing/), add a
-   trusted publisher: owner `lightly-ai`, repository `labelformat`, workflow `publish.yml`, and
-   environment `pypi` or `testpypi`.
+The `pypi` and `testpypi` environments require approval from the `lightly` team and allow only
+`main` and `v*` tags. Do not relax this: PyPI does not check the branch, so these settings are
+what stop a workflow edited on a branch from publishing.
 
 ## Release process
 
